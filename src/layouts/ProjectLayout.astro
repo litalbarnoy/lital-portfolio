@@ -1,0 +1,159 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "./BaseLayout.astro";
+import Reveal from "../components/Reveal.astro";
+import { getLang, ui } from "../i18n/ui";
+
+interface Props {
+  title: string;
+  subtitle: string;
+  role: string;
+  client: string;
+  year: number;
+  tags: string[];
+  cover: string;
+  gallery: string[];
+  next?: { href: string; title: string } | null;
+}
+
+const { title, subtitle, role, client, year, tags, cover, gallery, next } =
+  Astro.props;
+
+const lang = getLang(Astro.url.pathname);
+const t = ui[lang].project;
+---
+
+<BaseLayout title={title} description={subtitle}>
+  <article>
+    <header class="mx-auto grid max-w-6xl gap-10 px-6 pt-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14 lg:px-10 lg:pt-20">
+      <div class="flex flex-col lg:min-h-[68vh] lg:justify-between">
+        <div>
+          <p class="reveal text-sm font-medium text-accent">{role}</p>
+          <h1 class="reveal mt-3 font-display text-5xl font-bold leading-[0.95] lg:text-7xl">
+            {title}
+          </h1>
+        </div>
+
+        <div class="reveal mt-10 lg:mt-0">
+          <p class="max-w-md text-lg text-ink-soft">{subtitle}</p>
+          <dl class="mt-8 grid grid-cols-2 gap-6 border-t border-line pt-6">
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.role}</dt>
+              <dd class="mt-1 font-medium">{role}</dd>
+            </div>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.client}</dt>
+              <dd class="mt-1 font-medium">{client}</dd>
+            </div>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.year}</dt>
+              <dd class="mt-1 font-medium">{year}</dd>
+            </div>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.tags}</dt>
+              <dd class="mt-1 font-medium">{tags.join(" · ")}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="hero-frame-clip overflow-hidden rounded-sm lg:h-[68vh]" data-ripple>
+        <Image
+          src={cover}
+          inferSize
+          alt={title}
+          class="hero-frame-img aspect-[4/3] w-full object-cover lg:h-full"
+          widths={[800, 1200, 1600, 2000]}
+          sizes="(max-width: 1024px) 100vw, 55vw"
+        />
+      </div>
+    </header>
+
+    <div class="prose prose-project mx-auto max-w-3xl px-6 py-16 lg:px-10">
+      <slot />
+    </div>
+
+    {
+      gallery.length > 0 && (
+        <div class="mx-auto grid max-w-6xl gap-6 px-6 pb-20 md:grid-cols-2 lg:px-10">
+          {gallery.map((src) => (
+            <Reveal>
+              <Image
+                src={src}
+                inferSize
+                alt={title}
+                class="aspect-[4/3] w-full rounded-sm object-cover"
+                widths={[400, 800, 1200]}
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </Reveal>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      next && (
+        <a
+          href={next.href}
+          class="group block border-t border-line px-6 py-16 text-center lg:px-10"
+          data-cursor-hover
+        >
+          <p class="text-sm text-ink-soft">{t.next}</p>
+          <p class="link-underline mt-2 inline-block font-display text-3xl font-bold transition-transform duration-500 group-hover:-translate-y-1">
+            {next.title}
+          </p>
+        </a>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<script>
+  import gsap from "gsap";
+
+  function playHeroReveal() {
+    const clip = document.querySelector<HTMLElement>(".hero-frame-clip");
+    const img = document.querySelector<HTMLElement>(".hero-frame-img");
+    if (!clip || !img) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReducedMotion) return;
+
+    gsap.set(clip, { clipPath: "inset(15% round 4px)" });
+    gsap.set(img, { scale: 1.12 });
+
+    gsap.to(clip, {
+      clipPath: "inset(0% round 0px)",
+      duration: 1,
+      ease: "power3.out",
+      delay: 0.15,
+    });
+    gsap.to(img, {
+      scale: 1,
+      duration: 1.1,
+      ease: "power3.out",
+      delay: 0.15,
+    });
+  }
+
+  playHeroReveal();
+  document.addEventListener("astro:page-load", playHeroReveal);
+</script>
+
+<style>
+  .prose-project :global(h2) {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .prose-project :global(p) {
+    line-height: 1.9;
+    color: var(--color-ink);
+    margin-bottom: 1.25rem;
+  }
+</style>

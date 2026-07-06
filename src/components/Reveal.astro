@@ -1,0 +1,52 @@
+---
+interface Props {
+  as?: keyof HTMLElementTagNameMap;
+  class?: string;
+  delay?: number;
+}
+
+const { as: Tag = "div", class: className, delay = 0 } = Astro.props;
+---
+
+<Tag class:list={["reveal", className]} style={delay ? `--reveal-delay:${delay}` : undefined}>
+  <slot />
+</Tag>
+
+<script>
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  function setupReveals() {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReducedMotion) return;
+
+    const elements = gsap.utils.toArray<HTMLElement>(".reveal:not([data-reveal-done])");
+
+    ScrollTrigger.batch(elements, {
+      start: "top 88%",
+      once: true,
+      onEnter: (batch) => {
+        gsap.to(batch, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: "power2.out",
+          stagger: 0.08,
+        });
+        batch.forEach((el) => el.setAttribute("data-reveal-done", ""));
+      },
+    });
+  }
+
+  setupReveals();
+
+  if (!(window as any).__revealListenersInit) {
+    (window as any).__revealListenersInit = true;
+    document.addEventListener("astro:page-load", setupReveals);
+    document.addEventListener("astro:after-swap", () => ScrollTrigger.refresh());
+  }
+</script>

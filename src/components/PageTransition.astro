@@ -1,0 +1,60 @@
+---
+---
+
+<div class="page-transition-overlay" id="page-transition-overlay" aria-hidden="true"></div>
+
+<script>
+  import gsap from "gsap";
+
+  const COVERED = "polygon(0 0, 100% 0, 100% 100%, 0 100%)";
+  const HIDDEN_BOTTOM = "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)";
+  const HIDDEN_TOP = "polygon(0 0, 100% 0, 100% 0, 0 0)";
+
+  function getOverlay() {
+    return document.getElementById("page-transition-overlay");
+  }
+
+  function cover(): Promise<void> {
+    const overlay = getOverlay();
+    if (!overlay) return Promise.resolve();
+    gsap.set(overlay, { clipPath: HIDDEN_BOTTOM });
+    return new Promise((resolve) => {
+      gsap.to(overlay, {
+        clipPath: COVERED,
+        duration: 0.6,
+        ease: "power3.inOut",
+        onComplete: resolve,
+      });
+    });
+  }
+
+  function reveal() {
+    const overlay = getOverlay();
+    if (!overlay) return;
+    gsap.to(overlay, {
+      clipPath: HIDDEN_TOP,
+      duration: 0.6,
+      ease: "power3.inOut",
+      delay: 0.05,
+    });
+  }
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  if (!prefersReducedMotion && !(window as any).__pageTransitionInit) {
+    (window as any).__pageTransitionInit = true;
+    document.addEventListener("astro:before-preparation", (event: any) => {
+      const originalLoader = event.loader;
+      event.loader = async function () {
+        await cover();
+        await originalLoader();
+      };
+    });
+
+    document.addEventListener("astro:after-swap", () => {
+      reveal();
+    });
+  }
+</script>

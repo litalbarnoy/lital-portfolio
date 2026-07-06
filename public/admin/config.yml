@@ -1,0 +1,137 @@
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "product_design_he"
+    label: "עיצוב UX — עברית"
+    label_singular: "פרויקט UX"
+    folder: "src/content/product-design/he"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "title"
+    fields:
+      - { label: "כותרת", name: "title", widget: "string" }
+      - { label: "כותרת משנה", name: "subtitle", widget: "string" }
+      - { label: "תפקיד", name: "role", widget: "string" }
+      - { label: "לקוח", name: "client", widget: "string" }
+      - { label: "שנה", name: "year", widget: "number", value_type: "int" }
+      - { label: "תגיות", name: "tags", widget: "list" }
+      - label: "תמונת כיסוי (יחס רוחב-גובה מומלץ 16:10)"
+        name: "cover"
+        widget: "image"
+      - label: "גלריית תמונות (יחס מומלץ 4:3)"
+        name: "gallery"
+        widget: "list"
+        field: { label: "תמונה", name: "image", widget: "image" }
+      - label: "סדר הצגה ברשימה (מספר קטן = מוצג ראשון)"
+        name: "order"
+        widget: "number"
+        value_type: "int"
+      - label: "תוכן העמוד (האתגר / התהליך / הפתרון / תוצאות)"
+        name: "body"
+        widget: "markdown"
+
+  - name: "product_design_en"
+    label: "Product Design — English"
+    label_singular: "Product Design Project"
+    folder: "src/content/product-design/en"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "title"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Subtitle", name: "subtitle", widget: "string" }
+      - { label: "Role", name: "role", widget: "string" }
+      - { label: "Client", name: "client", widget: "string" }
+      - { label: "Year", name: "year", widget: "number", value_type: "int" }
+      - { label: "Tags", name: "tags", widget: "list" }
+      - label: "Cover image (recommended ratio 16:10)"
+        name: "cover"
+        widget: "image"
+      - label: "Gallery images (recommended ratio 4:3)"
+        name: "gallery"
+        widget: "list"
+        field: { label: "Image", name: "image", widget: "image" }
+      - label: "Display order (lower number = shown first)"
+        name: "order"
+        widget: "number"
+        value_type: "int"
+      - label: "Page content (Challenge / Process / Solution / Results)"
+        name: "body"
+        widget: "markdown"
+
+  - name: "curatorial_he"
+    label: "אוצרות — עברית"
+    label_singular: "פרויקט אוצרות"
+    folder: "src/content/curatorial/he"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "title"
+    fields:
+      - { label: "כותרת", name: "title", widget: "string" }
+      - { label: "כותרת משנה", name: "subtitle", widget: "string" }
+      - { label: "תפקיד", name: "role", widget: "string" }
+      - { label: "לקוח / מוסד", name: "client", widget: "string" }
+      - { label: "שנה", name: "year", widget: "number", value_type: "int" }
+      - { label: "תגיות", name: "tags", widget: "list" }
+      - label: "תמונת כיסוי (יחס רוחב-גובה מומלץ 16:10)"
+        name: "cover"
+        widget: "image"
+      - label: "גלריית תמונות (יחס מומלץ 4:3)"
+        name: "gallery"
+        widget: "list"
+        field: { label: "תמונה", name: "image", widget: "image" }
+      - label: "סדר הצגה ברשימה (מספר קטן = מוצג ראשון)"
+        name: "order"
+        widget: "number"
+        value_type: "int"
+      - label: "תוכן העמוד (הרעיון / התהליך / התוצאה / הדים)"
+        name: "body"
+        widget: "markdown"
+
+  - name: "curatorial_en"
+    label: "Curatorial — English"
+    label_singular: "Curatorial Project"
+    folder: "src/content/curatorial/en"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "title"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Subtitle", name: "subtitle", widget: "string" }
+      - { label: "Role", name: "role", widget: "string" }
+      - { label: "Client / Institution", name: "client", widget: "string" }
+      - { label: "Year", name: "year", widget: "number", value_type: "int" }
+      - { label: "Tags", name: "tags", widget: "list" }
+      - label: "Cover image (recommended ratio 16:10)"
+        name: "cover"
+        widget: "image"
+      - label: "Gallery images (recommended ratio 4:3)"
+        name: "gallery"
+        widget: "list"
+        field: { label: "Image", name: "image", widget: "image" }
+      - label: "Display order (lower number = shown first)"
+        name: "order"
+        widget: "number"
+        value_type: "int"
+      - label: "Page content (Idea / Process / Result / Reception)"
+        name: "body"
+        widget: "markdown"

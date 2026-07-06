@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #ffffff;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #6f6f6f;
+  --color-accent: #0a0a0a;
+  --color-line: #e5e5e5;
+
+  --font-display: "Frank Ruhl Libre", "David Libre", serif;
+  --font-body: "Assistant", "Heebo", sans-serif;
+
+  --ease-expo: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-io: cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+/* Wagon — display serif for English headlines only (commercial license required, see EULA) */
+@font-face {
+  font-family: "Wagon";
+  src: url("/fonts/wagon/Wagon-ExtraLight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wagon";
+  src: url("/fonts/wagon/Wagon-ExtraLightItalic.otf") format("opentype");
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wagon";
+  src: url("/fonts/wagon/Wagon-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* English pages use Wagon + Geist Sans; Hebrew keeps the Hebrew pairing */
+:dir(ltr) {
+  --font-display: "Wagon", "Frank Ruhl Libre", serif;
+  --font-body: "Geist", "Assistant", sans-serif;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* underline-grow link hover */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform-origin: 100% 0;
+  transform: scaleX(0);
+  transition: transform 0.4s var(--ease-expo);
+}
+
+:dir(ltr) .link-underline::after {
+  transform-origin: 0 0;
+}
+
+.link-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* custom cursor — desktop pointer devices only */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  mix-blend-mode: difference;
+  pointer-events: none;
+  z-index: 9999;
+  clip-path: circle(35%);
+  transform: translate(-50%, -50%);
+  transition: clip-path 0.3s var(--ease-expo);
+  will-change: transform;
+}
+
+.cursor-dot.is-active {
+  clip-path: circle(50%);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot {
+    display: none;
+  }
+}
+
+/* full-screen page transition overlay */
+.page-transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--color-ink);
+  pointer-events: none;
+  clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+}
+
+/* scroll reveal — initial state, cleared by GSAP ScrollTrigger */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .cursor-dot,
+  .page-transition-overlay {
+    display: none;
+  }
+}

@@ -1,0 +1,38 @@
+---
+---
+
+<script>
+  import Lenis from "lenis";
+  import gsap from "gsap";
+
+  function initLenis() {
+    if ((window as any).__lenis) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReducedMotion) return;
+
+    const lenis = new Lenis({
+      lerp: 0.1,
+      wheelMultiplier: 1,
+      syncTouch: false,
+    });
+
+    function raf(time: number) {
+      // GSAP's ticker reports time in seconds; Lenis expects milliseconds.
+      lenis.raf(time * 1000);
+    }
+
+    gsap.ticker.add(raf);
+    gsap.ticker.lagSmoothing(0);
+
+    (window as any).__lenis = lenis;
+  }
+
+  initLenis();
+
+  document.addEventListener("astro:after-swap", () => {
+    (window as any).__lenis?.scrollTo(0, { immediate: true });
+  });
+</script>

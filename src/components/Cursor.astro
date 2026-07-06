@@ -1,0 +1,41 @@
+---
+---
+
+<div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
+
+<script>
+  const isDesktopPointer = window.matchMedia(
+    "(hover: hover) and (pointer: fine)"
+  ).matches;
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  if (isDesktopPointer && !prefersReducedMotion && !(window as any).__cursorInit) {
+    (window as any).__cursorInit = true;
+    const dot = document.getElementById("cursor-dot")!;
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let posX = mouseX;
+    let posY = mouseY;
+
+    window.addEventListener("mousemove", (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function tick() {
+      posX += (mouseX - posX) * 0.18;
+      posY += (mouseY - posY) * 0.18;
+      dot.style.transform = `translate(${posX}px, ${posY}px) translate(-50%, -50%)`;
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    document.addEventListener("pointerover", (e) => {
+      const target = e.target as HTMLElement;
+      const interactive = target.closest("a, button, [data-cursor-hover]");
+      dot.classList.toggle("is-active", !!interactive);
+    });
+  }
+</script>

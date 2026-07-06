@@ -1,0 +1,45 @@
+---
+import { getCollection, render } from "astro:content";
+import ProjectLayout from "../../layouts/ProjectLayout.astro";
+import { stripLocale } from "../../i18n/ui";
+
+export async function getStaticPaths() {
+  const projects = (await getCollection("curatorial"))
+    .filter((e) => e.id.startsWith("he/"))
+    .sort((a, b) => a.data.order - b.data.order);
+
+  return projects.map((project, index) => {
+    const nextProject = projects[(index + 1) % projects.length];
+    return {
+      params: { slug: stripLocale(project.id) },
+      props: {
+        project,
+        next:
+          projects.length > 1
+            ? {
+                href: `/curatorial/${stripLocale(nextProject.id)}`,
+                title: nextProject.data.title,
+              }
+            : null,
+      },
+    };
+  });
+}
+
+const { project, next } = Astro.props;
+const { Content } = await render(project);
+---
+
+<ProjectLayout
+  title={project.data.title}
+  subtitle={project.data.subtitle}
+  role={project.data.role}
+  client={project.data.client}
+  year={project.data.year}
+  tags={project.data.tags}
+  cover={project.data.cover}
+  gallery={project.data.gallery}
+  next={next}
+>
+  <Content />
+</ProjectLayout>

@@ -1,0 +1,70 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Reveal from "../../components/Reveal.astro";
+---
+
+<BaseLayout
+  title="About"
+  description="A little about me — Lital Bar Noy, UX Designer and Curator."
+>
+  <section class="mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:px-10 lg:py-24">
+    <div class="flex flex-col lg:min-h-[70vh] lg:justify-between">
+      <Reveal as="h1" class="font-display text-6xl font-bold leading-[0.95] lg:text-8xl">
+        About
+      </Reveal>
+
+      <div>
+        <Reveal as="div" class="mt-10 space-y-5 text-lg leading-relaxed text-ink-soft lg:mt-0">
+          <p>
+            I'm Lital Bar Noy, a UX designer and curator. I work across two
+            fields that look different on the surface — digital design and art
+            curation — but to me they're the exact same craft: figuring out
+            what actually matters to say, and arranging it so the person in
+            front of me understands it without effort.
+          </p>
+          <p>
+            In product design I always start with research — in the field,
+            with real users — never with a sketch. In curatorial work I
+            believe the space itself is part of the statement, not just a
+            frame to hang work on.
+          </p>
+          <p>
+            My approach is simple: less is more, every design decision has to
+            answer a real question, and no project is finished until it's been
+            tested with real people.
+          </p>
+        </Reveal>
+
+        <Reveal as="div" class="mt-8 flex flex-wrap gap-6">
+          <a
+            href="mailto:hello@litalbarnoy.com"
+            class="link-underline text-sm font-medium"
+            data-cursor-hover
+          >
+            hello@litalbarnoy.com
+          </a>
+          <a
+            href="https://www.linkedin.com"
+            target="_blank"
+            rel="noopener"
+            class="link-underline text-sm font-medium"
+            data-cursor-hover
+          >
+            LinkedIn
+          </a>
+        </Reveal>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-sm lg:h-[70vh]" data-ripple>
+      <Image
+        src="https://placehold.co/900x1100/E4DCD0/1a1a18.png?text=Lital+Bar+Noy"
+        inferSize
+        alt="Lital Bar Noy"
+        crossorigin="anonymous"
+        class="aspect-[9/11] w-full object-cover lg:h-full"
+      />
+    </div>
+  </section>
+</BaseLayout>

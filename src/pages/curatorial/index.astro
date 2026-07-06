@@ -1,0 +1,37 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Reveal from "../../components/Reveal.astro";
+import ProjectGrid from "../../components/ProjectGrid.astro";
+import { stripLocale } from "../../i18n/ui";
+
+const projects = (await getCollection("curatorial"))
+  .filter((e) => e.id.startsWith("he/"))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((project) => ({
+    href: `/curatorial/${stripLocale(project.id)}`,
+    title: project.data.title,
+    subtitle: project.data.subtitle,
+    cover: project.data.cover,
+    year: project.data.year,
+    tags: project.data.tags,
+  }));
+---
+
+<BaseLayout
+  title="אוצרות"
+  description="פרויקטי אוצרות ותערוכות מאת ליטל בר נוי."
+>
+  <section class="mx-auto max-w-6xl px-6 pt-16 lg:px-10 lg:pt-24">
+    <Reveal as="h1" class="font-display text-4xl font-bold lg:text-6xl">
+      אוצרות
+    </Reveal>
+    <Reveal as="p" class="mt-4 max-w-xl text-lg text-ink-soft">
+      תערוכות ופרויקטים אמנותיים, מהרעיון האוצרותי ועד החוויה בחלל.
+    </Reveal>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 py-16 lg:px-10">
+    <ProjectGrid projects={projects} />
+  </section>
+</BaseLayout>

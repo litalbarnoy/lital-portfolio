@@ -1,0 +1,26 @@
+---
+import { getLang, ui } from "../i18n/ui";
+
+const year = new Date().getFullYear();
+const lang = getLang(Astro.url.pathname);
+const t = ui[lang];
+const brandName = lang === "en" ? "Lital Bar Noy" : "ליטל בר נוי";
+---
+
+<footer class="border-t border-line px-6 py-12 lg:px-10">
+  <div class="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+    <div>
+      <p class="font-display text-lg font-bold">{brandName}</p>
+      <p class="mt-1 text-sm text-ink-soft">{t.footer.tagline}</p>
+    </div>
+    <div class="flex gap-6 text-sm">
+      <a href="mailto:hello@litalbarnoy.com" class="link-underline" data-cursor-hover>
+        hello@litalbarnoy.com
+      </a>
+      <a href="https://www.linkedin.com" target="_blank" rel="noopener" class="link-underline" data-cursor-hover>
+        {t.footer.linkedin}
+      </a>
+    </div>
+    <p class="text-sm text-ink-soft">© {year} {t.footer.rights}</p>
+  </div>
+</footer>

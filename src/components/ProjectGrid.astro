@@ -1,0 +1,98 @@
+---
+import ProjectCard from "./ProjectCard.astro";
+import ProjectListRow from "./ProjectListRow.astro";
+import { getLang, ui } from "../i18n/ui";
+
+interface Project {
+  href: string;
+  title: string;
+  subtitle: string;
+  cover: string;
+  year: number;
+  tags: string[];
+}
+
+interface Props {
+  projects: Project[];
+}
+
+const { projects } = Astro.props;
+const lang = getLang(Astro.url.pathname);
+const t = ui[lang].project;
+---
+
+<div class="project-view">
+  <div class="mb-10 flex gap-8 border-b border-line">
+    <button
+      type="button"
+      class="view-tab is-active border-b-2 border-ink pb-3 text-sm font-medium"
+      data-view-btn="card"
+    >
+      {t.cardView}
+    </button>
+    <button
+      type="button"
+      class="view-tab border-b-2 border-transparent pb-3 text-sm font-medium text-ink-soft"
+      data-view-btn="list"
+    >
+      {t.listView}
+    </button>
+  </div>
+
+  <div data-view-panel="card" class="grid gap-10 md:grid-cols-2">
+    {
+      projects.map((project) => (
+        <ProjectCard
+          href={project.href}
+          title={project.title}
+          subtitle={project.subtitle}
+          cover={project.cover}
+          year={project.year}
+        />
+      ))
+    }
+  </div>
+
+  <div data-view-panel="list" class="hidden">
+    {
+      projects.map((project) => (
+        <ProjectListRow
+          href={project.href}
+          title={project.title}
+          subtitle={project.subtitle}
+          year={project.year}
+          tags={project.tags}
+        />
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  function setupViewToggle() {
+    document.querySelectorAll<HTMLElement>(".project-view").forEach((root) => {
+      if (root.dataset.viewBound) return;
+      root.dataset.viewBound = "true";
+
+      const buttons = root.querySelectorAll<HTMLButtonElement>("[data-view-btn]");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const view = btn.dataset.viewBtn;
+          buttons.forEach((b) => {
+            const active = b === btn;
+            b.classList.toggle("is-active", active);
+            b.classList.toggle("border-ink", active);
+            b.classList.toggle("border-transparent", !active);
+            b.classList.toggle("text-ink-soft", !active);
+          });
+          root.querySelectorAll<HTMLElement>("[data-view-panel]").forEach((panel) => {
+            panel.classList.toggle("hidden", panel.dataset.viewPanel !== view);
+          });
+        });
+      });
+    });
+  }
+
+  setupViewToggle();
+  document.addEventListener("astro:page-load", setupViewToggle);
+</script>

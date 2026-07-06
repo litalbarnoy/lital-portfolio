@@ -1,0 +1,28 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  subtitle: string;
+  year: number;
+  tags: string[];
+}
+
+const { href, title, subtitle, year, tags } = Astro.props;
+---
+
+<a
+  href={href}
+  class="link-underline group flex items-center justify-between gap-6 border-b border-line py-6"
+  data-cursor-hover
+>
+  <div>
+    <h3 class="font-display text-xl font-semibold transition-transform duration-300 group-hover:-translate-y-0.5 lg:text-2xl">
+      {title}
+    </h3>
+    <p class="mt-1 text-sm text-ink-soft">{subtitle}</p>
+  </div>
+  <div class="hidden shrink-0 text-sm text-ink-soft md:block">
+    {tags.slice(0, 2).join(" · ")}
+  </div>
+  <div class="shrink-0 text-sm text-ink-soft">{year}</div>
+</a>
