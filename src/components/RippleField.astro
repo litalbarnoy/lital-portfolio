@@ -28,6 +28,8 @@
   import * as THREE from "three";
   import gsap from "gsap";
 
+  type RippleSource = HTMLImageElement | HTMLCanvasElement;
+
   const VERTEX_SHADER = `
     varying vec2 vUv;
     void main() {
@@ -163,7 +165,7 @@
       rafId = requestAnimationFrame(render);
     }
 
-    function attachTo(source: HTMLCanvasElement, rect: DOMRect) {
+    function attachTo(source: RippleSource, rect: DOMRect) {
       activeRect = rect;
       canvas.style.width = `${rect.width}px`;
       canvas.style.height = `${rect.height}px`;
@@ -193,18 +195,14 @@
       });
     }
 
-    document.querySelectorAll<HTMLElement>("[data-ripple-text]").forEach((el) => {
-      if (el.dataset.rippleBound) return;
-      el.dataset.rippleBound = "true";
-
-      el.addEventListener("mouseenter", () => {
+    function bindMouseTracking(container: HTMLElement, getSource: () => RippleSource) {
+      container.addEventListener("mouseenter", () => {
         lastX = -1;
         lastY = -1;
-        el.classList.add("ripple-text-hidden");
-        attachTo(buildTextTexture(el), el.getBoundingClientRect());
+        attachTo(getSource(), container.getBoundingClientRect());
       });
 
-      el.addEventListener("mousemove", (e: MouseEvent) => {
+      container.addEventListener("mousemove", (e: MouseEvent) => {
         if (!activeRect) return;
         const x = (e.clientX - activeRect.left) / activeRect.width;
         const y = 1 - (e.clientY - activeRect.top) / activeRect.height;
@@ -217,7 +215,23 @@
         lastX = e.clientX;
         lastY = e.clientY;
       });
+    }
 
+    document.querySelectorAll<HTMLImageElement>("[data-ripple] img").forEach((img) => {
+      const container = img.closest<HTMLElement>("[data-ripple]");
+      if (!container || container.dataset.rippleBound) return;
+      container.dataset.rippleBound = "true";
+
+      bindMouseTracking(container, () => img);
+      container.addEventListener("mouseleave", detach);
+    });
+
+    document.querySelectorAll<HTMLElement>("[data-ripple-text]").forEach((el) => {
+      if (el.dataset.rippleBound) return;
+      el.dataset.rippleBound = "true";
+
+      bindMouseTracking(el, () => buildTextTexture(el));
+      el.addEventListener("mouseenter", () => el.classList.add("ripple-text-hidden"));
       el.addEventListener("mouseleave", () => {
         el.classList.remove("ripple-text-hidden");
         detach();

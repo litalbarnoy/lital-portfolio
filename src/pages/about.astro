@@ -1,7 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Reveal from "../components/Reveal.astro";
-import HoverDistortImage from "../components/HoverDistortImage.astro";
 ---
 
 <BaseLayout
@@ -53,10 +53,15 @@ import HoverDistortImage from "../components/HoverDistortImage.astro";
       </div>
     </div>
 
-    <HoverDistortImage
-      image1="/images/imports/about/portrait.webp"
-      alt="ליטל בר נוי"
-      class="aspect-[9/11] w-full rounded-sm lg:h-[70vh]"
-    />
+    <div class="overflow-hidden rounded-sm lg:h-[70vh]" data-ripple>
+      <Image
+        src="/images/imports/about/portrait.webp"
+        width={900}
+        height={1100}
+        alt="ליטל בר נוי"
+        crossorigin="anonymous"
+        class="aspect-[9/11] w-full object-cover lg:h-full"
+      />
+    </div>
   </section>
 </BaseLayout>

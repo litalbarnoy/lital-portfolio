@@ -1,25 +1,28 @@
 ---
-import HoverDistortImage from "./HoverDistortImage.astro";
+import { Image } from "astro:assets";
 
 interface Props {
   href: string;
   title: string;
   subtitle: string;
   cover: string;
-  image2?: string;
   year: number;
 }
 
-const { href, title, subtitle, cover, image2, year } = Astro.props;
+const { href, title, subtitle, cover, year } = Astro.props;
 ---
 
 <a href={href} class="reveal group block" data-cursor-hover>
-  <div class="relative overflow-hidden rounded-sm bg-line">
-    <HoverDistortImage
-      image1={cover}
-      image2={image2}
+  <div class="relative overflow-hidden rounded-sm bg-line" data-ripple>
+    <Image
+      src={cover}
+      width={1600}
+      height={1000}
       alt={title}
-      class="aspect-[16/10] w-full"
+      crossorigin="anonymous"
+      class="aspect-[16/10] w-full object-cover"
+      widths={[400, 800, 1200, 1600]}
+      sizes="(max-width: 768px) 100vw, 50vw"
     />
     <div
       class="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
