@@ -60,7 +60,8 @@ const t = ui[lang].project;
       <div class="hero-frame-clip overflow-hidden rounded-sm lg:h-[68vh]" data-ripple>
         <Image
           src={cover}
-          inferSize
+          width={1800}
+          height={1350}
           alt={title}
           class="hero-frame-img aspect-[4/3] w-full object-cover lg:h-full"
           widths={[800, 1200, 1600, 2000]}
@@ -76,18 +77,30 @@ const t = ui[lang].project;
     {
       gallery.length > 0 && (
         <div class="mx-auto grid max-w-6xl gap-6 px-6 pb-20 md:grid-cols-2 lg:px-10">
-          {gallery.map((src) => (
-            <Reveal>
-              <Image
-                src={src}
-                inferSize
-                alt={title}
-                class="aspect-[4/3] w-full rounded-sm object-cover"
-                widths={[400, 800, 1200]}
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </Reveal>
-          ))}
+          {gallery.map((src) =>
+            src.endsWith(".gif") ? (
+              <Reveal>
+                <img
+                  src={src}
+                  alt={title}
+                  loading="lazy"
+                  class="aspect-[4/3] w-full rounded-sm object-cover"
+                />
+              </Reveal>
+            ) : (
+              <Reveal>
+                <Image
+                  src={src}
+                  width={1200}
+                  height={900}
+                  alt={title}
+                  class="aspect-[4/3] w-full rounded-sm object-cover"
+                  widths={[400, 800, 1200]}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </Reveal>
+            )
+          )}
         </div>
       )
     }

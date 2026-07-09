@@ -4,6 +4,9 @@
 <script>
   import Lenis from "lenis";
   import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
 
   function initLenis() {
     if ((window as any).__lenis) return;
@@ -19,6 +22,9 @@
       syncTouch: false,
     });
 
+    // Keep ScrollTrigger's trigger positions in sync with Lenis's virtual scroll.
+    lenis.on("scroll", ScrollTrigger.update);
+
     function raf(time: number) {
       // GSAP's ticker reports time in seconds; Lenis expects milliseconds.
       lenis.raf(time * 1000);
@@ -28,6 +34,8 @@
     gsap.ticker.lagSmoothing(0);
 
     (window as any).__lenis = lenis;
+
+    requestAnimationFrame(() => ScrollTrigger.refresh());
   }
 
   initLenis();

@@ -24,7 +24,14 @@ const { as: Tag = "div", class: className, delay = 0 } = Astro.props;
     ).matches;
     if (prefersReducedMotion) return;
 
-    const elements = gsap.utils.toArray<HTMLElement>(".reveal:not([data-reveal-done])");
+    const elements = gsap.utils.toArray<HTMLElement>(
+      ".reveal:not([data-reveal-claimed])"
+    );
+    if (!elements.length) return;
+
+    // Claim synchronously so overlapping setup calls never create
+    // duplicate/competing ScrollTrigger batches for the same elements.
+    elements.forEach((el) => el.setAttribute("data-reveal-claimed", ""));
 
     ScrollTrigger.batch(elements, {
       start: "top 88%",
@@ -37,7 +44,6 @@ const { as: Tag = "div", class: className, delay = 0 } = Astro.props;
           ease: "power2.out",
           stagger: 0.08,
         });
-        batch.forEach((el) => el.setAttribute("data-reveal-done", ""));
       },
     });
   }
