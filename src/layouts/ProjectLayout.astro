@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import Reveal from "../components/Reveal.astro";
+import HoverDistortImage from "../components/HoverDistortImage.astro";
 import { getLang, ui } from "../i18n/ui";
 
 interface Props {
@@ -57,15 +58,12 @@ const t = ui[lang].project;
         </div>
       </div>
 
-      <div class="hero-frame-clip overflow-hidden rounded-sm lg:h-[68vh]" data-ripple>
-        <Image
-          src={cover}
-          width={1800}
-          height={1350}
+      <div class="hero-frame-clip overflow-hidden rounded-sm lg:h-[68vh]">
+        <HoverDistortImage
+          image1={cover}
+          image2={gallery[0]}
           alt={title}
-          class="hero-frame-img aspect-[4/3] w-full object-cover lg:h-full"
-          widths={[800, 1200, 1600, 2000]}
-          sizes="(max-width: 1024px) 100vw, 55vw"
+          class="hero-frame-img aspect-[4/3] w-full lg:h-full"
         />
       </div>
     </header>
@@ -113,7 +111,7 @@ const t = ui[lang].project;
           data-cursor-hover
         >
           <p class="text-sm text-ink-soft">{t.next}</p>
-          <p class="link-underline mt-2 inline-block font-display text-3xl font-bold transition-transform duration-500 group-hover:-translate-y-1">
+          <p class="link-underline mt-2 inline-block text-3xl font-bold transition-transform duration-500 group-hover:-translate-y-1">
             {next.title}
           </p>
         </a>
@@ -158,7 +156,6 @@ const t = ui[lang].project;
 
 <style>
   .prose-project :global(h2) {
-    font-family: var(--font-display);
     font-size: 1.5rem;
     font-weight: 700;
     margin-top: 2.5rem;

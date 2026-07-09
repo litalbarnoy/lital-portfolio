@@ -1,37 +1,34 @@
 ---
-import { Image } from "astro:assets";
+import HoverDistortImage from "./HoverDistortImage.astro";
 
 interface Props {
   href: string;
   title: string;
   subtitle: string;
   cover: string;
+  image2?: string;
   year: number;
 }
 
-const { href, title, subtitle, cover, year } = Astro.props;
+const { href, title, subtitle, cover, image2, year } = Astro.props;
 ---
 
 <a href={href} class="reveal group block" data-cursor-hover>
-  <div class="relative overflow-hidden rounded-sm bg-line" data-ripple>
-    <Image
-      src={cover}
-      width={1600}
-      height={1000}
+  <div class="relative overflow-hidden rounded-sm bg-line">
+    <HoverDistortImage
+      image1={cover}
+      image2={image2}
       alt={title}
-      crossorigin="anonymous"
-      class="aspect-[16/10] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-      widths={[400, 800, 1200, 1600]}
-      sizes="(max-width: 768px) 100vw, 50vw"
+      class="aspect-[16/10] w-full"
     />
     <div
-      class="absolute inset-0 flex items-end bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+      class="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
     >
-      <span class="p-6 font-display text-lg font-semibold text-cream">{title}</span>
+      <span class="p-6 font-bold text-lg text-cream">{title}</span>
     </div>
   </div>
   <div class="mt-4 flex items-baseline justify-between">
-    <h3 class="font-display text-xl font-semibold">{title}</h3>
+    <h3 class="text-xl font-semibold">{title}</h3>
     <span class="text-sm text-ink-soft">{year}</span>
   </div>
   <p class="mt-1 text-ink-soft">{subtitle}</p>

@@ -1,0 +1,78 @@
+---
+interface Props {
+  image1: string;
+  image2?: string;
+  alt: string;
+  class?: string;
+}
+
+const { image1, image2, alt, class: className } = Astro.props;
+---
+
+<div
+  class:list={["hover-distort", className]}
+  data-hover-distort
+  data-image1={image1}
+  data-image2={image2 || image1}
+  role="img"
+  aria-label={alt}
+>
+</div>
+
+<style>
+  .hover-distort {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-line);
+  }
+  .hover-distort :global(canvas) {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+  }
+</style>
+
+<script>
+  import hoverEffect from "hover-effect";
+
+  function setupHoverDistort() {
+    const isDesktopPointer = window.matchMedia(
+      "(hover: hover) and (pointer: fine)"
+    ).matches;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    document.querySelectorAll<HTMLElement>("[data-hover-distort]").forEach((el) => {
+      if (el.dataset.hoverBound) return;
+      el.dataset.hoverBound = "true";
+
+      const image1 = el.dataset.image1!;
+      const image2 = el.dataset.image2!;
+
+      if (!isDesktopPointer || prefersReducedMotion) {
+        // Fallback: plain background image, no WebGL / hover required.
+        el.style.backgroundImage = `url(${image1})`;
+        el.style.backgroundSize = "cover";
+        el.style.backgroundPosition = "center";
+        return;
+      }
+
+      const rect = el.getBoundingClientRect();
+      new hoverEffect({
+        parent: el,
+        image1,
+        image2,
+        displacementImage: "/images/effects/displacement.png",
+        imagesRatio: rect.height / rect.width || 0.625,
+        intensity: 0.35,
+        speedIn: 1.2,
+        speedOut: 0.9,
+        easing: "Expo.easeOut",
+      });
+    });
+  }
+
+  setupHoverDistort();
+  document.addEventListener("astro:page-load", setupHoverDistort);
+</script>

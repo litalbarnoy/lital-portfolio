@@ -9,6 +9,8 @@ cover: "/images/imports/bside/cover.webp"
 gallery:
   - "/images/imports/bside/01.webp"
   - "/images/imports/bside/02.webp"
+  - "https://placehold.co/1200x900/D9CFC0/1a1a18.png?text=More+Photos+Coming"
+  - "https://placehold.co/1200x900/EFE9E1/1a1a18.png?text=More+Photos+Coming"
 order: 1
 ---
 

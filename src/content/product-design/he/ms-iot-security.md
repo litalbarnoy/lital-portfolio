@@ -9,6 +9,8 @@ cover: "/images/imports/ms-iot-security/cover.webp"
 gallery:
   - "/images/imports/ms-iot-security/01.webp"
   - "/images/imports/ms-iot-security/02.webp"
+  - "https://placehold.co/1200x900/EFE9E1/1a1a18.png?text=More+Photos+Coming"
+  - "https://placehold.co/1200x900/E4DCD0/1a1a18.png?text=More+Photos+Coming"
 order: 4
 ---
 

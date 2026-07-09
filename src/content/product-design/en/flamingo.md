@@ -9,6 +9,8 @@ cover: "/images/imports/flamingo/01.webp"
 gallery:
   - "/images/imports/flamingo/02.webp"
   - "/images/imports/flamingo/demo.gif"
+  - "https://placehold.co/1200x900/EFE9E1/1a1a18.png?text=More+photos+coming"
+  - "https://placehold.co/1200x900/E4DCD0/1a1a18.png?text=More+photos+coming"
 order: 3
 ---
 

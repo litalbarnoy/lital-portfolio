@@ -16,6 +16,9 @@ const featured = [
   { entry: productDesign[0], base: "product-design" },
   { entry: curatorial[0], base: "curatorial" },
 ].filter((f) => f.entry);
+
+const pdPreviews = productDesign.map((p) => p.data.cover).join(",");
+const curPreviews = curatorial.map((p) => p.data.cover).join(",");
 ---
 
 <BaseLayout title="בית">
@@ -34,23 +37,41 @@ const featured = [
 
   <section class="mx-auto grid max-w-6xl gap-6 px-6 pb-24 md:grid-cols-2 lg:px-10">
     <Reveal>
-      <a href="/product-design" class="group block rounded-sm border border-line p-10" data-cursor-hover>
-        <span class="text-sm font-medium text-accent">01</span>
-        <h2 class="mt-4 font-display text-3xl font-bold">עיצוב חוויית משתמש</h2>
-        <p class="mt-3 text-ink-soft">מחקר, אב-טיפוס ובדיקות — מהבעיה ועד המסך.</p>
-        <span class="link-underline mt-6 inline-block text-sm font-medium">
-          לכל הפרויקטים
-        </span>
+      <a
+        href="/product-design"
+        class="group relative block overflow-hidden rounded-sm border border-line p-10"
+        data-cursor-hover
+        data-preview-images={pdPreviews}
+      >
+        <div class="preview-bg absolute inset-0 scale-105 bg-cover bg-center opacity-0 transition-opacity duration-700"></div>
+        <div class="absolute inset-0 bg-ink/0 transition-colors duration-700"></div>
+        <div class="relative">
+          <span class="text-sm font-medium text-accent transition-colors duration-500 preview-text">01</span>
+          <h2 class="mt-4 text-3xl font-bold transition-colors duration-500 preview-text">עיצוב חוויית משתמש</h2>
+          <p class="mt-3 text-ink-soft transition-colors duration-500 preview-text">מחקר, אב-טיפוס ובדיקות — מהבעיה ועד המסך.</p>
+          <span class="link-underline mt-6 inline-block text-sm font-medium transition-colors duration-500 preview-text">
+            לכל הפרויקטים
+          </span>
+        </div>
       </a>
     </Reveal>
     <Reveal>
-      <a href="/curatorial" class="group block rounded-sm border border-line p-10" data-cursor-hover>
-        <span class="text-sm font-medium text-accent">02</span>
-        <h2 class="mt-4 font-display text-3xl font-bold">אוצרות</h2>
-        <p class="mt-3 text-ink-soft">תערוכות ופרויקטים אמנותיים שבניתי מהרעיון ועד הקיר.</p>
-        <span class="link-underline mt-6 inline-block text-sm font-medium">
-          לכל הפרויקטים
-        </span>
+      <a
+        href="/curatorial"
+        class="group relative block overflow-hidden rounded-sm border border-line p-10"
+        data-cursor-hover
+        data-preview-images={curPreviews}
+      >
+        <div class="preview-bg absolute inset-0 scale-105 bg-cover bg-center opacity-0 transition-opacity duration-700"></div>
+        <div class="absolute inset-0 bg-ink/0 transition-colors duration-700"></div>
+        <div class="relative">
+          <span class="text-sm font-medium text-accent transition-colors duration-500 preview-text">02</span>
+          <h2 class="mt-4 text-3xl font-bold transition-colors duration-500 preview-text">אוצרות</h2>
+          <p class="mt-3 text-ink-soft transition-colors duration-500 preview-text">תערוכות ופרויקטים אמנותיים שבניתי מהרעיון ועד הקיר.</p>
+          <span class="link-underline mt-6 inline-block text-sm font-medium transition-colors duration-500 preview-text">
+            לכל הפרויקטים
+          </span>
+        </div>
       </a>
     </Reveal>
   </section>
@@ -58,7 +79,7 @@ const featured = [
   {
     featured.length > 0 && (
       <section class="mx-auto max-w-6xl px-6 pb-28 lg:px-10">
-        <Reveal as="h2" class="font-display text-2xl font-bold">
+        <Reveal as="h2" class="text-2xl font-bold">
           עבודות נבחרות
         </Reveal>
         <div class="mt-8 grid gap-10 md:grid-cols-2">
@@ -104,4 +125,39 @@ const featured = [
 
   playHeroIntro();
   document.addEventListener("astro:page-load", playHeroIntro);
+
+  function setupCategoryPreview() {
+    document.querySelectorAll<HTMLElement>("[data-preview-images]").forEach((el) => {
+      if (el.dataset.previewBound) return;
+      el.dataset.previewBound = "true";
+
+      const images = (el.dataset.previewImages || "").split(",").filter(Boolean);
+      const bg = el.querySelector<HTMLElement>(".preview-bg");
+      const overlay = el.querySelector<HTMLElement>(".preview-bg + div");
+      if (!images.length || !bg) return;
+
+      let index = 0;
+
+      el.addEventListener("mouseenter", () => {
+        bg.style.backgroundImage = `url(${images[index % images.length]})`;
+        bg.style.opacity = "1";
+        overlay?.classList.add("bg-ink/55");
+        el.querySelectorAll<HTMLElement>(".preview-text").forEach((t) => {
+          t.style.color = "var(--color-cream)";
+        });
+        index++;
+      });
+
+      el.addEventListener("mouseleave", () => {
+        bg.style.opacity = "0";
+        overlay?.classList.remove("bg-ink/55");
+        el.querySelectorAll<HTMLElement>(".preview-text").forEach((t) => {
+          t.style.color = "";
+        });
+      });
+    });
+  }
+
+  setupCategoryPreview();
+  document.addEventListener("astro:page-load", setupCategoryPreview);
 </script>

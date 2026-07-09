@@ -8,6 +8,9 @@ tags: ["Enterprise", "Data Platform", "KQL", "Microsoft Fabric"]
 cover: "/images/imports/ms-realtime-intelligence/cover.webp"
 gallery:
   - "/images/imports/ms-realtime-intelligence/01.webp"
+  - "https://placehold.co/1200x900/EFE9E1/1a1a18.png?text=More+photos+coming"
+  - "https://placehold.co/1200x900/E4DCD0/1a1a18.png?text=More+photos+coming"
+  - "https://placehold.co/1200x900/EFE9E1/1a1a18.png?text=More+photos+coming"
 order: 2
 ---
 
