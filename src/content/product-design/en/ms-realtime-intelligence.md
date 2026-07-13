@@ -6,6 +6,7 @@ client: "Microsoft"
 year: 2025
 tags: ["Enterprise", "Data Platform", "KQL", "Microsoft Fabric"]
 cover: "/images/imports/ms-realtime-intelligence/cover.webp"
+video: "https://youtu.be/hkChU3KMZaE"
 gallery:
   - "/images/imports/ms-realtime-intelligence/01.webp"
   - "https://placehold.co/1200x900/EFE9E1/1a1a18.png?text=More+photos+coming"

@@ -191,9 +191,10 @@
       activeRect = rect;
       canvas.style.width = `${rect.width}px`;
       canvas.style.height = `${rect.height}px`;
-      canvas.style.transform = `translate(${rect.left + window.scrollX}px, ${
-        rect.top + window.scrollY
-      }px)`;
+      // The canvas is position:fixed, so getBoundingClientRect()'s
+      // viewport-relative coordinates are exactly what we want — adding
+      // scroll offset here would push it off-target on any scrolled page.
+      canvas.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
       renderer.setSize(rect.width, rect.height, false);
 
       const texture = material.uniforms.uTexture.value as THREE.Texture;

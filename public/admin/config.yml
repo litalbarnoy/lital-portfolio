@@ -32,6 +32,10 @@ collections:
         name: "gallery"
         widget: "list"
         field: { label: "תמונה", name: "image", widget: "image" }
+      - label: "וידאו (קישור YouTube — לא חובה)"
+        name: "video"
+        widget: "string"
+        required: false
       - label: "סדר הצגה ברשימה (מספר קטן = מוצג ראשון)"
         name: "order"
         widget: "number"
@@ -64,6 +68,10 @@ collections:
         name: "gallery"
         widget: "list"
         field: { label: "Image", name: "image", widget: "image" }
+      - label: "Video (YouTube link — optional)"
+        name: "video"
+        widget: "string"
+        required: false
       - label: "Display order (lower number = shown first)"
         name: "order"
         widget: "number"
@@ -96,6 +104,10 @@ collections:
         name: "gallery"
         widget: "list"
         field: { label: "תמונה", name: "image", widget: "image" }
+      - label: "וידאו (קישור YouTube — לא חובה)"
+        name: "video"
+        widget: "string"
+        required: false
       - label: "סדר הצגה ברשימה (מספר קטן = מוצג ראשון)"
         name: "order"
         widget: "number"
@@ -128,6 +140,10 @@ collections:
         name: "gallery"
         widget: "list"
         field: { label: "Image", name: "image", widget: "image" }
+      - label: "Video (YouTube link — optional)"
+        name: "video"
+        widget: "string"
+        required: false
       - label: "Display order (lower number = shown first)"
         name: "order"
         widget: "number"

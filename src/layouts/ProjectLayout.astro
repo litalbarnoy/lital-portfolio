@@ -13,14 +13,25 @@ interface Props {
   tags: string[];
   cover: string;
   gallery: string[];
+  video?: string;
   next?: { href: string; title: string } | null;
 }
 
-const { title, subtitle, role, client, year, tags, cover, gallery, next } =
+const { title, subtitle, role, client, year, tags, cover, gallery, video, next } =
   Astro.props;
 
 const lang = getLang(Astro.url.pathname);
 const t = ui[lang].project;
+
+// Turn a YouTube watch/share/embed URL into an embeddable URL.
+function youtubeEmbed(url: string): string | null {
+  const match = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/
+  );
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+}
+
+const videoEmbed = video ? youtubeEmbed(video) : null;
 ---
 
 <BaseLayout title={title} description={subtitle}>
@@ -73,6 +84,23 @@ const t = ui[lang].project;
     <div class="prose prose-project mx-auto max-w-3xl px-6 py-16 lg:px-10">
       <slot />
     </div>
+
+    {
+      videoEmbed && (
+        <Reveal class="mx-auto max-w-6xl px-6 pb-20 lg:px-10">
+          <div class="aspect-video w-full overflow-hidden rounded-sm bg-line">
+            <iframe
+              class="h-full w-full"
+              src={videoEmbed}
+              title={title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            />
+          </div>
+        </Reveal>
+      )
+    }
 
     {
       gallery.length > 0 && (

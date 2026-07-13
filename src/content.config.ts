@@ -10,6 +10,7 @@ const projectSchema = z.object({
   tags: z.array(z.string()),
   cover: z.string(),
   gallery: z.array(z.string()),
+  video: z.string().optional(),
   order: z.number(),
 });
 
