@@ -35,7 +35,7 @@ const t = ui[lang].project;
         </div>
 
         <div class="reveal mt-10 lg:mt-0">
-          <p class="max-w-md text-lg text-ink-soft">{subtitle}</p>
+          <p class="max-w-md text-lg text-ink-soft" data-ripple-text>{subtitle}</p>
           <dl class="mt-8 grid grid-cols-2 gap-6 border-t border-line pt-6">
             <div>
               <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.role}</dt>
@@ -63,7 +63,6 @@ const t = ui[lang].project;
           width={1800}
           height={1350}
           alt={title}
-          crossorigin="anonymous"
           class="hero-frame-img aspect-[4/3] w-full object-cover lg:h-full"
           widths={[800, 1200, 1600, 2000]}
           sizes="(max-width: 1024px) 100vw, 55vw"

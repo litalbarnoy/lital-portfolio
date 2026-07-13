@@ -16,7 +16,7 @@
   .ripple-canvas.is-active {
     opacity: 1;
   }
-  [data-ripple-text] {
+  .ripple-text-el {
     transition: opacity 0.3s var(--ease-expo);
   }
   .ripple-text-hidden {
@@ -66,6 +66,11 @@
     }
   `;
 
+  // Renders an element's text to a canvas so it can be used as a WebGL
+  // texture. Uses the pre-split .hero-line-inner spans when present
+  // (exact match for the hero heading); otherwise falls back to a
+  // generic greedy word-wrap that approximates the element's own
+  // line breaks closely enough for a hover-only effect.
   function buildTextTexture(el: HTMLElement): HTMLCanvasElement {
     const rect = el.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio, 2);
@@ -80,38 +85,55 @@
     ctx.textAlign = isRtl ? "right" : "left";
     ctx.textBaseline = "alphabetic";
 
-    const lines = el.querySelectorAll<HTMLElement>(".hero-line-inner");
-    lines.forEach((line) => {
-      const lineRect = line.getBoundingClientRect();
-      const style = getComputedStyle(line);
-      ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-      ctx.fillStyle = style.color;
-      const x = isRtl ? lineRect.right - rect.left : lineRect.left - rect.left;
-      const y = lineRect.top - rect.top + lineRect.height * 0.78;
-      ctx.fillText(line.textContent || "", x, y);
-    });
+    const heroLines = el.querySelectorAll<HTMLElement>(".hero-line-inner");
+    if (heroLines.length) {
+      heroLines.forEach((line) => {
+        const lineRect = line.getBoundingClientRect();
+        const style = getComputedStyle(line);
+        ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        ctx.fillStyle = style.color;
+        const x = isRtl ? lineRect.right - rect.left : lineRect.left - rect.left;
+        const y = lineRect.top - rect.top + lineRect.height * 0.78;
+        ctx.fillText(line.textContent || "", x, y);
+      });
+      return off;
+    }
+
+    const style = getComputedStyle(el);
+    const fontSize = parseFloat(style.fontSize) || 16;
+    const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.4;
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    ctx.fillStyle = style.color;
+
+    const paddingLeft = parseFloat(style.paddingLeft) || 0;
+    const paddingRight = parseFloat(style.paddingRight) || 0;
+    const maxWidth = rect.width - paddingLeft - paddingRight;
+    const x = isRtl ? rect.width - paddingRight : paddingLeft;
+
+    const words = (el.textContent || "").trim().split(/\s+/).filter(Boolean);
+    let line = "";
+    let y = paddingLeft >= 0 ? lineHeight * 0.75 : lineHeight * 0.75;
+    for (const word of words) {
+      const test = line ? `${line} ${word}` : word;
+      if (line && ctx.measureText(test).width > maxWidth) {
+        ctx.fillText(line, x, y);
+        line = word;
+        y += lineHeight;
+      } else {
+        line = test;
+      }
+    }
+    if (line) ctx.fillText(line, x, y);
 
     return off;
   }
 
-  function setupRippleField() {
-    const isDesktopPointer = window.matchMedia(
-      "(hover: hover) and (pointer: fine)"
-    ).matches;
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    if (!isDesktopPointer || prefersReducedMotion) return;
-    if ((window as any).__rippleInit) return;
-    (window as any).__rippleInit = true;
-
-    const canvas = document.getElementById("ripple-canvas") as HTMLCanvasElement;
-    if (!canvas) return;
-
+  function createEngine(canvas: HTMLCanvasElement) {
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
       antialias: true,
+      preserveDrawingBuffer: true,
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -174,6 +196,7 @@
       }px)`;
       renderer.setSize(rect.width, rect.height, false);
 
+      const texture = material.uniforms.uTexture.value as THREE.Texture;
       texture.image = source;
       texture.needsUpdate = true;
 
@@ -217,31 +240,76 @@
       });
     }
 
+    function dispose() {
+      cancelAnimationFrame(rafId);
+      isRunning = false;
+      const currentTexture = material.uniforms.uTexture.value as THREE.Texture;
+      currentTexture?.dispose();
+      material.dispose();
+      mesh.geometry.dispose();
+      renderer.dispose();
+    }
+
+    return { canvas, bindMouseTracking, detach, dispose };
+  }
+
+  function bindPageElements(engine: ReturnType<typeof createEngine>) {
     document.querySelectorAll<HTMLImageElement>("[data-ripple] img").forEach((img) => {
       const container = img.closest<HTMLElement>("[data-ripple]");
       if (!container || container.dataset.rippleBound) return;
       container.dataset.rippleBound = "true";
 
-      bindMouseTracking(container, () => img);
-      container.addEventListener("mouseleave", detach);
+      engine.bindMouseTracking(container, () => img);
+      container.addEventListener("mouseleave", engine.detach);
     });
 
-    document.querySelectorAll<HTMLElement>("[data-ripple-text]").forEach((el) => {
-      if (el.dataset.rippleBound) return;
-      el.dataset.rippleBound = "true";
+    document
+      .querySelectorAll<HTMLElement>("[data-ripple-text], .prose-project p")
+      .forEach((el) => {
+        if (el.dataset.rippleBound) return;
+        el.dataset.rippleBound = "true";
+        el.classList.add("ripple-text-el");
 
-      bindMouseTracking(el, () => buildTextTexture(el));
-      el.addEventListener("mouseenter", () => el.classList.add("ripple-text-hidden"));
-      el.addEventListener("mouseleave", () => {
-        el.classList.remove("ripple-text-hidden");
-        detach();
+        engine.bindMouseTracking(el, () => buildTextTexture(el));
+        el.addEventListener("mouseenter", () => el.classList.add("ripple-text-hidden"));
+        el.addEventListener("mouseleave", () => {
+          el.classList.remove("ripple-text-hidden");
+          engine.detach();
+        });
       });
-    });
+  }
 
-    document.addEventListener("astro:before-swap", () => {
-      cancelAnimationFrame(rafId);
-      isRunning = false;
-    });
+  function setupRippleField() {
+    const isDesktopPointer = window.matchMedia(
+      "(hover: hover) and (pointer: fine)"
+    ).matches;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (!isDesktopPointer || prefersReducedMotion) return;
+
+    let engine = (window as any).__rippleEngine;
+
+    // Client-side navigation swaps in a brand new <canvas> element even
+    // though this script's top-level state persists; a WebGL context
+    // bound to the old (now-detached) canvas silently stops rendering
+    // correctly, so recreate the engine whenever that happens.
+    if (engine && !engine.canvas.isConnected) {
+      engine.dispose();
+      engine = null;
+    }
+
+    if (!engine) {
+      const canvas = document.getElementById("ripple-canvas") as HTMLCanvasElement;
+      if (!canvas) return;
+      engine = createEngine(canvas);
+      (window as any).__rippleEngine = engine;
+    }
+
+    // Element binding must re-run on every page load (client-side
+    // navigation swaps in new DOM elements that need fresh listeners),
+    // even though the WebGL engine itself is only created once.
+    bindPageElements(engine);
   }
 
   setupRippleField();
