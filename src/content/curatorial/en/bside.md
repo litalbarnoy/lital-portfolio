@@ -11,7 +11,7 @@ gallery:
   - "/images/imports/bside/02.webp"
   - "https://placehold.co/1200x900/D9CFC0/1a1a18.png?text=More+photos+coming"
   - "https://placehold.co/1200x900/EFE9E1/1a1a18.png?text=More+photos+coming"
-order: 2
+order: 3
 ---
 
 ## The Idea
