@@ -1,4 +1,8 @@
 ---
+// Pointer-driven displacement with per-channel RGB dispersion, rendered on a
+// single persistent WebGL canvas (OGL). The canvas is parked over whichever
+// [data-ripple] element the pointer is inside; every uniform lerps back to
+// zero so the resting state is always the untouched DOM underneath.
 ---
 
 <canvas id="ripple-canvas" class="ripple-canvas" aria-hidden="true"></canvas>
@@ -25,20 +29,25 @@
 </style>
 
 <script>
-  import * as THREE from "three";
-  import gsap from "gsap";
+  import { Renderer, Program, Mesh, Triangle, Texture } from "ogl";
 
   type RippleSource = HTMLImageElement | HTMLCanvasElement;
 
-  const VERTEX_SHADER = `
+  const VERTEX = `
+    attribute vec2 position;
+    attribute vec2 uv;
     varying vec2 vUv;
     void main() {
       vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      gl_Position = vec4(position, 0.0, 1.0);
     }
   `;
 
-  const FRAGMENT_SHADER = `
+  // Displacement falls off with distance from the pointer and scales with
+  // pointer speed; the three channels are offset by different amounts to
+  // produce the chromatic fringe on the leading edge.
+  const FRAGMENT = `
+    precision highp float;
     uniform sampler2D uTexture;
     uniform vec2 uMouse;
     uniform float uVelocity;
@@ -66,12 +75,14 @@
     }
   `;
 
-  // Renders an element's text to a canvas so it can be used as a WebGL
-  // texture. Uses the pre-split .hero-line-inner spans when present
-  // (exact match for the hero heading); otherwise falls back to a
-  // generic greedy word-wrap that approximates the element's own
-  // line breaks closely enough for a hover-only effect.
-  function buildTextTexture(el: HTMLElement): HTMLCanvasElement {
+  // Draws the element's own text into a canvas so it can be used as a
+  // texture. Only the pre-split hero lines are supported: re-flowing
+  // arbitrary wrapped text here never matches the browser's own line
+  // breaking, which reads as ghosting.
+  function buildTextTexture(el: HTMLElement): HTMLCanvasElement | null {
+    const heroLines = el.querySelectorAll<HTMLElement>(".hero-line-inner");
+    if (!heroLines.length) return null;
+
     const rect = el.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio, 2);
     const off = document.createElement("canvas");
@@ -85,141 +96,106 @@
     ctx.textAlign = isRtl ? "right" : "left";
     ctx.textBaseline = "alphabetic";
 
-    const heroLines = el.querySelectorAll<HTMLElement>(".hero-line-inner");
-    if (heroLines.length) {
-      heroLines.forEach((line) => {
-        const lineRect = line.getBoundingClientRect();
-        const style = getComputedStyle(line);
-        ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-        ctx.fillStyle = style.color;
-        const x = isRtl ? lineRect.right - rect.left : lineRect.left - rect.left;
-        const y = lineRect.top - rect.top + lineRect.height * 0.78;
-        ctx.fillText(line.textContent || "", x, y);
-      });
-      return off;
-    }
-
-    const style = getComputedStyle(el);
-    const fontSize = parseFloat(style.fontSize) || 16;
-    const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.4;
-    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-    ctx.fillStyle = style.color;
-
-    const paddingLeft = parseFloat(style.paddingLeft) || 0;
-    const paddingRight = parseFloat(style.paddingRight) || 0;
-    const maxWidth = rect.width - paddingLeft - paddingRight;
-    const x = isRtl ? rect.width - paddingRight : paddingLeft;
-
-    const words = (el.textContent || "").trim().split(/\s+/).filter(Boolean);
-    let line = "";
-    let y = paddingLeft >= 0 ? lineHeight * 0.75 : lineHeight * 0.75;
-    for (const word of words) {
-      const test = line ? `${line} ${word}` : word;
-      if (line && ctx.measureText(test).width > maxWidth) {
-        ctx.fillText(line, x, y);
-        line = word;
-        y += lineHeight;
-      } else {
-        line = test;
-      }
-    }
-    if (line) ctx.fillText(line, x, y);
+    heroLines.forEach((line) => {
+      const lineRect = line.getBoundingClientRect();
+      const style = getComputedStyle(line);
+      ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      ctx.fillStyle = style.color;
+      const x = isRtl ? lineRect.right - rect.left : lineRect.left - rect.left;
+      const y = lineRect.top - rect.top + lineRect.height * 0.78;
+      ctx.fillText(line.textContent || "", x, y);
+    });
 
     return off;
   }
 
   function createEngine(canvas: HTMLCanvasElement) {
-    const renderer = new THREE.WebGLRenderer({
+    const renderer = new Renderer({
       canvas,
       alpha: true,
-      antialias: true,
-      preserveDrawingBuffer: true,
+      dpr: Math.min(window.devicePixelRatio, 2),
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const gl = renderer.gl;
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 10);
-    camera.position.z = 1;
-
-    const texture = new THREE.Texture();
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.wrapS = THREE.ClampToEdgeWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    const material = new THREE.ShaderMaterial({
+    const texture = new Texture(gl, { generateMipmaps: false });
+    const program = new Program(gl, {
+      vertex: VERTEX,
+      fragment: FRAGMENT,
+      transparent: true,
       uniforms: {
         uTexture: { value: texture },
-        uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+        uMouse: { value: [0.5, 0.5] },
         uVelocity: { value: 0 },
         uHover: { value: 0 },
       },
-      vertexShader: VERTEX_SHADER,
-      fragmentShader: FRAGMENT_SHADER,
-      transparent: true,
     });
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
-    scene.add(mesh);
+    const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
 
-    const state = { hover: 0, velocity: 0 };
+    const state = { hover: 0, hoverTarget: 0, velocity: 0, velocityTarget: 0 };
     let activeRect: DOMRect | null = null;
-    let lastX = 0;
-    let lastY = 0;
+    let lastX = -1;
+    let lastY = -1;
     let rafId = 0;
-    let isRunning = false;
+    let running = false;
 
     function render() {
-      state.velocity *= 0.9;
-      material.uniforms.uVelocity.value = state.velocity;
-      material.uniforms.uHover.value = state.hover;
-      renderer.render(scene, camera);
+      // Everything lerps toward zero and hard-snaps below a threshold, so
+      // the effect can never be left part-way applied. Velocity is lerped
+      // rather than assigned so a fast pointer jump ramps in and trails
+      // out instead of snapping to full displacement in one frame.
+      state.hover += (state.hoverTarget - state.hover) * 0.12;
+      state.velocityTarget *= 0.9;
+      state.velocity += (state.velocityTarget - state.velocity) * 0.1;
+      if (state.velocity < 0.001) state.velocity = 0;
+      if (state.velocityTarget < 0.001) state.velocityTarget = 0;
+      if (Math.abs(state.hoverTarget - state.hover) < 0.001) {
+        state.hover = state.hoverTarget;
+      }
+
+      program.uniforms.uVelocity.value = state.velocity;
+      program.uniforms.uHover.value = state.hover;
+      renderer.render({ scene: mesh });
 
       if (state.hover > 0.001 || state.velocity > 0.001) {
         rafId = requestAnimationFrame(render);
       } else {
-        isRunning = false;
+        running = false;
+        canvas.classList.remove("is-active");
+        activeRect = null;
       }
     }
 
     function ensureRunning() {
-      if (isRunning) return;
-      isRunning = true;
+      if (running) return;
+      running = true;
       rafId = requestAnimationFrame(render);
     }
 
-    function attachTo(source: RippleSource, rect: DOMRect) {
+    function attachTo(source: RippleSource | null, rect: DOMRect) {
+      if (!source) return;
       activeRect = rect;
       canvas.style.width = `${rect.width}px`;
       canvas.style.height = `${rect.height}px`;
       // The canvas is position:fixed, so getBoundingClientRect()'s
-      // viewport-relative coordinates are exactly what we want — adding
-      // scroll offset here would push it off-target on any scrolled page.
+      // viewport-relative coordinates are already correct — adding scroll
+      // offset here would push it off-target on any scrolled page.
       canvas.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
-      renderer.setSize(rect.width, rect.height, false);
+      renderer.setSize(rect.width, rect.height);
 
-      const texture = material.uniforms.uTexture.value as THREE.Texture;
       texture.image = source;
       texture.needsUpdate = true;
 
       canvas.classList.add("is-active");
+      state.hoverTarget = 1;
       ensureRunning();
-      gsap.to(state, { hover: 1, duration: 0.5, ease: "power2.out" });
     }
 
     function detach() {
+      state.hoverTarget = 0;
       ensureRunning();
-      gsap.to(state, {
-        hover: 0,
-        duration: 0.5,
-        ease: "power2.out",
-        onComplete: () => {
-          canvas.classList.remove("is-active");
-          activeRect = null;
-        },
-      });
     }
 
-    function bindMouseTracking(container: HTMLElement, getSource: () => RippleSource) {
+    function bind(container: HTMLElement, getSource: () => RippleSource | null) {
       container.addEventListener("mouseenter", () => {
         lastX = -1;
         lastY = -1;
@@ -228,91 +204,113 @@
 
       container.addEventListener("mousemove", (e: MouseEvent) => {
         if (!activeRect) return;
-        const x = (e.clientX - activeRect.left) / activeRect.width;
-        const y = 1 - (e.clientY - activeRect.top) / activeRect.height;
-        material.uniforms.uMouse.value.set(x, y);
+        program.uniforms.uMouse.value[0] =
+          (e.clientX - activeRect.left) / activeRect.width;
+        program.uniforms.uMouse.value[1] =
+          1 - (e.clientY - activeRect.top) / activeRect.height;
         if (lastX >= 0) {
           const dx = e.clientX - lastX;
           const dy = e.clientY - lastY;
-          state.velocity = Math.min(Math.sqrt(dx * dx + dy * dy) * 0.15, 3);
+          state.velocityTarget = Math.min(
+            Math.sqrt(dx * dx + dy * dy) * 0.15,
+            3
+          );
         }
         lastX = e.clientX;
         lastY = e.clientY;
       });
     }
 
-    function dispose() {
-      cancelAnimationFrame(rafId);
-      isRunning = false;
-      const currentTexture = material.uniforms.uTexture.value as THREE.Texture;
-      currentTexture?.dispose();
-      material.dispose();
-      mesh.geometry.dispose();
-      renderer.dispose();
+    function reset() {
+      state.hover = 0;
+      state.hoverTarget = 0;
+      state.velocity = 0;
+      state.velocityTarget = 0;
+      activeRect = null;
+      program.uniforms.uHover.value = 0;
+      program.uniforms.uVelocity.value = 0;
+      canvas.classList.remove("is-active");
     }
 
-    return { canvas, bindMouseTracking, detach, dispose };
+    function dispose() {
+      cancelAnimationFrame(rafId);
+      running = false;
+      const ext = gl.getExtension("WEBGL_lose_context");
+      ext?.loseContext();
+    }
+
+    return { canvas, bind, detach, reset, dispose };
   }
 
-  function bindPageElements(engine: ReturnType<typeof createEngine>) {
+  type Engine = ReturnType<typeof createEngine>;
+
+  function bindPageElements(engine: Engine) {
     document.querySelectorAll<HTMLImageElement>("[data-ripple] img").forEach((img) => {
       const container = img.closest<HTMLElement>("[data-ripple]");
       if (!container || container.dataset.rippleBound) return;
       container.dataset.rippleBound = "true";
 
-      engine.bindMouseTracking(container, () => img);
+      engine.bind(container, () => img);
       container.addEventListener("mouseleave", engine.detach);
     });
 
-    document
-      .querySelectorAll<HTMLElement>("[data-ripple-text]")
-      .forEach((el) => {
-        if (el.dataset.rippleBound) return;
-        el.dataset.rippleBound = "true";
-        el.classList.add("ripple-text-el");
+    document.querySelectorAll<HTMLElement>("[data-ripple-text]").forEach((el) => {
+      if (el.dataset.rippleBound) return;
+      el.dataset.rippleBound = "true";
+      el.classList.add("ripple-text-el");
 
-        engine.bindMouseTracking(el, () => buildTextTexture(el));
-        el.addEventListener("mouseenter", () => el.classList.add("ripple-text-hidden"));
-        el.addEventListener("mouseleave", () => {
-          el.classList.remove("ripple-text-hidden");
-          engine.detach();
-        });
+      engine.bind(el, () => buildTextTexture(el));
+      el.addEventListener("mouseenter", () => {
+        if (buildTextTexture(el)) el.classList.add("ripple-text-hidden");
       });
+      el.addEventListener("mouseleave", () => {
+        el.classList.remove("ripple-text-hidden");
+        engine.detach();
+      });
+    });
   }
 
-  function setupRippleField() {
+  function setup() {
+    // The whole layer is optional: skip it entirely where it would be
+    // wasted or unwelcome, and the plain DOM is what remains.
     const isDesktopPointer = window.matchMedia(
       "(hover: hover) and (pointer: fine)"
     ).matches;
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
-    if (!isDesktopPointer || prefersReducedMotion) return;
+    if (!isDesktopPointer || prefersReducedMotion || window.innerWidth < 768) {
+      return;
+    }
 
-    let engine = (window as any).__rippleEngine;
+    let engine: Engine | undefined = (window as any).__rippleEngine;
 
-    // Client-side navigation swaps in a brand new <canvas> element even
-    // though this script's top-level state persists; a WebGL context
-    // bound to the old (now-detached) canvas silently stops rendering
-    // correctly, so recreate the engine whenever that happens.
+    // A client-side navigation swaps in a fresh <canvas> even though this
+    // module's state persists; a context bound to the detached canvas stops
+    // rendering, so rebuild the engine when that happens.
     if (engine && !engine.canvas.isConnected) {
       engine.dispose();
-      engine = null;
+      engine = undefined;
     }
 
     if (!engine) {
-      const canvas = document.getElementById("ripple-canvas") as HTMLCanvasElement;
+      const canvas = document.getElementById("ripple-canvas") as HTMLCanvasElement | null;
       if (!canvas) return;
-      engine = createEngine(canvas);
+      try {
+        engine = createEngine(canvas);
+      } catch {
+        return; // no WebGL — the DOM underneath is already the fallback
+      }
       (window as any).__rippleEngine = engine;
     }
 
-    // Element binding must re-run on every page load (client-side
-    // navigation swaps in new DOM elements that need fresh listeners),
-    // even though the WebGL engine itself is only created once.
+    // Element binding re-runs on every page load; the engine is built once.
     bindPageElements(engine);
   }
 
-  setupRippleField();
-  document.addEventListener("astro:page-load", setupRippleField);
+  setup();
+  document.addEventListener("astro:page-load", setup);
+  document.addEventListener("astro:before-swap", () => {
+    (window as any).__rippleEngine?.reset();
+  });
 </script>

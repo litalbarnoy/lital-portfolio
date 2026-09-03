@@ -1,50 +1,166 @@
 ---
+// Three stacked panels sweep up to cover the viewport with a short stagger,
+// a counter runs while the next page loads, then the stack sweeps off.
+// The reference uses black/red/yellow; this site is deliberately monochrome,
+// so the three layers are separated by value instead of hue.
 ---
 
-<div class="page-transition-overlay" id="page-transition-overlay" aria-hidden="true"></div>
+<div class="page-transition" id="page-transition" aria-hidden="true">
+  <div class="page-transition__panel" data-panel="0"></div>
+  <div class="page-transition__panel" data-panel="1"></div>
+  <div class="page-transition__panel" data-panel="2"></div>
+  <div class="page-transition__meter" id="page-transition-meter">
+    <span class="page-transition__count" id="page-transition-count">000</span>
+    <span class="page-transition__rule" id="page-transition-rule"></span>
+  </div>
+</div>
+
+<style>
+  .page-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .page-transition.is-running {
+    visibility: visible;
+  }
+
+  .page-transition__panel {
+    position: absolute;
+    inset: 0;
+    transform: translateY(100%);
+    will-change: transform;
+  }
+
+  .page-transition__panel[data-panel="0"] {
+    background: #d4d4d4;
+  }
+  .page-transition__panel[data-panel="1"] {
+    background: #4a4a4a;
+  }
+  .page-transition__panel[data-panel="2"] {
+    background: var(--color-ink);
+  }
+
+  .page-transition__meter {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 12%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0;
+  }
+
+  .page-transition__count {
+    font-family: ui-monospace, "SFMono-Regular", "Menlo", monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    color: var(--color-cream);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .page-transition__rule {
+    display: block;
+    width: min(220px, 40vw);
+    height: 1px;
+    background: var(--color-cream);
+    transform: scaleX(0);
+    transform-origin: 50% 50%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-transition {
+      display: none;
+    }
+  }
+</style>
 
 <script>
   import gsap from "gsap";
 
-  const COVERED = "polygon(0 0, 100% 0, 100% 100%, 0 100%)";
-  const HIDDEN_BOTTOM = "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)";
-  const HIDDEN_TOP = "polygon(0 0, 100% 0, 100% 0, 0 0)";
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  function getOverlay() {
-    return document.getElementById("page-transition-overlay");
+  function els() {
+    return {
+      root: document.getElementById("page-transition"),
+      panels: gsap.utils.toArray<HTMLElement>(".page-transition__panel"),
+      meter: document.getElementById("page-transition-meter"),
+      count: document.getElementById("page-transition-count"),
+      rule: document.getElementById("page-transition-rule"),
+    };
   }
+
+  let counter: gsap.core.Tween | null = null;
 
   function cover(): Promise<void> {
-    const overlay = getOverlay();
-    if (!overlay) return Promise.resolve();
-    gsap.set(overlay, { clipPath: HIDDEN_BOTTOM });
+    const { root, panels, meter, count, rule } = els();
+    if (!root || !panels.length) return Promise.resolve();
+
+    root.classList.add("is-running");
+    gsap.set(panels, { yPercent: 100 });
+    gsap.set(meter, { opacity: 0 });
+    gsap.set(rule, { scaleX: 0 });
+    if (count) count.textContent = "000";
+
     return new Promise((resolve) => {
-      gsap.to(overlay, {
-        clipPath: COVERED,
-        duration: 0.6,
+      const tl = gsap.timeline({ onComplete: resolve });
+      tl.to(panels, {
+        yPercent: 0,
+        duration: 0.55,
         ease: "power3.inOut",
-        onComplete: resolve,
+        stagger: 0.07,
       });
+      tl.to(meter, { opacity: 1, duration: 0.2 }, "-=0.15");
+
+      // The counter runs on its own so a fast navigation is never blocked
+      // waiting for it to finish.
+      const progress = { value: 0 };
+      counter = gsap.to(progress, {
+        value: 100,
+        duration: 1.1,
+        ease: "power1.inOut",
+        onUpdate: () => {
+          if (count) {
+            count.textContent = String(Math.round(progress.value)).padStart(3, "0");
+          }
+        },
+      });
+      gsap.to(rule, { scaleX: 1, duration: 1.1, ease: "power1.inOut" });
     });
   }
 
-  function reveal() {
-    const overlay = getOverlay();
-    if (!overlay) return;
-    gsap.to(overlay, {
-      clipPath: HIDDEN_TOP,
+  function revealPage() {
+    const { root, panels, meter } = els();
+    if (!root || !panels.length) return;
+
+    counter?.kill();
+    counter = null;
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        root.classList.remove("is-running");
+        // Reset to rest so nothing is left mid-transition.
+        gsap.set(panels, { yPercent: 100 });
+        gsap.set(meter, { opacity: 0 });
+      },
+    });
+    tl.to(meter, { opacity: 0, duration: 0.15 });
+    tl.to(panels, {
+      yPercent: -100,
       duration: 0.6,
       ease: "power3.inOut",
-      delay: 0.05,
+      stagger: 0.06,
     });
   }
 
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
-
-  if (!prefersReducedMotion && !(window as any).__pageTransitionInit) {
+  if (!reduceMotion.matches && !(window as any).__pageTransitionInit) {
     (window as any).__pageTransitionInit = true;
+
     document.addEventListener("astro:before-preparation", (event: any) => {
       const originalLoader = event.loader;
       event.loader = async function () {
@@ -53,8 +169,6 @@
       };
     });
 
-    document.addEventListener("astro:after-swap", () => {
-      reveal();
-    });
+    document.addEventListener("astro:after-swap", revealPage);
   }
 </script>

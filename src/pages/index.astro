@@ -43,7 +43,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
         data-cursor-hover
         data-preview-images={pdPreviews}
       >
-        <div class="preview-bg absolute inset-0 scale-105 bg-cover bg-center opacity-0 transition-opacity duration-700"></div>
+        <div class="preview-bg absolute inset-[-4%] bg-cover bg-center opacity-0 transition-opacity duration-700"></div>
         <div class="absolute inset-0 bg-ink/0 transition-colors duration-700"></div>
         <div class="relative">
           <span class="text-sm font-medium text-accent transition-colors duration-500 preview-text">01</span>
@@ -62,7 +62,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
         data-cursor-hover
         data-preview-images={curPreviews}
       >
-        <div class="preview-bg absolute inset-0 scale-105 bg-cover bg-center opacity-0 transition-opacity duration-700"></div>
+        <div class="preview-bg absolute inset-[-4%] bg-cover bg-center opacity-0 transition-opacity duration-700"></div>
         <div class="absolute inset-0 bg-ink/0 transition-colors duration-700"></div>
         <div class="relative">
           <span class="text-sm font-medium text-accent transition-colors duration-500 preview-text">02</span>
@@ -120,6 +120,8 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
       ease: "power3.out",
       stagger: 0.1,
       delay: 0.1,
+      // Leave no inline transform behind once the intro settles.
+      clearProps: "transform",
     });
   }
 

@@ -13,7 +13,7 @@ const { href, title, subtitle, cover, year } = Astro.props;
 ---
 
 <a href={href} class="reveal group block" data-cursor-hover>
-  <div class="relative overflow-hidden rounded-sm bg-line" data-ripple>
+  <div class="relative overflow-hidden rounded-sm bg-line" data-ripple data-media>
     <Image
       src={cover}
       width={1600}

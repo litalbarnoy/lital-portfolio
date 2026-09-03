@@ -1,70 +1,28 @@
 ---
+// Markup-only wrapper. All motion is owned by MotionLayer.astro:
+// text tags opt into a masked per-line reveal via `data-split`, everything
+// else gets the plain block reveal. Both are fail-safe — with no JS the
+// element renders in its final, readable state (see global.css).
 interface Props {
   as?: keyof HTMLElementTagNameMap;
   class?: string;
-  delay?: number;
+  split?: boolean;
 }
 
-const { as: Tag = "div", class: className, delay = 0 } = Astro.props;
+const { as: Tag = "div", class: className, split } = Astro.props;
+
+const TEXT_TAGS = ["h1", "h2", "h3", "h4", "p"];
+const useSplit = split ?? TEXT_TAGS.includes(Tag);
 ---
 
-<Tag class:list={["reveal", className]} style={delay ? `--reveal-delay:${delay}` : undefined}>
-  <slot />
-</Tag>
-
-<script>
-  import gsap from "gsap";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-  gsap.registerPlugin(ScrollTrigger);
-
-  function setupReveals() {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    if (prefersReducedMotion) return;
-
-    const elements = gsap.utils.toArray<HTMLElement>(
-      ".reveal:not([data-reveal-claimed])"
-    );
-    if (!elements.length) return;
-
-    // Claim synchronously so overlapping setup calls never create
-    // duplicate/competing ScrollTrigger batches for the same elements.
-    elements.forEach((el) => el.setAttribute("data-reveal-claimed", ""));
-
-    ScrollTrigger.batch(elements, {
-      start: "top 88%",
-      once: true,
-      onEnter: (batch) => {
-        // Flip to the CSS resting state (.is-in) up front, then animate
-        // FROM the hidden values via GSAP; clearProps on completion drops
-        // the inline styles entirely so the element is left exactly where
-        // the plain .reveal.is-in CSS rule already puts it — never a
-        // JS-only end state that could get stuck if something re-runs.
-        batch.forEach((el) => el.classList.add("is-in"));
-        gsap.set(batch, { willChange: "transform, opacity" });
-        gsap.fromTo(
-          batch,
-          { opacity: 0, y: 28 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            ease: "power2.out",
-            stagger: 0.08,
-            clearProps: "transform,opacity,willChange",
-          }
-        );
-      },
-    });
-  }
-
-  setupReveals();
-
-  if (!(window as any).__revealListenersInit) {
-    (window as any).__revealListenersInit = true;
-    document.addEventListener("astro:page-load", setupReveals);
-    document.addEventListener("astro:after-swap", () => ScrollTrigger.refresh());
-  }
-</script>
+{
+  useSplit ? (
+    <Tag class={className} data-split>
+      <slot />
+    </Tag>
+  ) : (
+    <Tag class:list={["reveal", className]}>
+      <slot />
+    </Tag>
+  )
+}

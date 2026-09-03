@@ -39,8 +39,15 @@ const videoEmbed = video ? youtubeEmbed(video) : null;
     <header class="mx-auto grid max-w-6xl gap-10 px-6 pt-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14 lg:px-10 lg:pt-20">
       <div class="flex flex-col lg:min-h-[68vh] lg:justify-between">
         <div>
-          <p class="reveal text-sm font-medium text-accent">{role}</p>
-          <h1 class="reveal mt-3 font-display text-5xl font-bold leading-[0.95] lg:text-7xl">
+          {/* Visual eyebrow only — the same string is exposed with a proper
+              label by the "Role" row in the metadata list below. */}
+          <p class="reveal text-sm font-medium text-accent" aria-hidden="true">
+            {role}
+          </p>
+          <h1
+            class="mt-3 font-display text-5xl font-bold leading-[0.95] lg:text-7xl"
+            data-split
+          >
             {title}
           </h1>
         </div>
@@ -68,7 +75,7 @@ const videoEmbed = video ? youtubeEmbed(video) : null;
         </div>
       </div>
 
-      <div class="hero-frame-clip overflow-hidden rounded-sm lg:h-[68vh]" data-ripple>
+      <div class="hero-frame-clip overflow-hidden rounded-sm lg:h-[68vh]" data-ripple data-media>
         <Image
           src={cover}
           width={1800}
@@ -149,40 +156,6 @@ const videoEmbed = video ? youtubeEmbed(video) : null;
     }
   </article>
 </BaseLayout>
-
-<script>
-  import gsap from "gsap";
-
-  function playHeroReveal() {
-    const clip = document.querySelector<HTMLElement>(".hero-frame-clip");
-    const img = document.querySelector<HTMLElement>(".hero-frame-img");
-    if (!clip || !img) return;
-
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    if (prefersReducedMotion) return;
-
-    gsap.set(clip, { clipPath: "inset(15% round 4px)" });
-    gsap.set(img, { scale: 1.12 });
-
-    gsap.to(clip, {
-      clipPath: "inset(0% round 0px)",
-      duration: 1,
-      ease: "power3.out",
-      delay: 0.15,
-    });
-    gsap.to(img, {
-      scale: 1,
-      duration: 1.1,
-      ease: "power3.out",
-      delay: 0.15,
-    });
-  }
-
-  playHeroReveal();
-  document.addEventListener("astro:page-load", playHeroReveal);
-</script>
 
 <style>
   .prose-project :global(h2) {

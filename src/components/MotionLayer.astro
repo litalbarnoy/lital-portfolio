@@ -1,0 +1,250 @@
+---
+// Single owner of the site's motion layer: Lenis smooth scroll, the GSAP
+// ticker, masked line reveals, and the per-navigation lifecycle. Everything
+// that writes inline styles registers its teardown here so a View Transitions
+// swap never leaves a half-finished animation behind.
+---
+
+<script>
+  import Lenis from "lenis";
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { SplitText } from "gsap/SplitText";
+
+  gsap.registerPlugin(ScrollTrigger, SplitText);
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  // ---------------------------------------------------------------- scroller
+
+  function initScroller() {
+    if ((window as any).__lenis || reduceMotion.matches) return;
+
+    const lenis = new Lenis({
+      lerp: 0.1,
+      wheelMultiplier: 1,
+      syncTouch: false,
+    });
+
+    lenis.on("scroll", ScrollTrigger.update);
+
+    // GSAP's ticker reports seconds; Lenis.raf expects milliseconds.
+    gsap.ticker.add((time: number) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+
+    (window as any).__lenis = lenis;
+  }
+
+  // ------------------------------------------------------- masked line reveal
+
+  let splits: SplitText[] = [];
+  let maskedBlocks: { el: HTMLElement; html: string }[] = [];
+
+  const isRtl = () =>
+    (document.dir || document.documentElement.dir || "ltr") === "rtl";
+
+  // Hebrew descenders (ק ן ף ך) and Latin g/y/p get clipped by the mask's
+  // overflow unless the wrapper is padded and the padding pulled back out.
+  const MASK_PAD = { paddingBlock: "0.12em", marginBlock: "-0.12em" };
+
+  function padMask(mask: HTMLElement) {
+    mask.style.paddingBlock = MASK_PAD.paddingBlock;
+    mask.style.marginBlock = MASK_PAD.marginBlock;
+  }
+
+  // GSAP's SplitText measures line boxes by grouping words on offsetTop.
+  // That is reliable for LTR but silently returns the whole string as a
+  // single line for Hebrew, so per-line staggering is an LTR-only feature.
+  // RTL gets the same masked translateY, applied to the block as a whole —
+  // deterministic and glyph-identical, per the "a single-block reveal that
+  // works beats a per-line reveal that breaks" rule.
+  function maskWholeBlock(el: HTMLElement) {
+    maskedBlocks.push({ el, html: el.innerHTML });
+
+    const inner = document.createElement("div");
+    inner.className = "split-line";
+    while (el.firstChild) inner.appendChild(el.firstChild);
+
+    const mask = document.createElement("div");
+    mask.className = "split-line-mask";
+    padMask(mask);
+    mask.appendChild(inner);
+    el.appendChild(mask);
+
+    return inner;
+  }
+
+  function buildSplitReveals() {
+    const targets = gsap.utils.toArray<HTMLElement>(
+      "[data-split]:not([data-split-claimed])"
+    );
+    if (!targets.length) return;
+
+    targets.forEach((el) => el.setAttribute("data-split-claimed", ""));
+
+    const rtl = isRtl();
+
+    targets.forEach((el) => {
+      if (rtl) {
+        const inner = maskWholeBlock(el);
+        gsap.from(inner, {
+          yPercent: 110,
+          duration: 0.9,
+          ease: "expo.out",
+          // Drop the inline transform once settled so the resting DOM is
+          // clean (see the §7 "no transform after idle" assertion).
+          clearProps: "transform",
+          scrollTrigger: { trigger: el, start: "top 88%", once: true },
+        });
+        return;
+      }
+
+      const split = SplitText.create(el, {
+        type: "lines",
+        mask: "lines",
+        // Re-splits on resize and once webfonts land, so line boxes are
+        // never measured against the fallback font.
+        autoSplit: true,
+        // Keeps the original string intact for screen readers.
+        aria: "auto",
+        linesClass: "split-line",
+        onSplit: (self: SplitText) => {
+          self.lines.forEach((line) => {
+            const mask = (line as HTMLElement).parentElement;
+            if (mask && mask !== el) padMask(mask);
+          });
+
+          // Returned animations are reverted automatically by SplitText
+          // when it re-splits, so resizes never stack duplicate tweens.
+          return gsap.from(self.lines, {
+            yPercent: 110,
+            duration: 0.9,
+            stagger: 0.06,
+            ease: "expo.out",
+            clearProps: "transform",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              once: true,
+            },
+          });
+        },
+      });
+      splits.push(split);
+    });
+  }
+
+  // ---------------------------------------------------------- simple reveals
+
+  function buildBlockReveals() {
+    const elements = gsap.utils.toArray<HTMLElement>(
+      ".reveal:not([data-reveal-claimed])"
+    );
+    if (!elements.length) return;
+
+    // Claimed synchronously, so overlapping setup passes can never register
+    // two competing batches against the same element.
+    elements.forEach((el) => el.setAttribute("data-reveal-claimed", ""));
+
+    ScrollTrigger.batch(elements, {
+      start: "top 88%",
+      once: true,
+      onEnter: (batch) => {
+        // Flip to the CSS resting state first, then animate from the hidden
+        // values and clear every inline style on completion — the element is
+        // left exactly where the plain `.reveal.is-in` rule puts it, never in
+        // a JS-only end state that could survive a swap.
+        batch.forEach((el) => el.classList.add("is-in"));
+        gsap.set(batch, { willChange: "transform, opacity" });
+        gsap.fromTo(
+          batch,
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: "power2.out",
+            stagger: 0.08,
+            clearProps: "transform,opacity,willChange",
+          }
+        );
+      },
+    });
+  }
+
+  // ----------------------------------------------------------- media reveals
+
+  function buildMediaReveals() {
+    const figures = gsap.utils.toArray<HTMLElement>(
+      "[data-media]:not([data-media-claimed])"
+    );
+    if (!figures.length) return;
+
+    figures.forEach((el) => el.setAttribute("data-media-claimed", ""));
+
+    ScrollTrigger.batch(figures, {
+      start: "top 90%",
+      once: true,
+      onEnter: (batch) => batch.forEach((el) => el.classList.add("is-in")),
+    });
+  }
+
+  // ---------------------------------------------------------------- lifecycle
+
+  async function init() {
+    initScroller();
+
+    if (reduceMotion.matches) {
+      // Nothing is hidden in the reduced-motion stylesheet, so there is
+      // nothing to animate in — bail before touching the DOM.
+      ScrollTrigger.refresh();
+      return;
+    }
+
+    // Splitting before webfonts resolve measures line boxes against the
+    // fallback face, which is what produced overlapping headings.
+    try {
+      await document.fonts.ready;
+    } catch {
+      /* fonts API unavailable — fall through with the fallback metrics */
+    }
+
+    buildSplitReveals();
+    buildBlockReveals();
+    buildMediaReveals();
+
+    ScrollTrigger.refresh();
+  }
+
+  function teardown() {
+    ScrollTrigger.getAll().forEach((t) => t.kill());
+    splits.forEach((s) => s.revert());
+    splits = [];
+
+    // Unwrap the RTL masks back to the original markup.
+    maskedBlocks.forEach(({ el, html }) => {
+      el.innerHTML = html;
+      el.removeAttribute("data-split-claimed");
+    });
+    maskedBlocks = [];
+
+    // Drop every inline style this layer wrote, so nothing survives the swap.
+    document
+      .querySelectorAll<HTMLElement>(
+        "[data-reveal-claimed], [data-split-claimed], [data-media-claimed]"
+      )
+      .forEach((el) => {
+        el.style.transform = "";
+        el.style.opacity = "";
+        el.style.filter = "";
+        el.style.willChange = "";
+      });
+  }
+
+  init();
+  document.addEventListener("astro:page-load", init);
+  document.addEventListener("astro:before-swap", teardown);
+  document.addEventListener("astro:after-swap", () => {
+    (window as any).__lenis?.scrollTo(0, { immediate: true });
+  });
+</script>

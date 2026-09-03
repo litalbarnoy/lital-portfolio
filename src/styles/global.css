@@ -88,6 +88,45 @@ html.lenis {
   transform: scaleX(1);
 }
 
+/* nav hover — filled pill scales up from the centre behind the label,
+   label inverts. Transform + color only. */
+.nav-pill {
+  position: relative;
+  display: inline-block;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  isolation: isolate;
+  transition: color 0.35s var(--ease-expo);
+}
+
+.nav-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--color-ink);
+  transform: scale(0);
+  transition: transform 0.35s var(--ease-expo);
+}
+
+.nav-pill:hover,
+.nav-pill:focus-visible {
+  color: var(--color-cream);
+}
+
+.nav-pill:hover::before,
+.nav-pill:focus-visible::before {
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-pill,
+  .nav-pill::before {
+    transition: none;
+  }
+}
+
 /* custom cursor — desktop pointer devices only */
 .cursor-dot {
   position: fixed;
@@ -116,16 +155,6 @@ html.lenis {
   }
 }
 
-/* full-screen page transition overlay */
-.page-transition-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background: var(--color-ink);
-  pointer-events: none;
-  clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
-}
-
 /* scroll reveal — CSS-first fail-safe: content is visible by default.
    It only starts hidden once html.js confirms JS actually took over;
    GSAP's ScrollTrigger.batch (see Reveal.astro) then animates it in via
@@ -141,14 +170,46 @@ html.js .reveal:not(.is-in) {
   transform: translateY(28px);
 }
 
+/* masked line reveal — lines only, never characters, which would break
+   Hebrew bidi runs and glyph shaping. LTR splits per line via SplitText;
+   RTL masks the block as a whole (see MotionLayer.astro). */
+.split-line-mask {
+  display: block;
+  overflow: clip;
+}
+
+.split-line {
+  display: block;
+}
+
+/* media reveal — inner image scales down to 1, wrapper keeps its box */
+[data-media] {
+  overflow: hidden;
+}
+
+html.js [data-media] :is(img, video) {
+  transform: scale(1.08);
+  transition: transform 1.2s var(--ease-expo);
+}
+
+/* Resting state is `none`, not `scale(1)` — a settled element must report
+   no transform at all (see the §7 idle assertion). */
+html.js [data-media].is-in :is(img, video) {
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   html.js .reveal:not(.is-in) {
     opacity: 1;
     transform: none;
   }
-  .cursor-dot,
-  .page-transition-overlay {
+  html.js [data-media] :is(img, video),
+  html.js [data-media].is-in :is(img, video) {
+    transform: none;
+    transition: none;
+  }
+  .cursor-dot {
     display: none;
   }
 }

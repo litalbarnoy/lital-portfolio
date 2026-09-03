@@ -22,33 +22,40 @@ const t = ui[lang].project;
 ---
 
 <div class="project-view">
-  <div class="mb-10 flex gap-8 border-b border-line">
+  <div class="view-tabs mb-10 flex gap-8 border-b border-line" role="tablist">
     <button
       type="button"
-      class="view-tab is-active border-b-2 border-ink pb-3 text-sm font-medium"
+      class="view-tab is-active pb-3 text-sm font-medium"
       data-view-btn="card"
+      role="tab"
+      aria-selected="true"
     >
       {t.cardView}
     </button>
     <button
       type="button"
-      class="view-tab border-b-2 border-transparent pb-3 text-sm font-medium text-ink-soft"
+      class="view-tab pb-3 text-sm font-medium text-ink-soft"
       data-view-btn="list"
+      role="tab"
+      aria-selected="false"
     >
       {t.listView}
     </button>
+    <span class="view-indicator" aria-hidden="true"></span>
   </div>
 
   <div data-view-panel="card" class="grid gap-10 md:grid-cols-2">
     {
       projects.map((project) => (
-        <ProjectCard
-          href={project.href}
-          title={project.title}
-          subtitle={project.subtitle}
-          cover={project.cover}
-          year={project.year}
-        />
+        <div data-flip-id={`card:${project.href}`}>
+          <ProjectCard
+            href={project.href}
+            title={project.title}
+            subtitle={project.subtitle}
+            cover={project.cover}
+            year={project.year}
+          />
+        </div>
       ))
     }
   </div>
@@ -56,39 +63,144 @@ const t = ui[lang].project;
   <div data-view-panel="list" class="hidden">
     {
       projects.map((project) => (
-        <ProjectListRow
-          href={project.href}
-          title={project.title}
-          subtitle={project.subtitle}
-          year={project.year}
-          tags={project.tags}
-        />
+        <div data-flip-id={`row:${project.href}`}>
+          <ProjectListRow
+            href={project.href}
+            title={project.title}
+            subtitle={project.subtitle}
+            year={project.year}
+            tags={project.tags}
+          />
+        </div>
       ))
     }
   </div>
 </div>
 
+<style>
+  .view-tabs {
+    position: relative;
+  }
+
+  .view-indicator {
+    position: absolute;
+    bottom: -1px;
+    inset-inline-start: 0;
+    height: 2px;
+    width: 0;
+    background: var(--color-ink);
+    /* Offset via inset-inline-start rather than translateX so the settled
+       element reports no transform at all (see the §7 idle assertion), and
+       so the slide direction follows the writing mode for free. */
+    transition:
+      inset-inline-start 0.45s var(--ease-expo),
+      width 0.45s var(--ease-expo);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .view-indicator {
+      transition: none;
+    }
+  }
+</style>
+
 <script>
+  import gsap from "gsap";
+  import { Flip } from "gsap/Flip";
+
+  gsap.registerPlugin(Flip);
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
   function setupViewToggle() {
     document.querySelectorAll<HTMLElement>(".project-view").forEach((root) => {
       if (root.dataset.viewBound) return;
       root.dataset.viewBound = "true";
 
-      const buttons = root.querySelectorAll<HTMLButtonElement>("[data-view-btn]");
-      buttons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const view = btn.dataset.viewBtn;
-          buttons.forEach((b) => {
-            const active = b === btn;
-            b.classList.toggle("is-active", active);
-            b.classList.toggle("border-ink", active);
-            b.classList.toggle("border-transparent", !active);
-            b.classList.toggle("text-ink-soft", !active);
-          });
-          root.querySelectorAll<HTMLElement>("[data-view-panel]").forEach((panel) => {
-            panel.classList.toggle("hidden", panel.dataset.viewPanel !== view);
-          });
+      const buttons = Array.from(
+        root.querySelectorAll<HTMLButtonElement>("[data-view-btn]")
+      );
+      const indicator = root.querySelector<HTMLElement>(".view-indicator");
+      const panels = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-view-panel]")
+      );
+
+      const rtl = getComputedStyle(root).direction === "rtl";
+
+      function moveIndicator(btn: HTMLButtonElement) {
+        if (!indicator) return;
+        const tabsBox = btn.parentElement!.getBoundingClientRect();
+        const box = btn.getBoundingClientRect();
+        // Distance from the container's inline-start edge in this direction.
+        const offset = rtl ? tabsBox.right - box.right : box.left - tabsBox.left;
+        indicator.style.width = `${box.width}px`;
+        indicator.style.insetInlineStart = `${offset}px`;
+      }
+
+      function select(btn: HTMLButtonElement) {
+        const view = btn.dataset.viewBtn;
+
+        buttons.forEach((b) => {
+          const active = b === btn;
+          b.classList.toggle("is-active", active);
+          b.classList.toggle("text-ink-soft", !active);
+          b.setAttribute("aria-selected", String(active));
         });
+
+        moveIndicator(btn);
+
+        if (reduceMotion.matches) {
+          panels.forEach((p) =>
+            p.classList.toggle("hidden", p.dataset.viewPanel !== view)
+          );
+          return;
+        }
+
+        // Flip records the current geometry, then animates the cards from
+        // their old boxes into the new layout after the swap.
+        const cards = root.querySelectorAll<HTMLElement>("[data-flip-id]");
+        const state = Flip.getState(cards);
+
+        panels.forEach((p) =>
+          p.classList.toggle("hidden", p.dataset.viewPanel !== view)
+        );
+
+        Flip.from(state, {
+          duration: 0.5,
+          ease: "power2.inOut",
+          absolute: true,
+          scale: false,
+          stagger: 0.02,
+          onEnter: (targets) =>
+            gsap.fromTo(
+              targets,
+              { opacity: 0, y: 16 },
+              { opacity: 1, y: 0, duration: 0.4, clearProps: "all" }
+            ),
+          onLeave: (targets) =>
+            gsap.to(targets, { opacity: 0, duration: 0.2 }),
+        });
+      }
+
+      buttons.forEach((btn) =>
+        btn.addEventListener("click", () => select(btn))
+      );
+
+      const active =
+        buttons.find((b) => b.classList.contains("is-active")) ?? buttons[0];
+      if (active) {
+        // Position the indicator without animating it on first paint.
+        const prev = indicator?.style.transition ?? "";
+        if (indicator) indicator.style.transition = "none";
+        moveIndicator(active);
+        requestAnimationFrame(() => {
+          if (indicator) indicator.style.transition = prev;
+        });
+      }
+
+      window.addEventListener("resize", () => {
+        const current = buttons.find((b) => b.classList.contains("is-active"));
+        if (current) moveIndicator(current);
       });
     });
   }
