@@ -2,7 +2,7 @@
 import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import { getLang, ui } from "../i18n/ui";
-import { buildBlocks } from "../lib/projectContent";
+import { parseSections } from "../lib/projectContent";
 import { imageSize } from "../lib/imageSize";
 
 interface Props {
@@ -38,23 +38,26 @@ const {
 const lang = getLang(Astro.url.pathname);
 const t = ui[lang].project;
 
-// UI screenshots must be shown whole on a neutral surface; cropping them to
-// fill a frame turns them into unreadable fragments. Photography fills.
+// UI screenshots are shown whole on a neutral surface; cropping them to fill
+// a frame turns them into unreadable fragments. Photography fills.
 const isUi = Astro.url.pathname.includes("/product-design/");
 const fit: "contain" | "cover" = isUi ? "contain" : "cover";
 
-const blocks = buildBlocks(body, gallery, video);
+const texts = parseSections(body);
+const intro = texts[0] ?? null;
+const rest = texts.slice(1);
 
-// Every figure carries its real intrinsic ratio, so nothing reflows once the
-// images land and desyncs the scroll triggers measured before then.
+// Every reel card gets its own width and baseline. A strip of identically
+// sized rectangles is what makes a short gallery read as generic; the varied
+// rhythm plus the oversized type behind it is what carries the section when
+// there are only three or four images to show.
+const CARD_WIDTHS = ["is-w-lg", "is-w-sm", "is-w-md", "is-w-xs", "is-w-lg"];
+const CARD_OFFSETS = ["is-drop-0", "is-drop-2", "is-drop-1", "is-drop-3", "is-drop-1"];
+
 const sizes = new Map<string, { width: number; height: number }>();
 for (const src of [cover, ...gallery, ...(next?.cover ? [next.cover] : [])]) {
   sizes.set(src, await imageSize(src));
 }
-const ratio = (src: string) => {
-  const s = sizes.get(src)!;
-  return `${s.width} / ${s.height}`;
-};
 
 function youtubeEmbed(url: string): string | null {
   const match = url.match(
@@ -63,151 +66,179 @@ function youtubeEmbed(url: string): string | null {
   return match ? `https://www.youtube.com/embed/${match[1]}` : null;
 }
 
+// Each arrow is drawn pointing the way it travels, rather than mirrored with
+// a transform — which would leave a permanent scaleX(-1) sitting in the page.
+const CHEVRON_LEFT = "M15 5l-7 7 7 7";
+const CHEVRON_RIGHT = "M9 5l7 7-7 7";
+const rtl = lang === "he";
+const arrowStart = rtl ? CHEVRON_RIGHT : CHEVRON_LEFT;
+const arrowEnd = rtl ? CHEVRON_LEFT : CHEVRON_RIGHT;
+
+const videoEmbed = video ? youtubeEmbed(video) : null;
 const coverSize = sizes.get(cover)!;
 ---
 
 <BaseLayout title={title} description={subtitle}>
   <article class="project">
-    {/* 01 — hero. No image: the title and the meta row own the first screen. */}
+    {/* 01 — header: oversized title beside the cover, which carries the
+        same pointer-driven hover as the rest of the site. */}
     <header class="project-hero container">
-      <p class="label reveal">{role}</p>
-      <h1 class="project-title" data-hero-title>{title}</h1>
-      <p class="project-subtitle reveal">{subtitle}</p>
+      <div class="hero-text">
+        <p class="label reveal">{role}</p>
+        <h1 class="project-title" data-hero-title>{title}</h1>
 
-      <dl class="meta-row reveal">
-        <div>
-          <dt class="label">{t.role}</dt>
-          <dd>{role}</dd>
-        </div>
-        <div>
-          <dt class="label">{t.client}</dt>
-          <dd>{client}</dd>
-        </div>
-        <div>
-          <dt class="label">{t.year}</dt>
-          <dd>{year}</dd>
-        </div>
-        <div>
-          <dt class="label">{t.tags}</dt>
-          <dd>{tags.join(" · ")}</dd>
-        </div>
-        {
-          externalUrl && (
+        <div class="hero-foot reveal">
+          <p class="project-subtitle">{subtitle}</p>
+
+          <ul class="tag-pills">
+            {tags.map((tag) => <li>{tag}</li>)}
+          </ul>
+
+          <dl class="meta-row">
             <div>
-              <dt class="label">{t.link ?? "Link"}</dt>
-              <dd>
-                <a href={externalUrl} target="_blank" rel="noopener" class="link-underline">
-                  {new URL(externalUrl).hostname}
-                </a>
-              </dd>
+              <dt class="label">{t.client}</dt>
+              <dd>{client}</dd>
             </div>
-          )
-        }
-      </dl>
+            <div>
+              <dt class="label">{t.year}</dt>
+              <dd>{year}</dd>
+            </div>
+            {
+              externalUrl && (
+                <div>
+                  <dt class="label">{t.link}</dt>
+                  <dd>
+                    <a href={externalUrl} target="_blank" rel="noopener" class="link-underline">
+                      {new URL(externalUrl).hostname}
+                    </a>
+                  </dd>
+                </div>
+              )
+            }
+          </dl>
+        </div>
+      </div>
+
+      {/* Parallax needs object-fit: cover, which would crop a UI screenshot
+          into an unreadable fragment — so photography gets the drift and
+          screenshots get shown whole instead. */}
+      <figure
+        class:list={["hero-media", "media-frame", `fit-${fit}`]}
+        data-ripple
+        data-media
+        data-parallax={fit === "cover" ? "" : undefined}
+      >
+        <Image
+          src={cover}
+          width={coverSize.width}
+          height={coverSize.height}
+          alt={title}
+          widths={[600, 900, 1200, 1600]}
+          sizes="(max-width: 900px) 100vw, 45vw"
+        />
+      </figure>
     </header>
 
-    {/* 02 — cover. Full-bleed, parallax, and shown exactly once. */}
-    <figure class="project-cover" data-ripple data-media data-parallax>
-      <Image
-        src={cover}
-        width={coverSize.width}
-        height={coverSize.height}
-        alt={title}
-        widths={[800, 1200, 1600, 2000]}
-        sizes="100vw"
-      />
-    </figure>
-
     {
-      blocks.map((block) => {
-        if (block.type === "text") {
-          return (
-            <section class="project-section container text-section">
-              <h2 class="section-label" data-split>
-                {block.label}
-              </h2>
-              <div class="section-body reveal" set:html={block.html} />
-            </section>
-          );
-        }
+      intro && (
+        <section class="project-section container text-section">
+          <h2 class="section-label" data-split>{intro.label}</h2>
+          <div class="section-body reveal" set:html={intro.html} />
+        </section>
+      )
+    }
 
-        if (block.type === "video") {
-          const embed = youtubeEmbed(block.url);
-          return embed ? (
-            <section class="project-section container">
-              <div class="video-frame" data-media>
-                <iframe
-                  src={embed}
-                  title={title}
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowfullscreen
-                />
-              </div>
-            </section>
-          ) : null;
-        }
+    {/* 02 — the one gallery: a horizontal reel, dragged or stepped with the
+        arrows, riding over the project name at display size. */}
+    {
+      gallery.length > 0 && (
+        <section class="reel" aria-roledescription="carousel" aria-label={title}>
+          <div class="reel-type" data-horizontal aria-hidden="true">
+            <span>{title}</span>
+          </div>
 
-        if (block.type === "media") {
-          return (
-            <section
-              class:list={[
-                "project-section container media-block",
-                block.layout === "pair" ? "media-pair" : "media-wide",
-              ]}
-            >
-              {block.items.map((src) => (
-                <figure class="media-figure" data-ripple data-media>
-                  <div class:list={["media-frame", `fit-${fit}`]} style={`aspect-ratio:${ratio(src)}`}>
-                    {src.endsWith(".gif") ? (
-                      <img src={src} alt={title} loading="lazy" width={sizes.get(src)!.width} height={sizes.get(src)!.height} />
-                    ) : (
-                      <Image
-                        src={src}
-                        width={sizes.get(src)!.width}
-                        height={sizes.get(src)!.height}
-                        alt={title}
-                        widths={[400, 800, 1200, 1600]}
-                        sizes="(max-width: 768px) 100vw, 60vw"
-                      />
-                    )}
-                  </div>
-                </figure>
-              ))}
-            </section>
-          );
-        }
-
-        // 08 — gallery, two columns with the second offset down.
-        return (
-          <section class="project-section container gallery-grid">
-            {block.items.map((src, i) => (
-              <figure class:list={["media-figure", i % 2 === 1 && "is-offset"]} data-ripple data-media>
-                <div class:list={["media-frame", `fit-${fit}`]} style={`aspect-ratio:${ratio(src)}`}>
+          <div class="reel-track" data-reel-track tabindex="0">
+            {gallery.map((src, i) => (
+              <figure
+                class:list={[
+                  "reel-card",
+                  CARD_WIDTHS[i % CARD_WIDTHS.length],
+                  CARD_OFFSETS[i % CARD_OFFSETS.length],
+                ]}
+                data-ripple
+                data-media
+              >
+                {/* A contained screenshot keeps its own proportions — forcing
+                    it into a decorative portrait frame just surrounds it with
+                    empty surface. Photography is cropped anyway, so it takes
+                    the varied frame that gives the reel its rhythm. */}
+                <div
+                  class:list={["media-frame", `fit-${fit}`]}
+                  style={
+                    fit === "contain"
+                      ? `aspect-ratio:${sizes.get(src)!.width} / ${sizes.get(src)!.height}`
+                      : undefined
+                  }
+                >
                   {src.endsWith(".gif") ? (
-                    <img src={src} alt={title} loading="lazy" width={sizes.get(src)!.width} height={sizes.get(src)!.height} />
+                    <img
+                      src={src}
+                      alt={title}
+                      loading="lazy"
+                      width={sizes.get(src)!.width}
+                      height={sizes.get(src)!.height}
+                    />
                   ) : (
                     <Image
                       src={src}
                       width={sizes.get(src)!.width}
                       height={sizes.get(src)!.height}
                       alt={title}
-                      widths={[400, 800, 1200]}
-                      sizes="(max-width: 768px) 100vw, 45vw"
+                      widths={[400, 800, 1200, 1600]}
+                      sizes="(max-width: 900px) 78vw, 50vw"
                     />
                   )}
                 </div>
               </figure>
             ))}
-          </section>
-        );
-      })
+          </div>
+
+          <div class="reel-controls container">
+            <button type="button" class="reel-btn" data-reel-prev aria-label={t.prev}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={arrowStart} /></svg>
+            </button>
+            <button type="button" class="reel-btn" data-reel-next aria-label={t.nextImage}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={arrowEnd} /></svg>
+            </button>
+          </div>
+        </section>
+      )
     }
 
-    {/* 09 — the project name at display size, drifting on scroll. */}
-    <div class="name-band" data-horizontal aria-hidden="true">
-      <span class="name-band-inner">{title}</span>
-    </div>
+    {
+      rest.map((section) => (
+        <section class="project-section container text-section">
+          <h2 class="section-label" data-split>{section.label}</h2>
+          <div class="section-body reveal" set:html={section.html} />
+        </section>
+      ))
+    }
+
+    {
+      videoEmbed && (
+        <section class="project-section container">
+          <div class="video-frame" data-media>
+            <iframe
+              src={videoEmbed}
+              title={title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            />
+          </div>
+        </section>
+      )
+    }
 
     {
       next && (
@@ -238,38 +269,77 @@ const coverSize = sizes.get(cover)!;
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // 09 — the only scrubbed text on the page, and it is decorative and
-  // aria-hidden. Travel is signed by writing direction so the band drifts
-  // the same way the language reads.
-  function buildNameBand() {
-    const band = document.querySelector<HTMLElement>("[data-horizontal]");
-    const inner = band?.querySelector<HTMLElement>(".name-band-inner");
-    if (!band || !inner || band.dataset.bandClaimed) return;
-    band.dataset.bandClaimed = "true";
+  // The track is a real horizontal scroll container, so dragging, swiping,
+  // the keyboard and a no-JS load all work on their own. The arrows only
+  // step it — they are an addition, never the only way through.
+  function buildReel() {
+    const track = document.querySelector<HTMLElement>("[data-reel-track]");
+    if (!track || track.dataset.reelBound) return;
+    track.dataset.reelBound = "true";
+
+    const prev = document.querySelector<HTMLElement>("[data-reel-prev]");
+    const next = document.querySelector<HTMLElement>("[data-reel-next]");
+
+    // In RTL the inline axis runs the other way, and scrollLeft counts down
+    // from zero, so every step has to be signed by the writing direction.
+    const sign = () => (document.dir === "rtl" ? -1 : 1);
+
+    const step = () => {
+      const card = track.querySelector<HTMLElement>(".reel-card");
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      return (card?.getBoundingClientRect().width ?? track.clientWidth * 0.6) + gap;
+    };
+
+    const go = (dir: 1 | -1) =>
+      track.scrollBy({ left: step() * dir * sign(), behavior: "smooth" });
+
+    prev?.addEventListener("click", () => go(-1));
+    next?.addEventListener("click", () => go(1));
+
+    // Arrows that can never do anything are worse than no arrows, so a reel
+    // whose images already fit hides them entirely rather than showing two
+    // permanently dead buttons.
+    const controls = document.querySelector<HTMLElement>(".reel-controls");
+    const sync = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      controls?.toggleAttribute("hidden", max <= 1);
+      const pos = Math.abs(track.scrollLeft);
+      prev?.toggleAttribute("disabled", pos <= 1);
+      next?.toggleAttribute("disabled", pos >= max - 1);
+    };
+    track.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync, { passive: true });
+    sync();
+  }
+
+  // The project name drifts behind the reel — the only scrubbed thing in the
+  // section, decorative, aria-hidden, and clipped by its own wrapper.
+  function buildReelType() {
+    const band = document.querySelector<HTMLElement>(".reel-type");
+    const inner = band?.querySelector<HTMLElement>("span");
+    if (!band || !inner || band.dataset.typeBound) return;
+    band.dataset.typeBound = "true";
 
     const mm = gsap.matchMedia();
-    mm.add(
-      "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
-      () => {
-        const sign = document.dir === "rtl" ? 1 : -1;
-        const tween = gsap.fromTo(
-          inner,
-          { xPercent: -8 * sign },
-          {
-            xPercent: 8 * sign,
-            ease: "none",
-            scrollTrigger: {
-              trigger: band,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 0.5,
-              invalidateOnRefresh: true,
-            },
-          }
-        );
-        return () => tween.kill();
-      }
-    );
+    mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
+      const dir = document.dir === "rtl" ? 1 : -1;
+      const tween = gsap.fromTo(
+        inner,
+        { xPercent: -6 * dir },
+        {
+          xPercent: 6 * dir,
+          ease: "none",
+          scrollTrigger: {
+            trigger: band,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.5,
+            invalidateOnRefresh: true,
+          },
+        }
+      );
+      return () => tween.kill();
+    });
   }
 
   // The hero title reveals on load, not on scroll — it is already on screen.
@@ -277,7 +347,6 @@ const coverSize = sizes.get(cover)!;
     const el = document.querySelector<HTMLElement>("[data-hero-title]");
     if (!el || el.dataset.heroRevealed) return;
     el.dataset.heroRevealed = "true";
-
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const inner = document.createElement("span");
@@ -291,19 +360,14 @@ const coverSize = sizes.get(cover)!;
     gsap.fromTo(
       inner,
       { yPercent: 100 },
-      {
-        yPercent: 0,
-        duration: 0.9,
-        ease: "expo.out",
-        delay: 0.1,
-        clearProps: "transform",
-      }
+      { yPercent: 0, duration: 0.9, ease: "expo.out", delay: 0.1, clearProps: "transform" }
     );
   }
 
   function init() {
     revealHeroTitle();
-    buildNameBand();
+    buildReel();
+    buildReelType();
   }
 
   init();

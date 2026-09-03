@@ -24,6 +24,9 @@ export const ui = {
       allProjects: "לכל הפרויקטים",
       cardView: "תצוגת כרטיסים",
       listView: "תצוגת רשימה",
+      prev: "הקודם",
+      nextImage: "הבא",
+      link: "קישור",
     },
   },
   en: {
@@ -49,6 +52,9 @@ export const ui = {
       allProjects: "View all projects",
       cardView: "Card View",
       listView: "List View",
+      prev: "Previous",
+      nextImage: "Next",
+      link: "Link",
     },
   },
 } as const;

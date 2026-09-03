@@ -12,26 +12,26 @@ interface Props {
 const { href, title, subtitle, cover, year } = Astro.props;
 ---
 
-<a href={href} class="reveal group block" data-cursor-hover>
-  <div class="relative overflow-hidden rounded-sm bg-line" data-ripple data-media>
+<a href={href} class="project-card reveal block" data-cursor-hover data-astro-prefetch="hover">
+  {/* The thumbnail grows on hover. The transform sits on this wrapper rather
+      than on the image inside it, so the pointer-driven canvas — which
+      re-measures this element every frame — stays in register with it. The
+      title used to be repeated in a gradient overlay here; it already sits
+      directly underneath, so the overlay is gone rather than aria-hidden. */}
+  <div class="card-media" data-ripple data-media>
     <Image
       src={cover}
       width={1600}
       height={1000}
       alt={title}
-      class="aspect-[16/10] w-full object-cover"
-      widths={[400, 800, 1200, 1600]}
-      sizes="(max-width: 768px) 100vw, 50vw"
+      class="aspect-[4/3] w-full object-cover"
+      widths={[400, 800, 1200]}
+      sizes="(max-width: 768px) 100vw, 30vw"
     />
-    <div
-      class="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-    >
-      <span class="p-6 font-bold text-lg text-cream" aria-hidden="true">{title}</span>
-    </div>
   </div>
-  <div class="mt-4 flex items-baseline justify-between">
-    <h3 class="text-xl font-semibold">{title}</h3>
-    <span class="text-sm text-ink-soft">{year}</span>
+  <div class="mt-4 flex items-baseline justify-between gap-4">
+    <h3 class="text-lg font-semibold">{title}</h3>
+    <span class="shrink-0 text-sm text-ink-soft">{year}</span>
   </div>
-  <p class="mt-1 text-ink-soft">{subtitle}</p>
+  <p class="mt-1 text-sm text-ink-soft">{subtitle}</p>
 </a>

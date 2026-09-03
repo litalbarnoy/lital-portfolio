@@ -269,7 +269,8 @@ html.js [data-media].is-done {
   padding-inline: var(--gutter);
 }
 
-/* Type roles. `start` rather than `right` so the /en routes mirror for free. */
+/* Type roles. `start` rather than `right`, so /en mirrors without a second
+   set of rules. */
 .label {
   font-size: 0.75rem;
   letter-spacing: 0.08em;
@@ -281,8 +282,8 @@ html.js [data-media].is-done {
 .project-title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(3.5rem, 11vw, 11rem);
-  line-height: 0.92;
+  font-size: clamp(3rem, 7.5vw, 7.5rem);
+  line-height: 0.94;
   letter-spacing: -0.02em;
   text-align: start;
   text-wrap: balance;
@@ -326,14 +327,44 @@ html.js [data-media].is-done {
   font-weight: 700;
 }
 
-/* 01 hero — svh so mobile browser chrome cannot clip it. */
+/* 01 hero — title above, supporting detail pinned to the bottom, cover
+   alongside. svh so mobile browser chrome cannot clip it. */
 .project-hero {
-  min-block-size: 88svh;
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  padding-block: clamp(3rem, 8vh, 6rem);
+  align-items: stretch;
+}
+
+.hero-text {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   gap: 1.25rem;
-  padding-block: clamp(3rem, 8vh, 6rem);
+  min-inline-size: 0;
+}
+
+.hero-foot {
+  margin-block-start: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tag-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.tag-pills li {
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .meta-row {
@@ -342,7 +373,6 @@ html.js [data-media].is-done {
   gap: 1.5rem;
   border-block-start: 1px solid var(--color-line);
   padding-block-start: 1.5rem;
-  margin-block-start: 1rem;
 }
 
 .meta-row dd {
@@ -350,31 +380,142 @@ html.js [data-media].is-done {
   font-weight: 500;
 }
 
-/* 02 cover — full-bleed without 100vw, which would add the scrollbar width
-   and reintroduce horizontal overflow. */
-.project-cover {
-  block-size: 85svh;
-  margin-block-start: var(--section-gap);
+.hero-media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  aspect-ratio: 4 / 5;
+  min-block-size: 60svh;
+}
+
+/* A contained screenshot in a tall portrait box is mostly empty surface. */
+.hero-media.fit-contain {
+  aspect-ratio: 4 / 3;
+  min-block-size: auto;
 }
 
 .project-section {
   margin-block-start: var(--section-gap);
 }
 
-/* 03/05 — sticky label beside the body; stacked and unstuck on mobile. */
 .text-section {
   display: grid;
   gap: clamp(1.5rem, 4vw, 3rem);
 }
 
-.media-block {
-  display: grid;
+/* 02 reel — one horizontal gallery, dragged or stepped, over the project
+   name at display size. The type is what fills the section when there are
+   only a few images to show. */
+.reel {
+  position: relative;
+  margin-block-start: var(--section-gap);
+  padding-block: clamp(2rem, 6vh, 4rem);
+  overflow: hidden;
+}
+
+.reel-type {
+  position: absolute;
+  inset-block: 0;
+  inset-inline: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.reel-type span {
+  display: block;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(4rem, 16vw, 15rem);
+  line-height: 1;
+  color: var(--color-line);
+}
+
+/* A real scroll container: drag, swipe, keyboard and no-JS all work without
+   the arrows, which only step it. */
+.reel-track {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
   gap: var(--gutter);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  /* `safe` centres the cards when they already fit and falls back to the
+     start edge when they overflow, so the first card is never stranded
+     out of reach. */
+  justify-content: safe center;
+  padding-inline: var(--gutter);
+  padding-block: clamp(1rem, 4vh, 3rem);
+  scrollbar-width: none;
+}
+
+.reel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.reel-card {
+  flex: 0 0 auto;
+  inline-size: 78vw;
+  scroll-snap-align: center;
+}
+
+.reel-card .fit-cover.media-frame {
+  aspect-ratio: 4 / 3;
+}
+
+.reel-controls[hidden] {
+  display: none;
+}
+
+.reel-controls {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-block-start: 1rem;
+}
+
+.reel-btn {
+  inline-size: 3rem;
+  block-size: 3rem;
+  border: 1px solid var(--color-ink);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background-color 0.3s var(--ease-expo), color 0.3s var(--ease-expo),
+    opacity 0.3s var(--ease-expo);
+}
+
+.reel-btn svg {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.reel-btn:hover:not([disabled]) {
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+
+.reel-btn[disabled] {
+  opacity: 0.25;
+  cursor: default;
 }
 
 .media-frame {
   overflow: hidden;
   inline-size: 100%;
+  border-radius: 4px;
 }
 
 .media-frame :is(img, video) {
@@ -386,24 +527,21 @@ html.js [data-media].is-done {
   object-fit: cover;
 }
 
-/* UI screenshots sit whole on a neutral surface rather than being cropped. */
+/* UI screenshots sit whole on a neutral surface rather than being cropped
+   into unreadable fragments. */
 .fit-contain {
   background: #f4f4f4;
-  padding: clamp(1rem, 4vw, 4rem);
+  padding: clamp(0.75rem, 2.5vw, 2rem);
 }
 
 .fit-contain :is(img, video) {
   object-fit: contain;
 }
 
-.gallery-grid {
-  display: grid;
-  gap: var(--gutter);
-}
-
 .video-frame {
   aspect-ratio: 16 / 9;
   overflow: hidden;
+  border-radius: 4px;
 }
 
 .video-frame iframe {
@@ -412,26 +550,7 @@ html.js [data-media].is-done {
   border: 0;
 }
 
-/* 09 — decorative name band. Clipped, and exempt from the transform
-   assertion via [data-horizontal]. */
-.name-band {
-  overflow: hidden;
-  margin-block-start: var(--section-gap);
-  padding-block: clamp(2rem, 6vh, 5rem);
-}
-
-.name-band-inner {
-  display: block;
-  white-space: nowrap;
-  text-align: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(3rem, 12vw, 10rem);
-  line-height: 1;
-  color: var(--color-line);
-}
-
-/* 10 — next project. */
+/* 03 next project. */
 .next-project {
   display: flex;
   align-items: center;
@@ -455,6 +574,7 @@ html.js [data-media].is-done {
   inline-size: clamp(6rem, 14vw, 11rem);
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  border-radius: 4px;
   clip-path: inset(0 0 100% 0);
   transition: clip-path 0.6s var(--ease-expo);
 }
@@ -470,9 +590,6 @@ html.js [data-media].is-done {
 }
 
 @media (min-width: 768px) {
-  .meta-row {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
   .text-section {
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
@@ -485,20 +602,81 @@ html.js [data-media].is-done {
   .section-body {
     grid-column: span 7;
   }
-  .media-pair {
-    grid-template-columns: 7fr 5fr;
+}
+
+@media (min-width: 900px) {
+  .project-hero {
+    grid-template-columns: 1fr 0.85fr;
+    min-block-size: 88svh;
   }
-  .gallery-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .hero-media,
+  .hero-media.fit-contain {
+    aspect-ratio: auto;
+    block-size: 100%;
+    min-block-size: 0;
   }
-  .gallery-grid .is-offset {
-    margin-block-start: clamp(3rem, 8vh, 8rem);
+  .meta-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  /* Each card gets its own width and baseline: a strip of identical
+     rectangles is exactly what makes a short gallery look generic. */
+  .reel-card.is-w-lg { inline-size: 46vw; }
+  .reel-card.is-w-md { inline-size: 36vw; }
+  .reel-card.is-w-sm { inline-size: 28vw; }
+  .reel-card.is-w-xs { inline-size: 22vw; }
+
+  .reel-card.is-drop-0 { margin-block-start: 0; }
+  .reel-card.is-drop-1 { margin-block-start: clamp(2rem, 6vh, 5rem); }
+  .reel-card.is-drop-2 { margin-block-start: clamp(4rem, 11vh, 9rem); }
+  .reel-card.is-drop-3 { margin-block-start: clamp(1rem, 3vh, 3rem); }
+
+  .reel-card.is-w-lg .fit-cover.media-frame { aspect-ratio: 16 / 10; }
+  .reel-card.is-w-sm .fit-cover.media-frame { aspect-ratio: 3 / 4; }
+  .reel-card.is-w-xs .fit-cover.media-frame { aspect-ratio: 1 / 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .next-thumb {
     clip-path: none;
     transition: none;
+  }
+  .reel-track {
+    scroll-behavior: auto;
+  }
+}
+
+/* ------------------------------------------------------------ index cards
+   Small thumbnails that grow on hover. The scale is on the media wrapper,
+   never on the image inside it, so the wrapper keeps clipping its own
+   contents and nothing can spill into a neighbouring card. */
+.card-media {
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--color-line);
+  transition: transform 0.5s var(--ease-expo);
+}
+
+.project-card {
+  position: relative;
+}
+
+.project-card:hover,
+.project-card:focus-visible {
+  z-index: 2;
+}
+
+.project-card:hover .card-media,
+.project-card:focus-visible .card-media {
+  transform: scale(1.045);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-media {
+    transition: none;
+  }
+  .project-card:hover .card-media,
+  .project-card:focus-visible .card-media {
+    transform: none;
   }
 }
