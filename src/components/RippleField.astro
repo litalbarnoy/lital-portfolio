@@ -265,7 +265,7 @@
     });
 
     document
-      .querySelectorAll<HTMLElement>("[data-ripple-text], .prose-project p")
+      .querySelectorAll<HTMLElement>("[data-ripple-text]")
       .forEach((el) => {
         if (el.dataset.rippleBound) return;
         el.dataset.rippleBound = "true";

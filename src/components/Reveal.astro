@@ -37,13 +37,25 @@ const { as: Tag = "div", class: className, delay = 0 } = Astro.props;
       start: "top 88%",
       once: true,
       onEnter: (batch) => {
-        gsap.to(batch, {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power2.out",
-          stagger: 0.08,
-        });
+        // Flip to the CSS resting state (.is-in) up front, then animate
+        // FROM the hidden values via GSAP; clearProps on completion drops
+        // the inline styles entirely so the element is left exactly where
+        // the plain .reveal.is-in CSS rule already puts it — never a
+        // JS-only end state that could get stuck if something re-runs.
+        batch.forEach((el) => el.classList.add("is-in"));
+        gsap.set(batch, { willChange: "transform, opacity" });
+        gsap.fromTo(
+          batch,
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: "power2.out",
+            stagger: 0.08,
+            clearProps: "transform,opacity,willChange",
+          }
+        );
       },
     });
   }

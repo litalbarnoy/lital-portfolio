@@ -126,14 +126,24 @@ html.lenis {
   clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
 }
 
-/* scroll reveal — initial state, cleared by GSAP ScrollTrigger */
+/* scroll reveal — CSS-first fail-safe: content is visible by default.
+   It only starts hidden once html.js confirms JS actually took over;
+   GSAP's ScrollTrigger.batch (see Reveal.astro) then animates it in via
+   inline styles, which take precedence over this rule. No JS, a JS
+   error, or SSR without hydration all fall back to plain, readable text. */
 .reveal {
+  opacity: 1;
+  transform: none;
+}
+
+html.js .reveal:not(.is-in) {
   opacity: 0;
   transform: translateY(28px);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .reveal,
+  html.js .reveal:not(.is-in) {
     opacity: 1;
     transform: none;
   }

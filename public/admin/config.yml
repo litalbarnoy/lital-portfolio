@@ -151,3 +151,71 @@ collections:
       - label: "Page content (Idea / Process / Result / Reception)"
         name: "body"
         widget: "markdown"
+
+  - name: "academic_he"
+    label: "מחקר אקדמי — עברית"
+    label_singular: "פריט אקדמי"
+    folder: "src/content/academic/he"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "title"
+    fields:
+      - { label: "כותרת", name: "title", widget: "string" }
+      - { label: "כותרת משנה", name: "subtitle", widget: "string" }
+      - { label: "תפקיד (מחברת / מרצה / תלמידת מחקר...)", name: "role", widget: "string" }
+      - { label: "כתב עת / כנס / מוסד", name: "client", widget: "string" }
+      - { label: "שנה", name: "year", widget: "number", value_type: "int" }
+      - { label: "תגיות", name: "tags", widget: "list", required: false }
+      - label: "תמונת כיסוי (לא חובה — רק אם יש דימוי אמיתי)"
+        name: "cover"
+        widget: "image"
+        required: false
+      - label: "גלריית תמונות (לא חובה)"
+        name: "gallery"
+        widget: "list"
+        required: false
+        field: { label: "תמונה", name: "image", widget: "image" }
+      - label: "סדר הצגה ברשימה (מספר קטן = מוצג ראשון)"
+        name: "order"
+        widget: "number"
+        value_type: "int"
+      - label: "תוכן העמוד"
+        name: "body"
+        widget: "markdown"
+
+  - name: "academic_en"
+    label: "Academic Research — English"
+    label_singular: "Academic Entry"
+    folder: "src/content/academic/en"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "title"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Subtitle", name: "subtitle", widget: "string" }
+      - { label: "Role (Author / Lecturer / PhD Student...)", name: "role", widget: "string" }
+      - { label: "Journal / Conference / Institution", name: "client", widget: "string" }
+      - { label: "Year", name: "year", widget: "number", value_type: "int" }
+      - { label: "Tags", name: "tags", widget: "list", required: false }
+      - label: "Cover image (optional — only if a real photo exists)"
+        name: "cover"
+        widget: "image"
+        required: false
+      - label: "Gallery images (optional)"
+        name: "gallery"
+        widget: "list"
+        required: false
+        field: { label: "Image", name: "image", widget: "image" }
+      - label: "Display order (lower number = shown first)"
+        name: "order"
+        widget: "number"
+        value_type: "int"
+      - label: "Page content"
+        name: "body"
+        widget: "markdown"

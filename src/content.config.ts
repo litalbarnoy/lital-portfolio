@@ -24,7 +24,25 @@ const curatorial = defineCollection({
   schema: projectSchema,
 });
 
+const academicSchema = z.object({
+  title: z.string(),
+  subtitle: z.string(),
+  role: z.string(),
+  client: z.string(),
+  year: z.number(),
+  tags: z.array(z.string()).default([]),
+  cover: z.string().optional(),
+  gallery: z.array(z.string()).default([]),
+  order: z.number(),
+});
+
+const academic = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/academic" }),
+  schema: academicSchema,
+});
+
 export const collections = {
   "product-design": productDesign,
   curatorial: curatorial,
+  academic: academic,
 };

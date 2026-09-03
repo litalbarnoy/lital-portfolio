@@ -9,8 +9,6 @@ cover: "/images/imports/axonius/cover.webp"
 gallery:
   - "/images/imports/axonius/workflows.webp"
   - "/images/imports/axonius/nodes.webp"
-  - "https://placehold.co/1200x900/EFE9E1/1a1a18.png?text=More+photos+coming"
-  - "https://placehold.co/1200x900/E4DCD0/1a1a18.png?text=More+photos+coming"
 order: 1
 ---
 

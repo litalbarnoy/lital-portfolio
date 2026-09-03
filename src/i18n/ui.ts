@@ -7,6 +7,7 @@ export const ui = {
       home: "בית",
       productDesign: "עיצוב חוויית משתמש",
       curatorial: "אוצרות",
+      academic: "מחקר אקדמי",
       about: "אודות",
     },
     footer: {
@@ -31,6 +32,7 @@ export const ui = {
       home: "Home",
       productDesign: "Product Design",
       curatorial: "Curatorial",
+      academic: "Academic Research",
       about: "About",
     },
     footer: {

@@ -1,0 +1,31 @@
+---
+import { getCollection, render } from "astro:content";
+import AcademicLayout from "../../../layouts/AcademicLayout.astro";
+import { stripLocale } from "../../../i18n/ui";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("academic");
+  return entries
+    .filter((e) => e.id.startsWith("en/"))
+    .map((entry) => ({
+      params: { slug: stripLocale(entry.id) },
+      props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<AcademicLayout
+  title={entry.data.title}
+  subtitle={entry.data.subtitle}
+  role={entry.data.role}
+  client={entry.data.client}
+  year={entry.data.year}
+  tags={entry.data.tags}
+  cover={entry.data.cover}
+  gallery={entry.data.gallery}
+>
+  <Content />
+</AcademicLayout>

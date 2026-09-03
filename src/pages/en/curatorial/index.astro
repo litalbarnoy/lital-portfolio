@@ -35,4 +35,29 @@ const projects = (await getCollection("curatorial"))
   <section class="mx-auto max-w-6xl px-6 py-16 lg:px-10">
     <ProjectGrid projects={projects} />
   </section>
+
+  <section class="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
+    <Reveal as="h2" class="mb-6 text-sm font-medium uppercase tracking-wide text-ink-soft">
+      Additional Curatorial Experience
+    </Reveal>
+    <div class="divide-y divide-line border-t border-line">
+      {
+        [
+          { title: "Hole", role: "Co-Founder, Curator", venue: "Multidisciplinary performance series, in collaboration with the Jerusalem Municipality's Youth Authority (\"Barutina\")", year: "2025–present" },
+          { title: "Purge Pray Play", role: "Co-Curator, Product Design", venue: "The Wrong Biennale, 5th edition", year: "2021–2022" },
+          { title: "Tel Aviv Museum of Art", role: "Assistant Curator", venue: "Assistant to Ruth Direktor, Curator of the Contemporary Art Department", year: "2021" },
+          { title: "Rest Mass", role: "Assistant Curator", venue: "Assistant to Tali Ben Nun, The Edmond de Rothschild Center, Tel Aviv", year: "2021" },
+          { title: "Daddy Issues", role: "Co-Curator (with Yoomee Ohayon)", venue: "Ha'Cheder Gallery, Beit Romano", year: "2019" },
+        ].map((item) => (
+          <div class="flex flex-col gap-1 py-5 sm:flex-row sm:items-baseline sm:justify-between">
+            <div>
+              <p class="font-bold">{item.title}</p>
+              <p class="text-sm text-ink-soft">{item.role} · {item.venue}</p>
+            </div>
+            <span class="shrink-0 text-sm text-ink-soft">{item.year}</span>
+          </div>
+        ))
+      }
+    </div>
+  </section>
 </BaseLayout>

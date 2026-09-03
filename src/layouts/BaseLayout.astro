@@ -46,6 +46,13 @@ const siteName = lang === "en" ? "Lital Bar Noy" : "ליטל בר נוי";
       rel="stylesheet"
     />
     <ClientRouter />
+    <script is:inline>
+      // Fail-safe flag for CSS-driven reveal animations: only elements
+      // painted after JS has actually taken over ever start hidden.
+      // If JS is disabled or fails to load, .reveal elements simply
+      // render in their final, visible state (see global.css).
+      document.documentElement.classList.add("js");
+    </script>
   </head>
   <body class="bg-cream font-body text-ink antialiased">
     <PageTransition />
