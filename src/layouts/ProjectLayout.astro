@@ -1,8 +1,9 @@
 ---
 import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
-import Reveal from "../components/Reveal.astro";
 import { getLang, ui } from "../i18n/ui";
+import { buildBlocks } from "../lib/projectContent";
+import { imageSize } from "../lib/imageSize";
 
 interface Props {
   title: string;
@@ -14,16 +15,47 @@ interface Props {
   cover: string;
   gallery: string[];
   video?: string;
-  next?: { href: string; title: string } | null;
+  body: string;
+  externalUrl?: string;
+  next?: { href: string; title: string; cover?: string } | null;
 }
 
-const { title, subtitle, role, client, year, tags, cover, gallery, video, next } =
-  Astro.props;
+const {
+  title,
+  subtitle,
+  role,
+  client,
+  year,
+  tags,
+  cover,
+  gallery,
+  video,
+  body,
+  externalUrl,
+  next,
+} = Astro.props;
 
 const lang = getLang(Astro.url.pathname);
 const t = ui[lang].project;
 
-// Turn a YouTube watch/share/embed URL into an embeddable URL.
+// UI screenshots must be shown whole on a neutral surface; cropping them to
+// fill a frame turns them into unreadable fragments. Photography fills.
+const isUi = Astro.url.pathname.includes("/product-design/");
+const fit: "contain" | "cover" = isUi ? "contain" : "cover";
+
+const blocks = buildBlocks(body, gallery, video);
+
+// Every figure carries its real intrinsic ratio, so nothing reflows once the
+// images land and desyncs the scroll triggers measured before then.
+const sizes = new Map<string, { width: number; height: number }>();
+for (const src of [cover, ...gallery, ...(next?.cover ? [next.cover] : [])]) {
+  sizes.set(src, await imageSize(src));
+}
+const ratio = (src: string) => {
+  const s = sizes.get(src)!;
+  return `${s.width} / ${s.height}`;
+};
+
 function youtubeEmbed(url: string): string | null {
   const match = url.match(
     /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/
@@ -31,146 +63,249 @@ function youtubeEmbed(url: string): string | null {
   return match ? `https://www.youtube.com/embed/${match[1]}` : null;
 }
 
-const videoEmbed = video ? youtubeEmbed(video) : null;
+const coverSize = sizes.get(cover)!;
 ---
 
 <BaseLayout title={title} description={subtitle}>
-  <article>
-    <header class="mx-auto grid max-w-6xl gap-10 px-6 pt-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14 lg:px-10 lg:pt-20">
-      <div class="flex flex-col lg:min-h-[68vh] lg:justify-between">
+  <article class="project">
+    {/* 01 — hero. No image: the title and the meta row own the first screen. */}
+    <header class="project-hero container">
+      <p class="label reveal">{role}</p>
+      <h1 class="project-title" data-hero-title>{title}</h1>
+      <p class="project-subtitle reveal">{subtitle}</p>
+
+      <dl class="meta-row reveal">
         <div>
-          {/* Visual eyebrow only — the same string is exposed with a proper
-              label by the "Role" row in the metadata list below. */}
-          <p class="reveal text-sm font-medium text-accent" aria-hidden="true">
-            {role}
-          </p>
-          <h1
-            class="mt-3 font-display text-5xl font-bold leading-[0.95] lg:text-7xl"
-            data-split
-          >
-            {title}
-          </h1>
+          <dt class="label">{t.role}</dt>
+          <dd>{role}</dd>
         </div>
-
-        <div class="reveal mt-10 lg:mt-0">
-          <p class="max-w-md text-lg text-ink-soft">{subtitle}</p>
-          <dl class="mt-8 grid grid-cols-2 gap-6 border-t border-line pt-6">
-            <div>
-              <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.role}</dt>
-              <dd class="mt-1 font-medium">{role}</dd>
-            </div>
-            <div>
-              <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.client}</dt>
-              <dd class="mt-1 font-medium">{client}</dd>
-            </div>
-            <div>
-              <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.year}</dt>
-              <dd class="mt-1 font-medium">{year}</dd>
-            </div>
-            <div>
-              <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.tags}</dt>
-              <dd class="mt-1 font-medium">{tags.join(" · ")}</dd>
-            </div>
-          </dl>
+        <div>
+          <dt class="label">{t.client}</dt>
+          <dd>{client}</dd>
         </div>
-      </div>
-
-      <div
-        class="aspect-[4/3] overflow-hidden rounded-sm lg:aspect-auto lg:h-[68vh]"
-        data-ripple
-        data-media
-        data-parallax
-      >
-        <Image
-          src={cover}
-          width={1800}
-          height={1350}
-          alt={title}
-          widths={[800, 1200, 1600, 2000]}
-          sizes="(max-width: 1024px) 100vw, 55vw"
-        />
-      </div>
+        <div>
+          <dt class="label">{t.year}</dt>
+          <dd>{year}</dd>
+        </div>
+        <div>
+          <dt class="label">{t.tags}</dt>
+          <dd>{tags.join(" · ")}</dd>
+        </div>
+        {
+          externalUrl && (
+            <div>
+              <dt class="label">{t.link ?? "Link"}</dt>
+              <dd>
+                <a href={externalUrl} target="_blank" rel="noopener" class="link-underline">
+                  {new URL(externalUrl).hostname}
+                </a>
+              </dd>
+            </div>
+          )
+        }
+      </dl>
     </header>
 
-    <div class="prose prose-project mx-auto max-w-3xl px-6 py-16 lg:px-10">
-      <slot />
+    {/* 02 — cover. Full-bleed, parallax, and shown exactly once. */}
+    <figure class="project-cover" data-ripple data-media data-parallax>
+      <Image
+        src={cover}
+        width={coverSize.width}
+        height={coverSize.height}
+        alt={title}
+        widths={[800, 1200, 1600, 2000]}
+        sizes="100vw"
+      />
+    </figure>
+
+    {
+      blocks.map((block) => {
+        if (block.type === "text") {
+          return (
+            <section class="project-section container text-section">
+              <h2 class="section-label" data-split>
+                {block.label}
+              </h2>
+              <div class="section-body reveal" set:html={block.html} />
+            </section>
+          );
+        }
+
+        if (block.type === "video") {
+          const embed = youtubeEmbed(block.url);
+          return embed ? (
+            <section class="project-section container">
+              <div class="video-frame" data-media>
+                <iframe
+                  src={embed}
+                  title={title}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                />
+              </div>
+            </section>
+          ) : null;
+        }
+
+        if (block.type === "media") {
+          return (
+            <section
+              class:list={[
+                "project-section container media-block",
+                block.layout === "pair" ? "media-pair" : "media-wide",
+              ]}
+            >
+              {block.items.map((src) => (
+                <figure class="media-figure" data-ripple data-media>
+                  <div class:list={["media-frame", `fit-${fit}`]} style={`aspect-ratio:${ratio(src)}`}>
+                    {src.endsWith(".gif") ? (
+                      <img src={src} alt={title} loading="lazy" width={sizes.get(src)!.width} height={sizes.get(src)!.height} />
+                    ) : (
+                      <Image
+                        src={src}
+                        width={sizes.get(src)!.width}
+                        height={sizes.get(src)!.height}
+                        alt={title}
+                        widths={[400, 800, 1200, 1600]}
+                        sizes="(max-width: 768px) 100vw, 60vw"
+                      />
+                    )}
+                  </div>
+                </figure>
+              ))}
+            </section>
+          );
+        }
+
+        // 08 — gallery, two columns with the second offset down.
+        return (
+          <section class="project-section container gallery-grid">
+            {block.items.map((src, i) => (
+              <figure class:list={["media-figure", i % 2 === 1 && "is-offset"]} data-ripple data-media>
+                <div class:list={["media-frame", `fit-${fit}`]} style={`aspect-ratio:${ratio(src)}`}>
+                  {src.endsWith(".gif") ? (
+                    <img src={src} alt={title} loading="lazy" width={sizes.get(src)!.width} height={sizes.get(src)!.height} />
+                  ) : (
+                    <Image
+                      src={src}
+                      width={sizes.get(src)!.width}
+                      height={sizes.get(src)!.height}
+                      alt={title}
+                      widths={[400, 800, 1200]}
+                      sizes="(max-width: 768px) 100vw, 45vw"
+                    />
+                  )}
+                </div>
+              </figure>
+            ))}
+          </section>
+        );
+      })
+    }
+
+    {/* 09 — the project name at display size, drifting on scroll. */}
+    <div class="name-band" data-horizontal aria-hidden="true">
+      <span class="name-band-inner">{title}</span>
     </div>
 
     {
-      videoEmbed && (
-        <Reveal class="mx-auto max-w-6xl px-6 pb-20 lg:px-10">
-          <div class="aspect-video w-full overflow-hidden rounded-sm bg-line">
-            <iframe
-              class="h-full w-full"
-              src={videoEmbed}
-              title={title}
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
-            />
-          </div>
-        </Reveal>
-      )
-    }
-
-    {
-      gallery.length > 0 && (
-        <div class="mx-auto grid max-w-6xl gap-6 px-6 pb-20 md:grid-cols-2 lg:px-10">
-          {gallery.map((src) =>
-            src.endsWith(".gif") ? (
-              <Reveal>
-                <img
-                  src={src}
-                  alt={title}
-                  loading="lazy"
-                  class="aspect-[4/3] w-full rounded-sm object-cover"
-                />
-              </Reveal>
-            ) : (
-              <Reveal>
-                <Image
-                  src={src}
-                  width={1200}
-                  height={900}
-                  alt={title}
-                  class="aspect-[4/3] w-full rounded-sm object-cover"
-                  widths={[400, 800, 1200]}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </Reveal>
-            )
-          )}
-        </div>
-      )
-    }
-
-    {
       next && (
-        <a
-          href={next.href}
-          class="group block border-t border-line px-6 py-16 text-center lg:px-10"
-          data-cursor-hover
-        >
-          <p class="text-sm text-ink-soft">{t.next}</p>
-          <p class="link-underline mt-2 inline-block text-3xl font-bold transition-transform duration-500 group-hover:-translate-y-1">
-            {next.title}
-          </p>
+        <a class="next-project" href={next.href} data-cursor-hover data-astro-prefetch="hover">
+          <span class="label">{t.next}</span>
+          <span class="next-title">{next.title}</span>
+          {next.cover && (
+            <span class="next-thumb" aria-hidden="true">
+              <Image
+                src={next.cover}
+                width={sizes.get(next.cover)!.width}
+                height={sizes.get(next.cover)!.height}
+                alt=""
+                widths={[400, 800]}
+                sizes="18vw"
+              />
+            </span>
+          )}
         </a>
       )
     }
   </article>
 </BaseLayout>
 
-<style>
-  .prose-project :global(h2) {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
+<script>
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // 09 — the only scrubbed text on the page, and it is decorative and
+  // aria-hidden. Travel is signed by writing direction so the band drifts
+  // the same way the language reads.
+  function buildNameBand() {
+    const band = document.querySelector<HTMLElement>("[data-horizontal]");
+    const inner = band?.querySelector<HTMLElement>(".name-band-inner");
+    if (!band || !inner || band.dataset.bandClaimed) return;
+    band.dataset.bandClaimed = "true";
+
+    const mm = gsap.matchMedia();
+    mm.add(
+      "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+      () => {
+        const sign = document.dir === "rtl" ? 1 : -1;
+        const tween = gsap.fromTo(
+          inner,
+          { xPercent: -8 * sign },
+          {
+            xPercent: 8 * sign,
+            ease: "none",
+            scrollTrigger: {
+              trigger: band,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 0.5,
+              invalidateOnRefresh: true,
+            },
+          }
+        );
+        return () => tween.kill();
+      }
+    );
   }
-  .prose-project :global(p) {
-    line-height: 1.9;
-    color: var(--color-ink);
-    margin-bottom: 1.25rem;
+
+  // The hero title reveals on load, not on scroll — it is already on screen.
+  function revealHeroTitle() {
+    const el = document.querySelector<HTMLElement>("[data-hero-title]");
+    if (!el || el.dataset.heroRevealed) return;
+    el.dataset.heroRevealed = "true";
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const inner = document.createElement("span");
+    inner.className = "hero-title-inner";
+    while (el.firstChild) inner.appendChild(el.firstChild);
+    const mask = document.createElement("span");
+    mask.className = "hero-title-mask";
+    mask.appendChild(inner);
+    el.appendChild(mask);
+
+    gsap.fromTo(
+      inner,
+      { yPercent: 100 },
+      {
+        yPercent: 0,
+        duration: 0.9,
+        ease: "expo.out",
+        delay: 0.1,
+        clearProps: "transform",
+      }
+    );
   }
-</style>
+
+  function init() {
+    revealHeroTitle();
+    buildNameBand();
+  }
+
+  init();
+  document.addEventListener("astro:page-load", init);
+</script>

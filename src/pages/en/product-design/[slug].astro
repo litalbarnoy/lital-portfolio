@@ -1,5 +1,5 @@
 ---
-import { getCollection, render } from "astro:content";
+import { getCollection } from "astro:content";
 import ProjectLayout from "../../../layouts/ProjectLayout.astro";
 import { stripLocale } from "../../../i18n/ui";
 
@@ -19,6 +19,7 @@ export async function getStaticPaths() {
             ? {
                 href: `/en/product-design/${stripLocale(nextProject.id)}`,
                 title: nextProject.data.title,
+                cover: nextProject.data.cover,
               }
             : null,
       },
@@ -27,7 +28,6 @@ export async function getStaticPaths() {
 }
 
 const { project, next } = Astro.props;
-const { Content } = await render(project);
 ---
 
 <ProjectLayout
@@ -40,7 +40,6 @@ const { Content } = await render(project);
   cover={project.data.cover}
   gallery={project.data.gallery}
   video={project.data.video}
+  body={project.body ?? ""}
   next={next}
->
-  <Content />
-</ProjectLayout>
+/>

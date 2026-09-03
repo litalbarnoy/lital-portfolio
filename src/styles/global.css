@@ -252,3 +252,253 @@ html.js [data-media].is-done {
     display: none;
   }
 }
+
+/* ---------------------------------------------------------------- project page
+   Grid, type roles and section rhythm for the case-study layout. */
+
+:root {
+  --gutter: clamp(1rem, 3vw, 2.5rem);
+  --measure: 62ch;
+  --page-max: 1600px;
+  --section-gap: clamp(6rem, 12vh, 11rem);
+}
+
+.container {
+  max-inline-size: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Type roles. `start` rather than `right` so the /en routes mirror for free. */
+.label {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  text-align: start;
+}
+
+.project-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(3.5rem, 11vw, 11rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-align: start;
+  text-wrap: balance;
+}
+
+.hero-title-mask {
+  display: block;
+  overflow: clip;
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+}
+
+.hero-title-inner {
+  display: block;
+}
+
+.section-label {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: start;
+}
+
+.project-subtitle,
+.section-body {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  max-inline-size: var(--measure);
+}
+
+.section-body :is(p, ul) {
+  margin-block-end: 1.15rem;
+}
+
+.section-body ul {
+  padding-inline-start: 1.2em;
+  list-style: disc;
+}
+
+.section-body strong {
+  font-weight: 700;
+}
+
+/* 01 hero — svh so mobile browser chrome cannot clip it. */
+.project-hero {
+  min-block-size: 88svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  padding-block: clamp(3rem, 8vh, 6rem);
+}
+
+.meta-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  border-block-start: 1px solid var(--color-line);
+  padding-block-start: 1.5rem;
+  margin-block-start: 1rem;
+}
+
+.meta-row dd {
+  margin-block-start: 0.25rem;
+  font-weight: 500;
+}
+
+/* 02 cover — full-bleed without 100vw, which would add the scrollbar width
+   and reintroduce horizontal overflow. */
+.project-cover {
+  block-size: 85svh;
+  margin-block-start: var(--section-gap);
+}
+
+.project-section {
+  margin-block-start: var(--section-gap);
+}
+
+/* 03/05 — sticky label beside the body; stacked and unstuck on mobile. */
+.text-section {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.media-block {
+  display: grid;
+  gap: var(--gutter);
+}
+
+.media-frame {
+  overflow: hidden;
+  inline-size: 100%;
+}
+
+.media-frame :is(img, video) {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.fit-cover :is(img, video) {
+  object-fit: cover;
+}
+
+/* UI screenshots sit whole on a neutral surface rather than being cropped. */
+.fit-contain {
+  background: #f4f4f4;
+  padding: clamp(1rem, 4vw, 4rem);
+}
+
+.fit-contain :is(img, video) {
+  object-fit: contain;
+}
+
+.gallery-grid {
+  display: grid;
+  gap: var(--gutter);
+}
+
+.video-frame {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.video-frame iframe {
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+}
+
+/* 09 — decorative name band. Clipped, and exempt from the transform
+   assertion via [data-horizontal]. */
+.name-band {
+  overflow: hidden;
+  margin-block-start: var(--section-gap);
+  padding-block: clamp(2rem, 6vh, 5rem);
+}
+
+.name-band-inner {
+  display: block;
+  white-space: nowrap;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(3rem, 12vw, 10rem);
+  line-height: 1;
+  color: var(--color-line);
+}
+
+/* 10 — next project. */
+.next-project {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  border-block-start: 1px solid var(--color-line);
+  margin-block-start: var(--section-gap);
+  padding: clamp(3rem, 8vh, 6rem) var(--gutter);
+  text-align: center;
+}
+
+.next-title {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.next-thumb {
+  display: block;
+  inline-size: clamp(6rem, 14vw, 11rem);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.6s var(--ease-expo);
+}
+
+.next-thumb img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.next-project:hover .next-thumb {
+  clip-path: inset(0 0 0 0);
+}
+
+@media (min-width: 768px) {
+  .meta-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .text-section {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .section-label {
+    grid-column: span 3;
+    position: sticky;
+    top: 25vh;
+    align-self: start;
+  }
+  .section-body {
+    grid-column: span 7;
+  }
+  .media-pair {
+    grid-template-columns: 7fr 5fr;
+  }
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gallery-grid .is-offset {
+    margin-block-start: clamp(3rem, 8vh, 8rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .next-thumb {
+    clip-path: none;
+    transition: none;
+  }
+}
