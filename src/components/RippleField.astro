@@ -20,12 +20,6 @@
   .ripple-canvas.is-active {
     opacity: 1;
   }
-  .ripple-text-el {
-    transition: opacity 0.3s var(--ease-expo);
-  }
-  .ripple-text-hidden {
-    opacity: 0;
-  }
 </style>
 
 <script>
@@ -50,9 +44,28 @@
     precision highp float;
     uniform sampler2D uTexture;
     uniform vec2 uMouse;
+    uniform vec2 uResolution;
+    uniform vec2 uImageSize;
     uniform float uVelocity;
     uniform float uHover;
     varying vec2 vUv;
+
+    // The quad matches the element's box, but the texture keeps the image's
+    // own aspect ratio. Without this the shader would stretch the image to
+    // the box and the WebGL copy would be cropped differently from the
+    // object-fit:cover DOM image underneath it.
+    vec2 coverUv(vec2 uv) {
+      if (uImageSize.x <= 0.0 || uImageSize.y <= 0.0) return uv;
+      float boxRatio = uResolution.x / uResolution.y;
+      float imgRatio = uImageSize.x / uImageSize.y;
+      vec2 scaled = boxRatio < imgRatio
+        ? vec2(uImageSize.x * uResolution.y / uImageSize.y, uResolution.y)
+        : vec2(uResolution.x, uImageSize.y * uResolution.x / uImageSize.x);
+      vec2 offset = (boxRatio < imgRatio
+        ? vec2((scaled.x - uResolution.x) * 0.5, 0.0)
+        : vec2(0.0, (scaled.y - uResolution.y) * 0.5)) / scaled;
+      return uv * uResolution / scaled + offset;
+    }
 
     void main() {
       vec2 uv = vUv;
@@ -62,52 +75,18 @@
       vec2 dir = length(delta) > 0.0001 ? normalize(delta) : vec2(0.0);
       float amount = falloff * clamp(uVelocity, 0.0, 3.0) * uHover * 0.07;
 
-      vec2 uvR = clamp(uv + dir * amount * 1.5, 0.0, 1.0);
-      vec2 uvG = clamp(uv + dir * amount, 0.0, 1.0);
-      vec2 uvB = clamp(uv + dir * amount * 0.5, 0.0, 1.0);
+      vec2 uvR = coverUv(clamp(uv + dir * amount * 1.5, 0.0, 1.0));
+      vec2 uvG = coverUv(clamp(uv + dir * amount, 0.0, 1.0));
+      vec2 uvB = coverUv(clamp(uv + dir * amount * 0.5, 0.0, 1.0));
 
       float r = texture2D(uTexture, uvR).r;
       float g = texture2D(uTexture, uvG).g;
       float b = texture2D(uTexture, uvB).b;
-      float a = texture2D(uTexture, uv).a;
+      float a = texture2D(uTexture, coverUv(uv)).a;
 
       gl_FragColor = vec4(r, g, b, a);
     }
   `;
-
-  // Draws the element's own text into a canvas so it can be used as a
-  // texture. Only the pre-split hero lines are supported: re-flowing
-  // arbitrary wrapped text here never matches the browser's own line
-  // breaking, which reads as ghosting.
-  function buildTextTexture(el: HTMLElement): HTMLCanvasElement | null {
-    const heroLines = el.querySelectorAll<HTMLElement>(".hero-line-inner");
-    if (!heroLines.length) return null;
-
-    const rect = el.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio, 2);
-    const off = document.createElement("canvas");
-    off.width = Math.max(1, Math.round(rect.width * dpr));
-    off.height = Math.max(1, Math.round(rect.height * dpr));
-    const ctx = off.getContext("2d")!;
-    ctx.scale(dpr, dpr);
-
-    const isRtl = getComputedStyle(el).direction === "rtl";
-    ctx.direction = isRtl ? "rtl" : "ltr";
-    ctx.textAlign = isRtl ? "right" : "left";
-    ctx.textBaseline = "alphabetic";
-
-    heroLines.forEach((line) => {
-      const lineRect = line.getBoundingClientRect();
-      const style = getComputedStyle(line);
-      ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-      ctx.fillStyle = style.color;
-      const x = isRtl ? lineRect.right - rect.left : lineRect.left - rect.left;
-      const y = lineRect.top - rect.top + lineRect.height * 0.78;
-      ctx.fillText(line.textContent || "", x, y);
-    });
-
-    return off;
-  }
 
   function createEngine(canvas: HTMLCanvasElement) {
     const renderer = new Renderer({
@@ -125,6 +104,8 @@
       uniforms: {
         uTexture: { value: texture },
         uMouse: { value: [0.5, 0.5] },
+        uResolution: { value: [1, 1] },
+        uImageSize: { value: [0, 0] },
         uVelocity: { value: 0 },
         uHover: { value: 0 },
       },
@@ -132,13 +113,54 @@
     const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
 
     const state = { hover: 0, hoverTarget: 0, velocity: 0, velocityTarget: 0 };
+    let activeEl: HTMLElement | null = null;
     let activeRect: DOMRect | null = null;
+    let sizedW = 0;
+    let sizedH = 0;
     let lastX = -1;
     let lastY = -1;
     let rafId = 0;
     let running = false;
 
+    // The canvas is position:fixed and lives outside the hovered element,
+    // so it is not clipped by that element's overflow and does not move
+    // with the page. Re-anchoring it to the live rect every frame is what
+    // keeps it from stranding mid-viewport during a scroll — which
+    // otherwise paints a frozen second copy of the content.
+    function syncToActive() {
+      if (!activeEl) return;
+      const rect = activeEl.getBoundingClientRect();
+      activeRect = rect;
+      canvas.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+
+      if (rect.width !== sizedW || rect.height !== sizedH) {
+        sizedW = rect.width;
+        sizedH = rect.height;
+        renderer.setSize(rect.width, rect.height);
+        program.uniforms.uResolution.value[0] = rect.width;
+        program.uniforms.uResolution.value[1] = rect.height;
+      }
+
+      if (lastX >= 0) {
+        // Keep the sample point under the pointer as the element moves.
+        program.uniforms.uMouse.value[0] = (lastX - rect.left) / rect.width;
+        program.uniforms.uMouse.value[1] =
+          1 - (lastY - rect.top) / rect.height;
+
+        // Scrolling can carry the element out from under a stationary
+        // pointer without ever firing mouseleave.
+        const outside =
+          lastX < rect.left ||
+          lastX > rect.right ||
+          lastY < rect.top ||
+          lastY > rect.bottom;
+        if (outside) detach();
+      }
+    }
+
     function render() {
+      syncToActive();
+
       // Everything lerps toward zero and hard-snaps below a threshold, so
       // the effect can never be left part-way applied. Velocity is lerped
       // rather than assigned so a fast pointer jump ramps in and trails
@@ -161,6 +183,7 @@
       } else {
         running = false;
         canvas.classList.remove("is-active");
+        activeEl = null;
         activeRect = null;
       }
     }
@@ -171,16 +194,25 @@
       rafId = requestAnimationFrame(render);
     }
 
-    function attachTo(source: RippleSource | null, rect: DOMRect) {
+    function attachTo(el: HTMLElement, source: RippleSource | null) {
       if (!source) return;
+      activeEl = el;
+
+      const rect = el.getBoundingClientRect();
       activeRect = rect;
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
-      // The canvas is position:fixed, so getBoundingClientRect()'s
-      // viewport-relative coordinates are already correct — adding scroll
-      // offset here would push it off-target on any scrolled page.
+      sizedW = rect.width;
+      sizedH = rect.height;
+      // position:fixed, so getBoundingClientRect()'s viewport-relative
+      // coordinates are already correct; syncToActive() keeps them current.
       canvas.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
       renderer.setSize(rect.width, rect.height);
+      program.uniforms.uResolution.value[0] = rect.width;
+      program.uniforms.uResolution.value[1] = rect.height;
+
+      // Intrinsic pixel size, so the shader can reproduce object-fit:cover.
+      const img = source as HTMLImageElement;
+      program.uniforms.uImageSize.value[0] = img.naturalWidth || source.width;
+      program.uniforms.uImageSize.value[1] = img.naturalHeight || source.height;
 
       texture.image = source;
       texture.needsUpdate = true;
@@ -196,10 +228,10 @@
     }
 
     function bind(container: HTMLElement, getSource: () => RippleSource | null) {
-      container.addEventListener("mouseenter", () => {
-        lastX = -1;
-        lastY = -1;
-        attachTo(getSource(), container.getBoundingClientRect());
+      container.addEventListener("mouseenter", (e: MouseEvent) => {
+        lastX = e.clientX;
+        lastY = e.clientY;
+        attachTo(container, getSource());
       });
 
       container.addEventListener("mousemove", (e: MouseEvent) => {
@@ -226,7 +258,10 @@
       state.hoverTarget = 0;
       state.velocity = 0;
       state.velocityTarget = 0;
+      activeEl = null;
       activeRect = null;
+      lastX = -1;
+      lastY = -1;
       program.uniforms.uHover.value = 0;
       program.uniforms.uVelocity.value = 0;
       canvas.classList.remove("is-active");
@@ -254,20 +289,11 @@
       container.addEventListener("mouseleave", engine.detach);
     });
 
-    document.querySelectorAll<HTMLElement>("[data-ripple-text]").forEach((el) => {
-      if (el.dataset.rippleBound) return;
-      el.dataset.rippleBound = "true";
-      el.classList.add("ripple-text-el");
-
-      engine.bind(el, () => buildTextTexture(el));
-      el.addEventListener("mouseenter", () => {
-        if (buildTextTexture(el)) el.classList.add("ripple-text-hidden");
-      });
-      el.addEventListener("mouseleave", () => {
-        el.classList.remove("ripple-text-hidden");
-        engine.detach();
-      });
-    });
+    // Text is deliberately not distorted. Painting DOM text into a canvas
+    // and swapping the real text out cannot be kept in register with the
+    // live layout, and any drift reads as doubled or floating glyphs. Doing
+    // it properly needs a real DOM->bitmap snapshot pipeline; until that
+    // exists, headings stay untouched DOM text.
   }
 
   function setup() {
@@ -279,7 +305,12 @@
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
-    if (!isDesktopPointer || prefersReducedMotion || window.innerWidth < 768) {
+    // Skip narrow viewports — but only on a positive reading. innerWidth can
+    // report 0 before layout settles, and treating that as "narrow" silently
+    // disabled the whole layer. Touch devices are already excluded above.
+    const width = window.innerWidth || document.documentElement.clientWidth || 0;
+    const isNarrow = width > 0 && width < 768;
+    if (!isDesktopPointer || prefersReducedMotion || isNarrow) {
       return;
     }
 
@@ -298,14 +329,37 @@
       if (!canvas) return;
       try {
         engine = createEngine(canvas);
-      } catch {
-        return; // no WebGL — the DOM underneath is already the fallback
+      } catch (err) {
+        // The DOM underneath is already the fallback, but staying silent
+        // here once hid a real setup failure — say something.
+        console.warn("[ripple] WebGL layer disabled:", err);
+        return;
       }
       (window as any).__rippleEngine = engine;
     }
 
     // Element binding re-runs on every page load; the engine is built once.
     bindPageElements(engine);
+
+    if (!(window as any).__rippleGlobalsBound) {
+      (window as any).__rippleGlobalsBound = true;
+      const active = () => (window as any).__rippleEngine as Engine | undefined;
+
+      // Scrolling moves the element out from under the pointer, and the
+      // canvas is a fixed-position sibling that nothing clips. Clearing it
+      // synchronously here — rather than waiting for the animation loop to
+      // fade it out — is what guarantees no stranded copy is left painted
+      // over the page, even when rAF is throttled or suspended.
+      window.addEventListener("scroll", () => active()?.reset(), {
+        passive: true,
+      });
+
+      // A hidden tab suspends rAF entirely; without this the effect would
+      // be frozen mid-hover and still visible on return.
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) active()?.reset();
+      });
+    }
   }
 
   setup();

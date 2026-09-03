@@ -12,8 +12,15 @@
   import { SplitText } from "gsap/SplitText";
 
   gsap.registerPlugin(ScrollTrigger, SplitText);
+  ScrollTrigger.config({ ignoreMobileResize: true });
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  // Below this width, and under reduced motion, only the text reveal runs —
+  // no parallax, no scrub.
+  const FULL_MOTION = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
+
+  let mm: gsap.MatchMedia | null = null;
 
   // ---------------------------------------------------------------- scroller
 
@@ -84,18 +91,35 @@
 
     const rtl = isRtl();
 
+    // Narrow viewports get a shorter reveal with no stagger.
+    const lean = !window.matchMedia(FULL_MOTION).matches;
+    const duration = lean ? 0.4 : 0.9;
+    const stagger = lean ? 0 : 0.06;
+
     targets.forEach((el) => {
       if (rtl) {
         const inner = maskWholeBlock(el);
-        gsap.from(inner, {
-          yPercent: 110,
-          duration: 0.9,
-          ease: "expo.out",
-          // Drop the inline transform once settled so the resting DOM is
-          // clean (see the §7 "no transform after idle" assertion).
-          clearProps: "transform",
-          scrollTrigger: { trigger: el, start: "top 88%", once: true },
-        });
+        // fromTo, never from: `from` writes its start state inline at parse
+        // time and leaves it there if the trigger never fires, which is what
+        // strands elements mid-animation.
+        gsap.fromTo(
+          inner,
+          { yPercent: 100 },
+          {
+            yPercent: 0,
+            duration,
+            ease: "expo.out",
+            // Drop the inline transform once settled so the resting DOM is
+            // clean (see the A6 "no transform after idle" assertion).
+            clearProps: "transform",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              once: true,
+              toggleActions: "play none none none",
+            },
+          }
+        );
         return;
       }
 
@@ -116,18 +140,23 @@
 
           // Returned animations are reverted automatically by SplitText
           // when it re-splits, so resizes never stack duplicate tweens.
-          return gsap.from(self.lines, {
-            yPercent: 110,
-            duration: 0.9,
-            stagger: 0.06,
-            ease: "expo.out",
-            clearProps: "transform",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 88%",
-              once: true,
-            },
-          });
+          return gsap.fromTo(
+            self.lines,
+            { yPercent: 100 },
+            {
+              yPercent: 0,
+              duration,
+              stagger,
+              ease: "expo.out",
+              clearProps: "transform",
+              scrollTrigger: {
+                trigger: el,
+                start: "top 85%",
+                once: true,
+                toggleActions: "play none none none",
+              },
+            }
+          );
         },
       });
       splits.push(split);
@@ -183,9 +212,61 @@
     figures.forEach((el) => el.setAttribute("data-media-claimed", ""));
 
     ScrollTrigger.batch(figures, {
-      start: "top 90%",
+      start: "top 85%",
       once: true,
-      onEnter: (batch) => batch.forEach((el) => el.classList.add("is-in")),
+      onEnter: (batch) =>
+        batch.forEach((el) => {
+          el.classList.add("is-in");
+          // Drop the clip entirely once the wipe finishes, so a settled
+          // figure reports `clip-path: none` rather than a full inset.
+          el.addEventListener(
+            "transitionend",
+            (e) => {
+              if ((e as TransitionEvent).propertyName === "clip-path") {
+                el.classList.add("is-done");
+              }
+            },
+            { once: true }
+          );
+        }),
+    });
+  }
+
+  // -------------------------------------------------------------- parallax
+
+  // The only scrubbed effect on the site, and it only ever moves the inner
+  // image inside a clipping figure — never the figure itself.
+  function buildParallax() {
+    const figures = gsap.utils.toArray<HTMLElement>(
+      "[data-parallax]:not([data-parallax-claimed])"
+    );
+    if (!figures.length) return;
+
+    figures.forEach((el) => el.setAttribute("data-parallax-claimed", ""));
+
+    mm = mm || gsap.matchMedia();
+    mm.add(FULL_MOTION, () => {
+      const tweens = figures.map((figure) => {
+        const media = figure.querySelector<HTMLElement>("img, video");
+        if (!media) return null;
+        return gsap.fromTo(
+          media,
+          { yPercent: -6 },
+          {
+            yPercent: 6,
+            ease: "none",
+            scrollTrigger: {
+              trigger: figure,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 0.5,
+              invalidateOnRefresh: true,
+            },
+          }
+        );
+      });
+      // matchMedia reverts these automatically when the query stops matching.
+      return () => tweens.forEach((t) => t?.kill());
     });
   }
 
@@ -212,12 +293,19 @@
     buildSplitReveals();
     buildBlockReveals();
     buildMediaReveals();
+    buildParallax();
 
     ScrollTrigger.refresh();
   }
 
+  // Lazy media only gets its intrinsic size at load; without this second
+  // refresh every trigger measured before then is off by that layout shift.
+  window.addEventListener("load", () => ScrollTrigger.refresh());
+
   function teardown() {
-    ScrollTrigger.getAll().forEach((t) => t.kill());
+    ScrollTrigger.getAll().forEach((t) => t.kill(true));
+    mm?.revert();
+    mm = null;
     splits.forEach((s) => s.revert());
     splits = [];
 
@@ -231,13 +319,22 @@
     // Drop every inline style this layer wrote, so nothing survives the swap.
     document
       .querySelectorAll<HTMLElement>(
-        "[data-reveal-claimed], [data-split-claimed], [data-media-claimed]"
+        "[data-reveal-claimed], [data-split-claimed], [data-media-claimed], [data-parallax-claimed]"
       )
       .forEach((el) => {
         el.style.transform = "";
         el.style.opacity = "";
         el.style.filter = "";
+        el.style.clipPath = "";
         el.style.willChange = "";
+        el.removeAttribute("data-parallax-claimed");
+      });
+
+    // Parallax writes its transform on the inner media, not the figure.
+    document
+      .querySelectorAll<HTMLElement>("[data-parallax] :is(img, video)")
+      .forEach((el) => {
+        el.style.transform = "";
       });
   }
 

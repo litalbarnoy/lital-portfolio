@@ -49,6 +49,14 @@ html {
   scroll-behavior: auto;
 }
 
+/* Horizontal overflow is a bug, not a scrollbar to live with. `clip` rather
+   than `hidden` so this never creates a scroll container that would break
+   position: sticky further down the tree. */
+html,
+body {
+  overflow-x: clip;
+}
+
 html.lenis {
   height: auto;
 }
@@ -182,20 +190,47 @@ html.js .reveal:not(.is-in) {
   display: block;
 }
 
-/* media reveal — inner image scales down to 1, wrapper keeps its box */
+/* media reveal — a clip wipe on the wrapper. The wrapper keeps its box and
+   the image is never scaled or moved, so nothing can escape its card. */
 [data-media] {
   overflow: hidden;
 }
 
-html.js [data-media] :is(img, video) {
-  transform: scale(1.08);
-  transition: transform 1.2s var(--ease-expo);
+html.js [data-media] {
+  transition: clip-path 1.1s var(--ease-expo);
 }
 
-/* Resting state is `none`, not `scale(1)` — a settled element must report
-   no transform at all (see the §7 idle assertion). */
-html.js [data-media].is-in :is(img, video) {
-  transform: none;
+html.js [data-media]:not(.is-in) {
+  clip-path: inset(0 0 100% 0);
+}
+
+html.js [data-media].is-in {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Once the wipe has finished the clip is dropped entirely: a settled
+   element must report `clip-path: none`, not a full-bleed inset. */
+html.js [data-media].is-done {
+  clip-path: none;
+  transition: none;
+}
+
+/* parallax — the transform lives on the inner image only, never on the
+   figure. The figure clips, and the ±6% travel against a 1.12 pre-scale
+   means the image can never expose an edge or cross into a neighbour. */
+[data-parallax] {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-parallax] :is(img, video) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.12);
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -204,10 +239,14 @@ html.js [data-media].is-in :is(img, video) {
     opacity: 1;
     transform: none;
   }
-  html.js [data-media] :is(img, video),
-  html.js [data-media].is-in :is(img, video) {
-    transform: none;
+  html.js [data-media],
+  html.js [data-media]:not(.is-in),
+  html.js [data-media].is-in {
+    clip-path: none;
     transition: none;
+  }
+  [data-parallax] :is(img, video) {
+    transform: none;
   }
   .cursor-dot {
     display: none;

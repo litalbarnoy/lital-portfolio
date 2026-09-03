@@ -75,13 +75,17 @@ const videoEmbed = video ? youtubeEmbed(video) : null;
         </div>
       </div>
 
-      <div class="hero-frame-clip overflow-hidden rounded-sm lg:h-[68vh]" data-ripple data-media>
+      <div
+        class="aspect-[4/3] overflow-hidden rounded-sm lg:aspect-auto lg:h-[68vh]"
+        data-ripple
+        data-media
+        data-parallax
+      >
         <Image
           src={cover}
           width={1800}
           height={1350}
           alt={title}
-          class="hero-frame-img aspect-[4/3] w-full object-cover lg:h-full"
           widths={[800, 1200, 1600, 2000]}
           sizes="(max-width: 1024px) 100vw, 55vw"
         />
