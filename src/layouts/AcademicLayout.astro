@@ -4,6 +4,7 @@ import BaseLayout from "./BaseLayout.astro";
 import Reveal from "../components/Reveal.astro";
 import { getLang, ui } from "../i18n/ui";
 import { formatYear } from "../lib/formatYear";
+import { youtubeEmbed } from "../lib/youtube";
 
 interface Props {
   title: string;
@@ -16,10 +17,26 @@ interface Props {
   tags: string[];
   cover?: string;
   gallery: string[];
+  video?: string;
+  externalUrl?: string;
 }
 
-const { title, subtitle, role, client, year, yearEnd, ongoing, tags, cover, gallery } =
-  Astro.props;
+const {
+  title,
+  subtitle,
+  role,
+  client,
+  year,
+  yearEnd,
+  ongoing,
+  tags,
+  cover,
+  gallery,
+  video,
+  externalUrl,
+} = Astro.props;
+
+const videoEmbed = video ? youtubeEmbed(video) : null;
 
 const lang = getLang(Astro.url.pathname);
 const t = ui[lang].project;
@@ -80,6 +97,22 @@ const t = ui[lang].project;
     <div class="prose prose-project mx-auto max-w-3xl px-6 py-16 lg:px-10">
       <slot />
     </div>
+
+    {
+      videoEmbed && (
+        <section class="mx-auto max-w-5xl px-6 pb-16 lg:px-10">
+          <div class="video-frame" data-media>
+            <iframe
+              src={videoEmbed}
+              title={title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            />
+          </div>
+        </section>
+      )
+    }
 
     {
       gallery.length > 0 && (

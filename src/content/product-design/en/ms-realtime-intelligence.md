@@ -7,7 +7,7 @@ year: 2021
 yearEnd: 2024
 tags: ["Enterprise", "Data Platform", "KQL", "Microsoft Fabric"]
 cover: "/images/imports/ms-realtime-intelligence/cover.webp"
-video: "https://youtu.be/hkChU3KMZaE"
+video: "https://www.youtube.com/watch?v=efjaj1Qo18w"
 gallery:
   - "/images/imports/ms-realtime-intelligence/01.webp"
 order: 3

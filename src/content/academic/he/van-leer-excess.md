@@ -4,6 +4,7 @@ subtitle: "הרצאה על עודף חזותי בפילטרים של מציאו�
 role: "מרצה · כנס אמנות ירושלים, פסטיבל מנופים"
 client: "מכון ון־ליר בירושלים"
 year: 2021
+video: "https://www.youtube.com/watch?v=wL22Op2oBoI&t=381s"
 tags: ["הרצאה", "AR", "אמנות עכשווית"]
 gallery: []
 order: 2

@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import { getLang, ui } from "../i18n/ui";
 import { formatYear } from "../lib/formatYear";
+import { youtubeEmbed } from "../lib/youtube";
 import { parseSections } from "../lib/projectContent";
 import { imageSize } from "../lib/imageSize";
 
@@ -62,13 +63,6 @@ const CARD_OFFSETS = ["is-drop-0", "is-drop-2", "is-drop-1", "is-drop-3", "is-dr
 const sizes = new Map<string, { width: number; height: number }>();
 for (const src of [cover, ...gallery, ...(next?.cover ? [next.cover] : [])]) {
   sizes.set(src, await imageSize(src));
-}
-
-function youtubeEmbed(url: string): string | null {
-  const match = url.match(
-    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/
-  );
-  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
 }
 
 // Each arrow is drawn pointing the way it travels, rather than mirrored with

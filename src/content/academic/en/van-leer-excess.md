@@ -4,6 +4,7 @@ subtitle: "A lecture on the visual excess of AR filters as a mechanism for parti
 role: "Lecturer · Jerusalem Art Conference, Manofim Festival"
 client: "Van Leer Institute, Jerusalem"
 year: 2021
+video: "https://www.youtube.com/watch?v=wL22Op2oBoI&t=381s"
 tags: ["Lecture", "AR", "Contemporary Art"]
 gallery: []
 order: 2

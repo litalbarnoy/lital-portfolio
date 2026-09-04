@@ -13,6 +13,7 @@ const projectSchema = z.object({
   cover: z.string(),
   gallery: z.array(z.string()),
   video: z.string().optional(),
+  externalUrl: z.string().optional(),
   order: z.number(),
 });
 
@@ -37,6 +38,8 @@ const academicSchema = z.object({
   tags: z.array(z.string()).default([]),
   cover: z.string().optional(),
   gallery: z.array(z.string()).default([]),
+  video: z.string().optional(),
+  externalUrl: z.string().optional(),
   order: z.number(),
 });
 
