@@ -10,7 +10,7 @@ gallery:
   - "/images/imports/daddy-issues/01.webp"
   - "/images/imports/daddy-issues/02.webp"
   - "/images/imports/daddy-issues/03.webp"
-order: 8
+order: 7
 ---
 
 ## The Idea

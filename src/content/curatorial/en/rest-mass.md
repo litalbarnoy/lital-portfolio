@@ -12,7 +12,7 @@ gallery:
   - "/images/imports/rest-mass/03.webp"
   - "/images/imports/rest-mass/04.webp"
   - "/images/imports/rest-mass/05.webp"
-order: 7
+order: 6
 ---
 
 ## The Role

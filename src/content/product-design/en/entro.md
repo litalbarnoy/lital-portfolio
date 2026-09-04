@@ -17,10 +17,16 @@ order: 1
 
 ## The Challenge
 
-Non-human identities — API keys, tokens, service accounts — have multiplied faster than security teams can track them. They are spread across many systems, created automatically, and often nobody knows who made them, what they are used for, or whether they are still needed.
+For every human employee in an organisation there are now dozens of identities that are not human: API keys, tokens, service accounts, certificates. They are created automatically every time one service talks to another, they are spread across cloud, code repositories and CI/CD tooling, and usually nobody remembers who made them or why.
 
-The result is a landscape that is hard to map, and harder still to prioritise risk within.
+For a security team that is a landscape which is close to impossible to map. It is hard enough to know what exists — harder still to know what is dangerous. A secret leaked into a public repository and a secret sitting exactly where it belongs look, at first glance, identical.
 
 ## The Solution
 
-I lead product design at the company, working to turn that complexity into a platform security teams can move quickly in: detect risks, understand their context, and act — without having to hold the whole map in their head first.
+I lead product design at Entro, and my starting point is that a user should not have to hold the whole map in their head before they can begin.
+
+Rather than presenting a long inventory and leaving the user to sort it, the platform opens on the practical question — **what is risky right now, and why** — and only then unfolds into depth: who created the secret, which systems it can reach, when it was last used, and what breaks if it is revoked.
+
+## How That Shows Up
+
+The work pulls between two ends that want opposite things: security researchers who want all the raw context, and managers who need one clear decision. The design tries to serve both in the same screen — a top-level picture that reads in a second, and layers that open only for the people looking for them.
