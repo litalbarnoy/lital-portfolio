@@ -13,6 +13,10 @@ gallery:
   - src: "/images/imports/entro/03.webp"
   - src: "/images/imports/entro/04.webp"
 video: "https://www.youtube.com/watch?v=Ze9h2e4y8Wg"
+coverAnimation:
+  src: "/animations/entro/lineage.json"
+  width: 560
+  height: 336
 animations:
   - src: "/animations/entro/slack-remediation.json"
     caption: "שליחת התראה ב-Slack ישירות מתוך כרטיס הסיכון"
@@ -22,10 +26,6 @@ animations:
     caption: "תפריט הפעולות על זהות שנחשפה — חסימת טוקן, אימות מחדש, פתיחת תקלה"
     width: 1780
     height: 1063
-  - src: "/animations/entro/lineage.json"
-    caption: "מפת השושלת: סוכן AI, ההרשאות שלו והבעלים האנושיים"
-    width: 560
-    height: 336
 order: 1
 ---
 

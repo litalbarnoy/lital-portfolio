@@ -21,6 +21,7 @@ interface Props {
   cover: string;
   gallery: MediaEntry[];
   video?: string;
+  coverAnimation?: { src: string; width: number; height: number };
   animations?: { src: string; caption?: string; width: number; height: number }[];
   body: string;
   externalUrl?: string;
@@ -39,6 +40,7 @@ const {
   cover,
   gallery,
   video,
+  coverAnimation,
   animations,
   body,
   externalUrl,
@@ -124,24 +126,40 @@ const coverSize = sizes.get(cover)!;
         </div>
       </div>
 
-      {/* Parallax needs object-fit: cover, which would crop a UI screenshot
-          into an unreadable fragment — so photography gets the drift and
-          screenshots get shown whole instead. */}
-      <figure
-        class:list={["hero-media", "media-frame", `fit-${fit}`]}
-        data-ripple="loupe"
-        data-media
-        data-parallax={fit === "cover" ? "" : undefined}
-      >
-        <Image
-          src={cover}
-          width={coverSize.width}
-          height={coverSize.height}
-          alt={title}
-          widths={[600, 900, 1200, 1600]}
-          sizes="(max-width: 900px) 100vw, 45vw"
-        />
-      </figure>
+      {
+        coverAnimation ? (
+          // The animation is the header. It carries no loupe: the WebGL layer
+          // textures an image, and this is live vector — the motion is the
+          // point here rather than the magnifier.
+          <div class="hero-media hero-media-animated" data-media>
+            <LottieFigure
+              src={coverAnimation.src}
+              width={coverAnimation.width}
+              height={coverAnimation.height}
+              label={title}
+            />
+          </div>
+        ) : (
+          /* Parallax needs object-fit: cover, which would crop a UI screenshot
+             into an unreadable fragment — so photography gets the drift and
+             screenshots get shown whole instead. */
+          <figure
+            class:list={["hero-media", "media-frame", `fit-${fit}`]}
+            data-ripple="loupe"
+            data-media
+            data-parallax={fit === "cover" ? "" : undefined}
+          >
+            <Image
+              src={cover}
+              width={coverSize.width}
+              height={coverSize.height}
+              alt={title}
+              widths={[600, 900, 1200, 1600]}
+              sizes="(max-width: 900px) 100vw, 45vw"
+            />
+          </figure>
+        )
+      }
     </header>
 
     {

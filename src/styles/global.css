@@ -703,3 +703,17 @@ html.js [data-media].is-done {
     grid-column: 1 / -1;
   }
 }
+
+/* An animated header: the Lottie sets the height, so the figure inside it
+   must not add its own margins or caption spacing. */
+.hero-media-animated {
+  overflow: hidden;
+  border-radius: 4px;
+  align-self: end;
+}
+
+.hero-media-animated .lottie-figure,
+.hero-media-animated .lottie-stage {
+  margin: 0;
+  block-size: auto;
+}

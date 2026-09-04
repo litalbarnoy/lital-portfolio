@@ -26,6 +26,11 @@ const projectSchema = z.object({
   cover: z.string(),
   gallery: z.array(mediaItem),
   video: z.string().optional(),
+  // Replaces the still in the header. `cover` is still required: the index
+  // cards and the next-project thumbnail need a static image.
+  coverAnimation: z
+    .object({ src: z.string(), width: z.number(), height: z.number() })
+    .optional(),
   // Vector UI animations shown alongside the stills.
   animations: z
     .array(

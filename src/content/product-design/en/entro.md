@@ -13,6 +13,10 @@ gallery:
   - src: "/images/imports/entro/03.webp"
   - src: "/images/imports/entro/04.webp"
 video: "https://www.youtube.com/watch?v=Ze9h2e4y8Wg"
+coverAnimation:
+  src: "/animations/entro/lineage.json"
+  width: 560
+  height: 336
 animations:
   - src: "/animations/entro/slack-remediation.json"
     caption: "Sending a Slack alert straight from the risk card"
@@ -22,10 +26,6 @@ animations:
     caption: "The action menu on an exposed identity — disable token, revalidate, raise a ticket"
     width: 1780
     height: 1063
-  - src: "/animations/entro/lineage.json"
-    caption: "Lineage map: an AI agent, what it can reach, and its human owners"
-    width: 560
-    height: 336
 order: 1
 ---
 
