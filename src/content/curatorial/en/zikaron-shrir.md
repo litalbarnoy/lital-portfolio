@@ -11,7 +11,7 @@ gallery:
   - "/images/imports/zikaron-shrir/02.webp"
   - "/images/imports/zikaron-shrir/03.webp"
   - "/images/imports/zikaron-shrir/04.webp"
-order: 1
+order: 2
 ---
 
 ## The Idea

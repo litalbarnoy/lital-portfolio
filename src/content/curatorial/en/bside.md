@@ -9,7 +9,7 @@ cover: "/images/imports/bside/cover.webp"
 gallery:
   - "/images/imports/bside/01.webp"
   - "/images/imports/bside/02.webp"
-order: 3
+order: 4
 ---
 
 ## The Idea

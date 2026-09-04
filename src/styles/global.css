@@ -602,12 +602,13 @@ html.js [data-media].is-done {
 @media (min-width: 900px) {
   .project-hero {
     grid-template-columns: 1fr 0.85fr;
-    min-block-size: 88svh;
   }
-  /* Sits on the baseline of the meta row rather than stretching, so the
-     top of the hero stays open for the title. */
+  /* Both columns start on the same line. The image's own height sets the
+     row, and the text spreads to meet it — title at the top, supporting
+     detail on the bottom edge — so the two columns share a top and a
+     bottom rather than one floating against the other. */
   .hero-media {
-    align-self: end;
+    align-self: start;
   }
   .meta-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));

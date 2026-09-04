@@ -11,7 +11,7 @@ gallery:
   - "/images/imports/shin/02.webp"
   - "/images/imports/shin/03.webp"
   - "/images/imports/shin/04.webp"
-order: 2
+order: 3
 ---
 
 ## The Idea
