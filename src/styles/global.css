@@ -686,3 +686,20 @@ html.js [data-media].is-done {
   text-align: start;
   text-wrap: pretty;
 }
+
+/* Product animations — one per row on narrow screens, paired on wide ones. */
+.animation-grid {
+  display: grid;
+  gap: clamp(2rem, 5vw, 3.5rem);
+}
+
+@media (min-width: 900px) {
+  .animation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  /* The first one leads at full width; the rest pair up beneath it. */
+  .animation-grid > :first-child {
+    grid-column: 1 / -1;
+  }
+}

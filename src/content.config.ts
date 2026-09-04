@@ -26,6 +26,17 @@ const projectSchema = z.object({
   cover: z.string(),
   gallery: z.array(mediaItem),
   video: z.string().optional(),
+  // Vector UI animations shown alongside the stills.
+  animations: z
+    .array(
+      z.object({
+        src: z.string(),
+        caption: z.string().optional(),
+        width: z.number(),
+        height: z.number(),
+      })
+    )
+    .optional(),
   externalUrl: z.string().optional(),
   order: z.number(),
 });

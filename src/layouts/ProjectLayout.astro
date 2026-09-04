@@ -7,6 +7,7 @@ import { youtubeEmbed } from "../lib/youtube";
 import { parseSections } from "../lib/projectContent";
 import { imageSize } from "../lib/imageSize";
 import { resolveGallery, type MediaEntry } from "../lib/media";
+import LottieFigure from "../components/LottieFigure.astro";
 
 interface Props {
   title: string;
@@ -20,6 +21,7 @@ interface Props {
   cover: string;
   gallery: MediaEntry[];
   video?: string;
+  animations?: { src: string; caption?: string; width: number; height: number }[];
   body: string;
   externalUrl?: string;
   next?: { href: string; title: string; cover?: string } | null;
@@ -37,6 +39,7 @@ const {
   cover,
   gallery,
   video,
+  animations,
   body,
   externalUrl,
   next,
@@ -214,6 +217,22 @@ const coverSize = sizes.get(cover)!;
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d={arrowEnd} /></svg>
             </button>
           </div>
+        </section>
+      )
+    }
+
+    {
+      animations && animations.length > 0 && (
+        <section class="project-section container animation-grid">
+          {animations.map((a) => (
+            <LottieFigure
+              src={a.src}
+              caption={a.caption}
+              width={a.width}
+              height={a.height}
+              label={title}
+            />
+          ))}
         </section>
       )
     }

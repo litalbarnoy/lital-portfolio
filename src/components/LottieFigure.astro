@@ -1,0 +1,108 @@
+---
+// A Lottie animation as a figure. These are vector, so they stay crisp at any
+// size, and the player is only fetched once one is actually on the page.
+interface Props {
+  src: string;
+  caption?: string;
+  /** Intrinsic size, used to reserve the box before the JSON loads. */
+  width: number;
+  height: number;
+  label: string;
+}
+
+const { src, caption, width, height, label } = Astro.props;
+---
+
+<figure class="lottie-figure">
+  <div
+    class="lottie-stage"
+    data-lottie={src}
+    style={`aspect-ratio:${width} / ${height}`}
+    role="img"
+    aria-label={caption ?? label}
+  >
+  </div>
+  {caption && <figcaption class="reel-caption">{caption}</figcaption>}
+</figure>
+
+<script>
+  import type { AnimationItem } from "lottie-web";
+
+  const players = new WeakMap<HTMLElement, AnimationItem>();
+
+  async function mount(stage: HTMLElement) {
+    const src = stage.dataset.lottie;
+    if (!src || stage.dataset.lottieMounted) return;
+    stage.dataset.lottieMounted = "true";
+
+    // ~250kb of player, so it is only pulled in when a page actually has one.
+    const lottie = (await import("lottie-web/build/player/lottie_light")).default;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const animation = lottie.loadAnimation({
+      container: stage,
+      renderer: "svg",
+      loop: true,
+      // Under reduced motion the artwork still renders — it just holds on its
+      // first frame instead of looping.
+      autoplay: !reduced,
+      path: src,
+      rendererSettings: { progressiveLoad: true },
+    });
+    players.set(stage, animation);
+
+    if (reduced) animation.addEventListener("DOMLoaded", () => animation.goToAndStop(0, true));
+  }
+
+  // Load and play only what is on screen: three of these running at once off
+  // screen is wasted work on every frame.
+  function observe() {
+    const stages = document.querySelectorAll<HTMLElement>("[data-lottie]");
+    if (!stages.length) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const stage = entry.target as HTMLElement;
+          if (entry.isIntersecting) {
+            mount(stage).then(() => players.get(stage)?.play());
+          } else {
+            players.get(stage)?.pause();
+          }
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+    stages.forEach((s) => io.observe(s));
+
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        io.disconnect();
+        stages.forEach((s) => {
+          players.get(s)?.destroy();
+          players.delete(s);
+        });
+      },
+      { once: true }
+    );
+  }
+
+  observe();
+  document.addEventListener("astro:page-load", observe);
+</script>
+
+<style>
+  .lottie-stage {
+    inline-size: 100%;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #f4f4f4;
+  }
+
+  .lottie-stage :global(svg) {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+</style>
