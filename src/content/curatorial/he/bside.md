@@ -10,6 +10,10 @@ cover: "/images/imports/bside/cover.webp"
 gallery:
   - "/images/imports/bside/01.webp"
   - "/images/imports/bside/02.webp"
+  - "/images/imports/bside/03.webp"
+  - "/images/imports/bside/04.webp"
+  - "/images/imports/bside/05.webp"
+  - "/images/imports/bside/06.webp"
 order: 4
 ---
 

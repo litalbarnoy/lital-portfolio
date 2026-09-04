@@ -61,9 +61,16 @@ async function importProject(slug) {
     ? Math.max(...taken.map((f) => parseInt(f, 10))) + 1
     : 1;
 
+  // If nothing is named cover and the project hasn't got one yet, the first
+  // dropped file becomes it — a project without a cover renders a broken
+  // header image.
+  const hasCover =
+    (await fs.readdir(to)).includes("cover.webp") ||
+    dropped.some((f) => /^cover/i.test(f));
+
   const done = [];
-  for (const file of dropped) {
-    const isCover = /^cover/i.test(file);
+  for (const [i, file] of dropped.entries()) {
+    const isCover = /^cover/i.test(file) || (!hasCover && i === 0);
     const name = isCover ? "cover.webp" : `${String(next++).padStart(2, "0")}.webp`;
     const stats = await convert(path.join(from, file), path.join(to, name));
     done.push({ file, name, ...stats });
