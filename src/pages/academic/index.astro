@@ -3,16 +3,16 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Reveal from "../../components/Reveal.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
-import ProjectListRow from "../../components/ProjectListRow.astro";
 import { stripLocale } from "../../i18n/ui";
+import { publications } from "../../lib/publications";
 import { paletteAttrs } from "../../lib/palette";
 
 const entries = (await getCollection("academic"))
   .filter((e) => e.id.startsWith("he/"))
   .sort((a, b) => a.data.order - b.data.order);
 
-const featured = entries.filter((e) => e.data.cover);
-const list = entries.filter((e) => !e.data.cover);
+const featured = entries;
+const list = publications.he;
 ---
 
 <BaseLayout palette="about"
@@ -52,17 +52,19 @@ const list = entries.filter((e) => !e.data.cover);
         <Reveal as="h2" class="mb-6 text-sm font-medium uppercase tracking-wide text-ink-soft">
           פרסומים והרצאות
         </Reveal>
-        <div>
-          {list.map((entry) => (
-            <ProjectListRow
-              href={`/academic/${stripLocale(entry.id)}`}
-              title={entry.data.title}
-              subtitle={entry.data.client}
-              year={entry.data.year}
-              tags={[entry.data.role]}
-            />
+        <ul class="publication-list">
+          {list.map((item) => (
+            <li class="publication">
+              <div>
+                <p class="publication-title">{item.title}</p>
+                <p class="publication-venue">{item.venue}</p>
+              </div>
+              <p class="publication-meta">
+                {item.role} · {item.year}
+              </p>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
     )
   }

@@ -1,6 +1,6 @@
 ---
-import { getCollection, render } from "astro:content";
-import AcademicLayout from "../../layouts/AcademicLayout.astro";
+import { getCollection } from "astro:content";
+import ProjectLayout from "../../layouts/ProjectLayout.astro";
 import { stripLocale } from "../../i18n/ui";
 
 export async function getStaticPaths() {
@@ -14,10 +14,9 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
 ---
 
-<AcademicLayout
+<ProjectLayout
   title={entry.data.title}
   subtitle={entry.data.subtitle}
   role={entry.data.role}
@@ -28,8 +27,8 @@ const { Content } = await render(entry);
   video={entry.data.video}
   externalUrl={entry.data.externalUrl}
   tags={entry.data.tags}
-  cover={entry.data.cover}
+  cover={entry.data.cover!}
   gallery={entry.data.gallery}
->
-  <Content />
-</AcademicLayout>
+  body={entry.body ?? ""}
+/>
+

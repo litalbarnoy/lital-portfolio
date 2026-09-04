@@ -5,6 +5,7 @@ role: "Lecturer · Jerusalem Art Conference, Manofim Festival"
 client: "Van Leer Institute, Jerusalem"
 year: 2021
 video: "https://www.youtube.com/watch?v=wL22Op2oBoI&t=381s"
+cover: "/images/imports/van-leer-excess/cover.webp"
 tags: ["Lecture", "AR", "Contemporary Art"]
 gallery: []
 order: 2

@@ -862,3 +862,40 @@ html.js [data-media].is-done {
     transition: none;
   }
 }
+
+/* ------------------------------------------------- publications list
+   CV entries with no page behind them: text, not links. */
+.publication-list {
+  list-style: none;
+  padding: 0;
+  border-block-start: 1px solid var(--color-line);
+}
+
+.publication {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-block: 1.25rem;
+  border-block-end: 1px solid var(--color-line);
+}
+
+.publication-title {
+  font-weight: 600;
+}
+
+.publication-venue,
+.publication-meta {
+  font-size: 0.9375rem;
+  color: var(--color-ink-soft);
+}
+
+.publication-venue {
+  margin-block-start: 0.2rem;
+  max-inline-size: var(--measure);
+}
+
+.publication-meta {
+  white-space: nowrap;
+}

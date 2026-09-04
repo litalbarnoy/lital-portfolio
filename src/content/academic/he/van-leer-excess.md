@@ -5,6 +5,7 @@ role: "מרצה · כנס אמנות ירושלים, פסטיבל מנופים"
 client: "מכון ון־ליר בירושלים"
 year: 2021
 video: "https://www.youtube.com/watch?v=wL22Op2oBoI&t=381s"
+cover: "/images/imports/van-leer-excess/cover.webp"
 tags: ["הרצאה", "AR", "אמנות עכשווית"]
 gallery: []
 order: 2
