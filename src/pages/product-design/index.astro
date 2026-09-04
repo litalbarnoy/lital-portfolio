@@ -15,6 +15,7 @@ const projects = (await getCollection("product-design"))
     title: project.data.title,
     subtitle: project.data.subtitle,
     cover: project.data.cover,
+    coverAnimation: project.data.coverAnimation,
     year: formatYear(project.data, "he"),
     tags: project.data.tags,
   }));

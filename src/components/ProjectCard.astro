@@ -1,33 +1,51 @@
 ---
 import { Image } from "astro:assets";
+import LottieFigure from "./LottieFigure.astro";
 
 interface Props {
   href: string;
   title: string;
   subtitle: string;
   cover: string;
+  /** Runs in place of the still on the card, when the project has one. */
+  coverAnimation?: { src: string; width: number; height: number };
   year: string;
 }
 
-const { href, title, subtitle, cover, year } = Astro.props;
+const { href, title, subtitle, cover, coverAnimation, year } = Astro.props;
 ---
 
 <a href={href} class="project-card reveal block" data-cursor-hover data-astro-prefetch="hover">
   {/* The thumbnail grows on hover. The transform sits on this wrapper rather
       than on the image inside it, so the pointer-driven canvas — which
-      re-measures this element every frame — stays in register with it. The
-      title used to be repeated in a gradient overlay here; it already sits
-      directly underneath, so the overlay is gone rather than aria-hidden. */}
-  <div class="card-media" data-ripple data-media>
-    <Image
-      src={cover}
-      width={1600}
-      height={1000}
-      alt={title}
-      class="aspect-[4/3] w-full object-cover"
-      widths={[400, 800, 1200]}
-      sizes="(max-width: 768px) 100vw, 30vw"
-    />
+      re-measures this element every frame — stays in register with it. An
+      animated card carries no pointer effect: the WebGL layer textures an
+      image, and this is live vector. */}
+  <div
+    class:list={["card-media", coverAnimation && "card-media--animated"]}
+    data-ripple={coverAnimation ? undefined : ""}
+    data-media
+  >
+    {
+      coverAnimation ? (
+        <LottieFigure
+          src={coverAnimation.src}
+          width={coverAnimation.width}
+          height={coverAnimation.height}
+          label={title}
+        />
+      ) : (
+        <Image
+          src={cover}
+          width={1600}
+          height={1000}
+          alt={title}
+          class="aspect-[4/3] w-full object-cover"
+          widths={[400, 800, 1200]}
+          sizes="(max-width: 768px) 100vw, 30vw"
+        />
+      )
+    }
   </div>
   <div class="mt-4 flex items-baseline justify-between gap-4">
     <h3 class="text-lg font-semibold">{title}</h3>

@@ -91,6 +91,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
               title={entry!.data.title}
               subtitle={entry!.data.subtitle}
               cover={entry!.data.cover}
+              coverAnimation={entry!.data.coverAnimation}
               year={formatYear(entry!.data, "he")}
             />
           ))}

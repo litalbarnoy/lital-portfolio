@@ -898,3 +898,24 @@ html.js [data-media].is-done {
 .publication-meta {
   white-space: nowrap;
 }
+
+/* An animated card keeps the same box as the stills beside it; the vector
+   letterboxes inside it rather than stretching to fill. */
+.card-media--animated {
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+}
+
+.card-media--animated .lottie-figure,
+.card-media--animated .lottie-stage {
+  inline-size: 100%;
+  margin: 0;
+}
+
+.card-media--animated .lottie-stage {
+  background: transparent;
+  border: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}

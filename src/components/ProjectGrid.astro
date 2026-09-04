@@ -9,6 +9,7 @@ interface Project {
   subtitle: string;
   cover: string;
   year: string;
+  coverAnimation?: { src: string; width: number; height: number };
   tags: string[];
 }
 
@@ -53,6 +54,7 @@ const t = ui[lang].project;
             title={project.title}
             subtitle={project.subtitle}
             cover={project.cover}
+            coverAnimation={project.coverAnimation}
             year={project.year}
           />
         </div>
