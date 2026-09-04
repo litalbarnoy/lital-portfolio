@@ -22,7 +22,11 @@
     z-index: -1;
     pointer-events: none;
     overflow: hidden;
-    background-color: var(--bg);
+    /* No base colour here. :root already paints var(--bg), and this element
+       is a composited layer whose style recalc gets deferred — painting the
+       base twice meant the page background visibly lagged behind the header,
+       which reads the variable directly. This carries only the blobs. */
+    background-color: transparent;
   }
 
   .blob {

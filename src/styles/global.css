@@ -126,17 +126,18 @@ body {
 @media (prefers-reduced-motion: no-preference) {
   :root,
   body {
-    /* The registered properties are what actually carry the change: every
-       gradient reading them crossfades along with the base. */
+    /* Only the registered properties are transitioned. Transitioning
+       background-color as well made it chase a value that was itself still
+       animating, so the root lagged behind every element that simply reads
+       var(--bg) — the header appeared to change colour before the page did.
+       One animating source, everything else follows it in lockstep. */
     transition:
       --bg 1600ms cubic-bezier(0.33, 0, 0.2, 1),
       --fg 1600ms cubic-bezier(0.33, 0, 0.2, 1),
       --t1 1600ms cubic-bezier(0.33, 0, 0.2, 1),
       --t2 1600ms cubic-bezier(0.33, 0, 0.2, 1),
       --t3 1600ms cubic-bezier(0.33, 0, 0.2, 1),
-      --t4 1600ms cubic-bezier(0.33, 0, 0.2, 1),
-      background-color 1600ms cubic-bezier(0.33, 0, 0.2, 1),
-      color 1600ms cubic-bezier(0.33, 0, 0.2, 1);
+      --t4 1600ms cubic-bezier(0.33, 0, 0.2, 1);
   }
 }
 
