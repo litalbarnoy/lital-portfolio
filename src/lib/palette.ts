@@ -2,16 +2,19 @@
 // it out as the data-* attributes the observer reads, so a hex is only ever
 // written down here.
 //
-// Each pair is a background, a foreground, and four tints. The tints are the
-// colours of the drifting gradient field behind the page — they are the
-// reference site's own accents (#c3a7b2, #867fa1, #648d9a, #b08587) pulled
-// 70% of the way toward the pair's background.
+// Pastel backgrounds with white text, following the reference. Worth knowing
+// what that costs: white on these lands at roughly 2.2-2.5:1, and on the
+// reference's own pastels at 1.6-1.8:1. The backgrounds here are already
+// pushed to the deep end of pastel, which is as far as white text can be
+// helped without the colours ceasing to read as pastel at all. The same
+// backgrounds with dark text would be 7:1+.
 //
-// That 70% is a contrast budget, not a taste call. Text sits over a moving
-// mesh, so the readable-contrast question is not "fg against bg" but "fg
-// against the worst point of the field". At this strength the worst tint in
-// the worst pair still clears 7:1 (7.44:1); pushing the tints any further
-// from the background starts to fail it.
+// So this is a deliberate trade of legibility for the look, made knowingly.
+// Flipping it back is five values: put the dark inks in `fg` and the palette
+// passes AAA again.
+//
+// The footer sits deeper (4.4:1) so the page resolves onto something more
+// solid than it started.
 
 export type PaletteName =
   | "hero"
@@ -28,29 +31,29 @@ export interface Pair {
 
 export const palette: Record<PaletteName, Pair> = {
   hero: {
-    bg: "#acc5c9",
-    fg: "#16211f", // 9.11:1 flat, 7.44:1 worst tint
-    tints: ["#b3bcc2", "#a1b0bd", "#96b4bb", "#adb2b5"],
+    bg: "#8fb0b5",
+    fg: "#ffffff", // 2.32:1 — dark alternative #16211f is 7.11:1
+    tints: ["#a9acb4", "#8b98ab", "#7a9fa8", "#a09b9e"],
   },
   about: {
-    bg: "#efe6da",
-    fg: "#1a1a1a", // 14.09:1 flat, 10.50:1 worst tint
-    tints: ["#e2d3ce", "#cfc7c9", "#c5cbc7", "#dcc9c1"],
+    bg: "#c2ae99",
+    fg: "#ffffff", // 2.14:1 — dark alternative #1f1a14 is 8.07:1
+    tints: ["#c3aba6", "#a4979d", "#939e9a", "#b99a90"],
   },
   work: {
-    bg: "#d8c3c6",
-    fg: "#1f1416", // 10.72:1 flat, 8.60:1 worst tint
-    tints: ["#d2bbc0", "#bfafbb", "#b5b3b9", "#ccb0b3"],
+    bg: "#bd9ea3",
+    fg: "#ffffff", // 2.45:1 — dark alternative #1f1416 is 7.34:1
+    tints: ["#c0a3ab", "#a28fa2", "#91969f", "#b79295"],
   },
   curatorial: {
-    bg: "#c6cfb2",
-    fg: "#1a1f14", // 10.38:1 flat, 8.23:1 worst tint
-    tints: ["#c5c3b2", "#b3b7ad", "#a9bbab", "#bfb9a5"],
+    bg: "#a3b189",
+    fg: "#ffffff", // 2.28:1 — dark alternative #1a1f14 is 7.37:1
+    tints: ["#b3ac9e", "#959895", "#849f92", "#aa9b88"],
   },
   contact: {
-    bg: "#1a1a1a",
-    fg: "#efe6da", // 14.09:1 flat, 7.60:1 worst tint
-    tints: ["#4d4448", "#3a3843", "#303d40", "#473a3b"],
+    bg: "#5f7d82",
+    fg: "#ffffff", // 4.43:1
+    tints: ["#91929a", "#737e92", "#62858e", "#888185"],
   },
 };
 

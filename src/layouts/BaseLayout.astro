@@ -94,10 +94,26 @@ const siteName = lang === "en" ? "Lital Bar Noy" : "ליטל בר נוי";
           // page was restored mid-scroll.
           paint(sections[0]);
 
-          const onIntersect = (entries) => {
-            for (const entry of entries) {
-              if (entry.isIntersecting) paint(entry.target);
+          // The observer only tells us that something changed; which section
+          // owns the colour is then decided by measurement. Painting straight
+          // from the entries let the last one in the batch win, which is not
+          // necessarily the section at the centre — jumping down the page
+          // could leave the previous section's colour in place.
+          const onIntersect = () => {
+            const middle = window.innerHeight / 2;
+            let best = null;
+            let bestDistance = Infinity;
+            for (const section of sections) {
+              const rect = section.getBoundingClientRect();
+              if (rect.bottom < 0 || rect.top > window.innerHeight) continue;
+              // Distance from the section's own centre to the viewport's.
+              const distance = Math.abs((rect.top + rect.bottom) / 2 - middle);
+              if (distance < bestDistance) {
+                bestDistance = distance;
+                best = section;
+              }
             }
+            if (best) paint(best);
           };
 
           observer = new IntersectionObserver(onIntersect, {

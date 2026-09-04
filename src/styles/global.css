@@ -62,15 +62,16 @@
   /* Secondary text at 90% toward the foreground. Lower mixes look right but
      drop under 7:1 on the lighter pairs — 90% is the point where the worst
      pair still clears it (7.4:1). */
-  --color-ink-soft: color-mix(in srgb, var(--fg) 90%, var(--bg));
-  --color-line: color-mix(in srgb, var(--fg) 22%, var(--bg));
+  --color-ink-soft: color-mix(in srgb, var(--fg) 88%, var(--bg));
+  --color-line: color-mix(in srgb, var(--fg) 45%, var(--bg));
   --color-cream: var(--bg);
   --color-ink: var(--fg);
   --color-accent: var(--fg);
 
-  /* Neutral surface behind contained screenshots, tinted by the palette
-     rather than a fixed grey. */
-  --surface: color-mix(in srgb, var(--fg) 7%, var(--bg));
+  /* Frosted glass for the boxes that hold images — the header treatment,
+     but further open so the drifting field reads through them. */
+  --surface: color-mix(in srgb, var(--fg) 22%, transparent);
+  --glass-border: color-mix(in srgb, var(--fg) 34%, transparent);
 
   background-color: var(--bg);
   color: var(--fg);
@@ -85,9 +86,11 @@ body {
 @media (prefers-reduced-motion: no-preference) {
   :root,
   body {
+    /* Long and eased-out at both ends: at 700ms the change announced
+       itself as you crossed a section. This should be felt, not seen. */
     transition:
-      background-color 700ms cubic-bezier(0.4, 0, 0.2, 1),
-      color 700ms cubic-bezier(0.4, 0, 0.2, 1);
+      background-color 1600ms cubic-bezier(0.33, 0, 0.2, 1),
+      color 1600ms cubic-bezier(0.33, 0, 0.2, 1);
   }
 }
 
@@ -578,7 +581,6 @@ html.js [data-media].is-done {
 /* UI screenshots sit whole on a neutral surface rather than being cropped
    into unreadable fragments. */
 .fit-contain {
-  background: var(--surface);
   padding: clamp(0.75rem, 2.5vw, 2rem);
 }
 
@@ -692,6 +694,25 @@ html.js [data-media].is-done {
   .reel-track {
     scroll-behavior: auto;
   }
+}
+
+/* ---------------------------------------------------------------- glass
+   Every box that holds an image is a pane of frosted glass rather than a
+   solid card, so the colour moving behind the page carries through it. */
+.card-media,
+.media-frame,
+.lottie-stage,
+.video-frame {
+  background: var(--surface);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+}
+
+/* A contained screenshot needs a little more body behind it than a photo
+   that fills its frame, or the artwork fights the field showing through. */
+.fit-contain {
+  background: color-mix(in srgb, var(--fg) 30%, transparent);
 }
 
 /* ------------------------------------------------------------ index cards
