@@ -1,14 +1,14 @@
 ---
 title: "The Face as a Platform"
-subtitle: "A genealogy of the self-portrait in the algorithmic age — PhD research, Sandberg Grant 2026"
+subtitle: "A genealogy of the self-portrait in the algorithmic age — PhD research"
 role: "PhD Student"
 client: "The Hebrew University of Jerusalem · advised by Prof. Paul Frosh and Dr. Ido Ramati"
 year: 2026
-tags: ["PhD Research", "Sandberg Grant", "Visual Culture", "Interface Design", "AR"]
-cover: "/images/imports/bside/cover.webp"
+tags: ["PhD Research", "Visual Culture", "Interface Design", "AR"]
+cover: "/images/imports/face-as-platform/cover.webp"
 gallery:
-  - src: "/images/imports/bside/01.webp"
-  - src: "/images/imports/bside/02.webp"
+  - src: "/images/imports/face-as-platform/01.webp"
+  - src: "/images/imports/face-as-platform/02.webp"
 order: 1
 ---
 

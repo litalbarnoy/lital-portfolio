@@ -1,14 +1,14 @@
 ---
 title: "הפנים כפלטפורמה"
-subtitle: "גנאלוגיה של הדיוקן העצמי בעידן האלגוריתמי — מחקר דוקטורט, מענק סנדברג 2026"
+subtitle: "גנאלוגיה של הדיוקן העצמי בעידן האלגוריתמי — מחקר דוקטורט"
 role: "תלמידת מחקר לדוקטורט"
 client: "האוניברסיטה העברית בירושלים · בהנחיית פרופ' פול פרוש וד״ר עידו רמתי"
 year: 2026
-tags: ["דוקטורט", "מענק סנדברג", "תרבות חזותית", "עיצוב ממשקים", "AR"]
-cover: "/images/imports/bside/cover.webp"
+tags: ["דוקטורט", "תרבות חזותית", "עיצוב ממשקים", "AR"]
+cover: "/images/imports/face-as-platform/cover.webp"
 gallery:
-  - src: "/images/imports/bside/01.webp"
-  - src: "/images/imports/bside/02.webp"
+  - src: "/images/imports/face-as-platform/01.webp"
+  - src: "/images/imports/face-as-platform/02.webp"
 order: 1
 ---
 

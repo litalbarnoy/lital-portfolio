@@ -17,7 +17,9 @@ const CHEVRON_RIGHT = "M9 5l7 7-7 7";
 <dialog class="lightbox" data-lightbox aria-label={t.gallery ?? "Gallery"}>
   <div class="lightbox-stage">
     <figure class="lightbox-figure">
-      <img data-lightbox-image src="" alt="" />
+      {/* No src until a slide is shown: an empty src makes the browser
+          re-request the page itself. */}
+      <img data-lightbox-image alt="" />
       <figcaption class="lightbox-caption" data-lightbox-caption></figcaption>
     </figure>
   </div>
