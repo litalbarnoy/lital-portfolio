@@ -10,6 +10,8 @@ cover: "/images/imports/axonius/cover.webp"
 gallery:
   - src: "/images/imports/axonius/workflows.webp"
   - src: "/images/imports/axonius/nodes.webp"
+  - src: "/images/imports/axonius/01.webp"
+  - src: "/images/imports/axonius/02.webp"
 video: "https://www.youtube.com/watch?v=sKQLvQXDsVc"
 order: 2
 ---

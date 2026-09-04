@@ -10,6 +10,11 @@ cover: "/images/imports/ms-realtime-intelligence/cover.webp"
 video: "https://www.youtube.com/watch?v=efjaj1Qo18w"
 gallery:
   - src: "/images/imports/ms-realtime-intelligence/01.webp"
+  - src: "/images/imports/ms-realtime-intelligence/02.webp"
+  - src: "/images/imports/ms-realtime-intelligence/03.webp"
+  - src: "/images/imports/ms-realtime-intelligence/04.webp"
+  - src: "/images/imports/ms-realtime-intelligence/05.webp"
+  - src: "/images/imports/ms-realtime-intelligence/06.webp"
 order: 3
 ---
 
