@@ -691,8 +691,10 @@ html.js [data-media].is-done {
   }
   .section-label {
     grid-column: span 3;
-    position: sticky;
-    top: 25vh;
+    /* Not sticky. How far a sticky label travels depends on how tall its
+       section is, so a long section slid and a short one sat still — the
+       same element behaving differently down the page reads as a fault.
+       align-self keeps it on the first line of its body text. */
     align-self: start;
   }
   .section-body {
