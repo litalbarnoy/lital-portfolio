@@ -17,7 +17,9 @@ export const ui = {
     },
     project: {
       role: "תפקיד",
-      client: "לקוח",
+      company: "חברה",
+      venue: "מקום",
+      institution: "מוסד",
       year: "שנה",
       tags: "תגיות",
       next: "הפרויקט הבא",
@@ -47,7 +49,9 @@ export const ui = {
     },
     project: {
       role: "Role",
-      client: "Client",
+      company: "Company",
+      venue: "Venue",
+      institution: "Institution",
       year: "Year",
       tags: "Tags",
       next: "Next Project",

@@ -17,7 +17,7 @@ order: 4
 
 Microsoft Defender for IoT delivers comprehensive threat detection across IoT and OT environments, with flexible cloud, on-premises, and hybrid deployments. When Microsoft acquired the Israeli cybersecurity firm CyberX, it gained powerful OT security capabilities, and a major design alignment problem.
 
-CyberX and Azure had completely different design systems. OT security workflows were highly specialized and didn't map cleanly onto existing Microsoft conventions. Investigations required switching between products, increasing cognitive load, and terminology and taxonomies were inconsistent, creating gaps in understanding between teams and customers.
+CyberX and Azure had completely different design systems. OT security workflows were highly specialized and didn't map cleanly onto existing Microsoft conventions. Investigations required switching between products, increasing cognitive load, and terminology and taxonomies were inconsistent, creating gaps in understanding between teams and users.
 
 ## The Solution
 

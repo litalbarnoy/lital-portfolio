@@ -55,6 +55,16 @@ const t = ui[lang].project;
 // UI screenshots are shown whole on a neutral surface; cropping them to fill
 // a frame turns them into unreadable fragments. Photography fills.
 const isUi = Astro.url.pathname.includes("/product-design/");
+
+// The same field holds a different kind of thing in each section: an employer
+// in product design, the space an exhibition was held in, an academic
+// institution. One label cannot be right for all three — and "client" was
+// wrong for every one of them, since none of this was freelance work.
+const contextLabel = Astro.url.pathname.includes("/curatorial/")
+  ? t.venue
+  : Astro.url.pathname.includes("/academic/")
+    ? t.institution
+    : t.company;
 const fit: "contain" | "cover" = isUi ? "contain" : "cover";
 
 // The header takes the colour of the section the project belongs to.
@@ -108,7 +118,7 @@ const coverSize = sizes.get(cover)!;
 
           <dl class="meta-row">
             <div>
-              <dt class="label">{t.client}</dt>
+              <dt class="label">{contextLabel}</dt>
               <dd>{client}</dd>
             </div>
             <div>

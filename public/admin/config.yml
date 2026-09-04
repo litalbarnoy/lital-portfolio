@@ -22,7 +22,7 @@ collections:
       - { label: "כותרת", name: "title", widget: "string" }
       - { label: "כותרת משנה", name: "subtitle", widget: "string" }
       - { label: "תפקיד", name: "role", widget: "string" }
-      - { label: "לקוח", name: "client", widget: "string" }
+      - { label: "חברה", name: "client", widget: "string" }
       - { label: "שנה", name: "year", widget: "number", value_type: "int" }
       - { label: "תגיות", name: "tags", widget: "list" }
       - label: "תמונת כיסוי (יחס רוחב-גובה מומלץ 16:10)"
@@ -65,7 +65,7 @@ collections:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Subtitle", name: "subtitle", widget: "string" }
       - { label: "Role", name: "role", widget: "string" }
-      - { label: "Client", name: "client", widget: "string" }
+      - { label: "Company", name: "client", widget: "string" }
       - { label: "Year", name: "year", widget: "number", value_type: "int" }
       - { label: "Tags", name: "tags", widget: "list" }
       - label: "Cover image (recommended ratio 16:10)"
@@ -108,7 +108,7 @@ collections:
       - { label: "כותרת", name: "title", widget: "string" }
       - { label: "כותרת משנה", name: "subtitle", widget: "string" }
       - { label: "תפקיד", name: "role", widget: "string" }
-      - { label: "לקוח / מוסד", name: "client", widget: "string" }
+      - { label: "מקום", name: "client", widget: "string" }
       - { label: "שנה", name: "year", widget: "number", value_type: "int" }
       - { label: "תגיות", name: "tags", widget: "list" }
       - label: "תמונת כיסוי (יחס רוחב-גובה מומלץ 16:10)"
@@ -151,7 +151,7 @@ collections:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Subtitle", name: "subtitle", widget: "string" }
       - { label: "Role", name: "role", widget: "string" }
-      - { label: "Client / Institution", name: "client", widget: "string" }
+      - { label: "Venue", name: "client", widget: "string" }
       - { label: "Year", name: "year", widget: "number", value_type: "int" }
       - { label: "Tags", name: "tags", widget: "list" }
       - label: "Cover image (recommended ratio 16:10)"
@@ -194,7 +194,7 @@ collections:
       - { label: "כותרת", name: "title", widget: "string" }
       - { label: "כותרת משנה", name: "subtitle", widget: "string" }
       - { label: "תפקיד (מחברת / מרצה / תלמידת מחקר...)", name: "role", widget: "string" }
-      - { label: "כתב עת / כנס / מוסד", name: "client", widget: "string" }
+      - { label: "מוסד", name: "client", widget: "string" }
       - { label: "שנה", name: "year", widget: "number", value_type: "int" }
       - { label: "תגיות", name: "tags", widget: "list", required: false }
       - label: "תמונת כיסוי (לא חובה — רק אם יש דימוי אמיתי)"
@@ -235,7 +235,7 @@ collections:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Subtitle", name: "subtitle", widget: "string" }
       - { label: "Role (Author / Lecturer / PhD Student...)", name: "role", widget: "string" }
-      - { label: "Journal / Conference / Institution", name: "client", widget: "string" }
+      - { label: "Institution", name: "client", widget: "string" }
       - { label: "Year", name: "year", widget: "number", value_type: "int" }
       - { label: "Tags", name: "tags", widget: "list", required: false }
       - label: "Cover image (optional — only if a real photo exists)"
