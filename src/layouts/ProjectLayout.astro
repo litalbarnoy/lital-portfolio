@@ -126,7 +126,7 @@ const coverSize = sizes.get(cover)!;
           screenshots get shown whole instead. */}
       <figure
         class:list={["hero-media", "media-frame", `fit-${fit}`]}
-        data-ripple
+        data-ripple="loupe"
         data-media
         data-parallax={fit === "cover" ? "" : undefined}
       >
@@ -179,7 +179,7 @@ const coverSize = sizes.get(cover)!;
                       ? `aspect-ratio:${sizes.get(src)!.width} / ${sizes.get(src)!.height}`
                       : undefined
                   }
-                  data-ripple
+                  data-ripple="loupe"
                   data-media
                 >
                   {src.endsWith(".gif") ? (

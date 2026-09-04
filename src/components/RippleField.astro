@@ -26,6 +26,7 @@
   import { Renderer, Program, Mesh, Triangle, Texture } from "ogl";
 
   type RippleSource = HTMLImageElement | HTMLCanvasElement;
+  type EffectMode = "ripple" | "loupe";
 
   const VERTEX = `
     attribute vec2 position;
@@ -48,6 +49,9 @@
     uniform vec2 uImageSize;
     uniform float uVelocity;
     uniform float uHover;
+    uniform float uLoupe;
+    uniform float uZoom;
+    uniform float uRadius;
     varying vec2 vUv;
 
     // The quad matches the element's box, but the texture keeps the image's
@@ -69,24 +73,66 @@
 
     void main() {
       vec2 uv = vUv;
-      float dist = distance(uv, uMouse);
-      float falloff = 1.0 - smoothstep(0.0, 0.4, dist);
+
+      // Measure distance in pixels, not uv, or the lens comes out an
+      // ellipse on any element that is not square.
+      vec2 px = vec2(uResolution.x / uResolution.y, 1.0);
+      float lensDist = distance(uv * px, uMouse * px);
+
+      // --- magnifier -------------------------------------------------
+      // Pull the sample point toward the cursor: the closer the sampled
+      // texel is dragged, the larger that part of the image is drawn.
+      float edge = smoothstep(uRadius, uRadius * 0.88, lensDist);
+      float lens = edge * uLoupe * uHover;
+      vec2 magnified = uMouse + (uv - uMouse) / uZoom;
+      vec2 lensUv = mix(uv, magnified, lens);
+
+      // A touch of refraction right at the rim, so the circle reads as a
+      // piece of glass sitting on the image rather than a cut-out.
+      float rim = smoothstep(uRadius * 0.82, uRadius, lensDist)
+                * smoothstep(uRadius * 1.02, uRadius * 0.94, lensDist);
+      vec2 outward = lensDist > 0.0001
+        ? normalize((uv - uMouse) * px) / px
+        : vec2(0.0);
+      lensUv += outward * rim * 0.012 * uLoupe * uHover;
+
+      // --- pointer-speed dispersion ----------------------------------
+      float falloff = 1.0 - smoothstep(0.0, 0.4, distance(uv, uMouse));
       vec2 delta = uv - uMouse;
       vec2 dir = length(delta) > 0.0001 ? normalize(delta) : vec2(0.0);
-      float amount = falloff * clamp(uVelocity, 0.0, 3.0) * uHover * 0.07;
+      float amount = falloff * clamp(uVelocity, 0.0, 3.0) * uHover * 0.07
+                   * (1.0 - uLoupe);
 
-      vec2 uvR = coverUv(clamp(uv + dir * amount * 1.5, 0.0, 1.0));
-      vec2 uvG = coverUv(clamp(uv + dir * amount, 0.0, 1.0));
-      vec2 uvB = coverUv(clamp(uv + dir * amount * 0.5, 0.0, 1.0));
+      // Split the channels by a hair inside the lens as well — real glass
+      // disperses, and it keeps the magnified edge from looking printed.
+      float split = amount + rim * 0.004 * uLoupe * uHover;
+
+      vec2 uvR = coverUv(clamp(lensUv + dir * split * 1.5, 0.0, 1.0));
+      vec2 uvG = coverUv(clamp(lensUv + dir * split, 0.0, 1.0));
+      vec2 uvB = coverUv(clamp(lensUv + dir * split * 0.5, 0.0, 1.0));
 
       float r = texture2D(uTexture, uvR).r;
       float g = texture2D(uTexture, uvG).g;
       float b = texture2D(uTexture, uvB).b;
-      float a = texture2D(uTexture, coverUv(uv)).a;
+      float a = texture2D(uTexture, coverUv(lensUv)).a;
 
-      gl_FragColor = vec4(r, g, b, a);
+      // Hairline ring, and a slight lift inside, so the lens has an edge
+      // without drawing a hard border over the design underneath.
+      vec3 color = vec3(r, g, b);
+      color += vec3(0.06) * rim * uLoupe * uHover;
+      color += vec3(0.02) * lens;
+
+      gl_FragColor = vec4(color, a);
     }
   `;
+
+  // Roughly 130px across whatever the element's size, clamped so it never
+  // swallows a small card or turns into a dot on a full-width hero.
+  function lensRadius(rect: DOMRect): number {
+    const shortest = Math.min(rect.width, rect.height);
+    const px = Math.max(90, Math.min(150, shortest * 0.28));
+    return px / rect.height;
+  }
 
   function createEngine(canvas: HTMLCanvasElement) {
     const renderer = new Renderer({
@@ -108,6 +154,9 @@
         uImageSize: { value: [0, 0] },
         uVelocity: { value: 0 },
         uHover: { value: 0 },
+        uLoupe: { value: 0 },
+        uZoom: { value: 2.6 },
+        uRadius: { value: 0.17 },
       },
     });
     const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
@@ -139,6 +188,7 @@
         renderer.setSize(rect.width, rect.height);
         program.uniforms.uResolution.value[0] = rect.width;
         program.uniforms.uResolution.value[1] = rect.height;
+        program.uniforms.uRadius.value = lensRadius(rect);
       }
 
       if (lastX >= 0) {
@@ -194,9 +244,14 @@
       rafId = requestAnimationFrame(render);
     }
 
-    function attachTo(el: HTMLElement, source: RippleSource | null) {
+    function attachTo(
+      el: HTMLElement,
+      source: RippleSource | null,
+      mode: EffectMode
+    ) {
       if (!source) return;
       activeEl = el;
+      program.uniforms.uLoupe.value = mode === "loupe" ? 1 : 0;
 
       const rect = el.getBoundingClientRect();
       activeRect = rect;
@@ -208,6 +263,7 @@
       renderer.setSize(rect.width, rect.height);
       program.uniforms.uResolution.value[0] = rect.width;
       program.uniforms.uResolution.value[1] = rect.height;
+      program.uniforms.uRadius.value = lensRadius(rect);
 
       // Intrinsic pixel size, so the shader can reproduce object-fit:cover.
       const img = source as HTMLImageElement;
@@ -227,11 +283,15 @@
       ensureRunning();
     }
 
-    function bind(container: HTMLElement, getSource: () => RippleSource | null) {
+    function bind(
+      container: HTMLElement,
+      getSource: () => RippleSource | null,
+      mode: EffectMode = "ripple"
+    ) {
       container.addEventListener("mouseenter", (e: MouseEvent) => {
         lastX = e.clientX;
         lastY = e.clientY;
-        attachTo(container, getSource());
+        attachTo(container, getSource(), mode);
       });
 
       container.addEventListener("mousemove", (e: MouseEvent) => {
@@ -285,8 +345,12 @@
       if (!container || container.dataset.rippleBound) return;
       container.dataset.rippleBound = "true";
 
-      engine.bind(container, () => img);
-      container.addEventListener("mouseleave", engine.detach);
+      // Track the image's own box, not the wrapper's. A contained screenshot
+      // sits inset inside its padded frame, and anchoring to the wrapper put
+      // the effect 32px off centre and at the wrong size.
+      const mode = container.dataset.ripple === "loupe" ? "loupe" : "ripple";
+      engine.bind(img, () => img, mode);
+      img.addEventListener("mouseleave", engine.detach);
     });
 
     // Text is deliberately not distorted. Painting DOM text into a canvas
