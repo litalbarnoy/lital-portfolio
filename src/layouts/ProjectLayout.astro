@@ -6,6 +6,7 @@ import { formatYear } from "../lib/formatYear";
 import { youtubeEmbed } from "../lib/youtube";
 import { parseSections } from "../lib/projectContent";
 import { imageSize } from "../lib/imageSize";
+import { resolveGallery, type MediaEntry } from "../lib/media";
 
 interface Props {
   title: string;
@@ -17,7 +18,7 @@ interface Props {
   ongoing?: boolean;
   tags: string[];
   cover: string;
-  gallery: string[];
+  gallery: MediaEntry[];
   video?: string;
   body: string;
   externalUrl?: string;
@@ -60,8 +61,10 @@ const rest = texts.slice(1);
 const CARD_WIDTHS = ["is-w-lg", "is-w-sm", "is-w-md", "is-w-xs", "is-w-lg"];
 const CARD_OFFSETS = ["is-drop-0", "is-drop-2", "is-drop-1", "is-drop-3", "is-drop-1"];
 
+const media = resolveGallery(gallery, title);
+
 const sizes = new Map<string, { width: number; height: number }>();
-for (const src of [cover, ...gallery, ...(next?.cover ? [next.cover] : [])]) {
+for (const src of [cover, ...media.map((m) => m.src), ...(next?.cover ? [next.cover] : [])]) {
   sizes.set(src, await imageSize(src));
 }
 
@@ -150,22 +153,20 @@ const coverSize = sizes.get(cover)!;
     {/* 02 — the one gallery: a horizontal reel, dragged or stepped with the
         arrows, riding over the project name at display size. */}
     {
-      gallery.length > 0 && (
+      media.length > 0 && (
         <section class="reel" aria-roledescription="carousel" aria-label={title}>
           <div class="reel-type" data-horizontal aria-hidden="true">
             <span>{title}</span>
           </div>
 
           <div class="reel-track" data-reel-track tabindex="0">
-            {gallery.map((src, i) => (
+            {media.map(({ src, caption, alt }, i) => (
               <figure
                 class:list={[
                   "reel-card",
                   CARD_WIDTHS[i % CARD_WIDTHS.length],
                   CARD_OFFSETS[i % CARD_OFFSETS.length],
                 ]}
-                data-ripple
-                data-media
               >
                 {/* A contained screenshot keeps its own proportions — forcing
                     it into a decorative portrait frame just surrounds it with
@@ -178,11 +179,13 @@ const coverSize = sizes.get(cover)!;
                       ? `aspect-ratio:${sizes.get(src)!.width} / ${sizes.get(src)!.height}`
                       : undefined
                   }
+                  data-ripple
+                  data-media
                 >
                   {src.endsWith(".gif") ? (
                     <img
                       src={src}
-                      alt={title}
+                      alt={alt}
                       loading="lazy"
                       width={sizes.get(src)!.width}
                       height={sizes.get(src)!.height}
@@ -192,12 +195,13 @@ const coverSize = sizes.get(cover)!;
                       src={src}
                       width={sizes.get(src)!.width}
                       height={sizes.get(src)!.height}
-                      alt={title}
+                      alt={alt}
                       widths={[400, 800, 1200, 1600]}
                       sizes="(max-width: 900px) 78vw, 50vw"
                     />
                   )}
                 </div>
+                {caption && <figcaption class="reel-caption">{caption}</figcaption>}
               </figure>
             ))}
           </div>

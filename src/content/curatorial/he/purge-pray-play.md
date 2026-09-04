@@ -8,10 +8,14 @@ yearEnd: 2022
 tags: ["תערוכה וירטואלית", "ביאנלה", "אמנות דיגיטלית", "תערוכה קבוצתית"]
 cover: "/images/imports/purge-pray-play/cover.webp"
 gallery:
-  - "/images/imports/purge-pray-play/01.webp"
-  - "/images/imports/purge-pray-play/02.webp"
-  - "/images/imports/purge-pray-play/03.webp"
-  - "/images/imports/purge-pray-play/04.webp"
+  - src: "/images/imports/purge-pray-play/01.webp"
+    caption: "לאה פורה, ‏Royal Fate is Fluid"
+  - src: "/images/imports/purge-pray-play/02.webp"
+    caption: "יון צ׳וי, ‏Where The Heart Goes"
+  - src: "/images/imports/purge-pray-play/03.webp"
+    caption: "Anthr0morph, סדרת ‏Earth Angel"
+  - src: "/images/imports/purge-pray-play/04.webp"
+    caption: "ווייארפריימים של הביתן"
 externalUrl: "https://www.prtfl.co.il/archives/156390"
 order: 5
 ---

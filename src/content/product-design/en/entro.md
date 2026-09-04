@@ -8,10 +8,10 @@ ongoing: true
 tags: ["Cybersecurity", "B2B", "Non-Human Identities", "Secrets Management"]
 cover: "/images/imports/entro/cover.webp"
 gallery:
-  - "/images/imports/entro/01.webp"
-  - "/images/imports/entro/02.webp"
-  - "/images/imports/entro/03.webp"
-  - "/images/imports/entro/04.webp"
+  - src: "/images/imports/entro/01.webp"
+  - src: "/images/imports/entro/02.webp"
+  - src: "/images/imports/entro/03.webp"
+  - src: "/images/imports/entro/04.webp"
 video: "https://www.youtube.com/watch?v=Ze9h2e4y8Wg"
 order: 1
 ---

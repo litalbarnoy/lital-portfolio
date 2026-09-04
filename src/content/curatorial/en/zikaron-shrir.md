@@ -7,10 +7,10 @@ year: 2023
 tags: ["Solo Exhibition", "Video Art", "3D", "Dance"]
 cover: "/images/imports/zikaron-shrir/cover.webp"
 gallery:
-  - "/images/imports/zikaron-shrir/01.webp"
-  - "/images/imports/zikaron-shrir/02.webp"
-  - "/images/imports/zikaron-shrir/03.webp"
-  - "/images/imports/zikaron-shrir/04.webp"
+  - src: "/images/imports/zikaron-shrir/01.webp"
+  - src: "/images/imports/zikaron-shrir/02.webp"
+  - src: "/images/imports/zikaron-shrir/03.webp"
+  - src: "/images/imports/zikaron-shrir/04.webp"
 order: 2
 ---
 

@@ -7,8 +7,8 @@ year: 2026
 tags: ["דוקטורט", "מענק סנדברג", "תרבות חזותית", "עיצוב ממשקים", "AR"]
 cover: "/images/imports/bside/cover.webp"
 gallery:
-  - "/images/imports/bside/01.webp"
-  - "/images/imports/bside/02.webp"
+  - src: "/images/imports/bside/01.webp"
+  - src: "/images/imports/bside/02.webp"
 order: 1
 ---
 

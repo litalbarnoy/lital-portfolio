@@ -675,3 +675,14 @@ html.js [data-media].is-done {
     transform: none;
   }
 }
+
+/* Caption under a gallery image — small, quiet, and the same string the
+   image carries as its alt text, so a credit is not sighted-only. */
+.reel-caption {
+  margin-block-start: 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+  text-align: start;
+  text-wrap: pretty;
+}

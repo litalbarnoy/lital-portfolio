@@ -31,7 +31,14 @@ collections:
       - label: "גלריית תמונות (יחס מומלץ 4:3)"
         name: "gallery"
         widget: "list"
-        field: { label: "תמונה", name: "image", widget: "image" }
+        fields:
+          - { label: "תמונה", name: "src", widget: "image" }
+          - {
+              label: "כיתוב (שם האמן/ית והעבודה — לא חובה)",
+              name: "caption",
+              widget: "string",
+              required: false,
+            }
       - label: "וידאו (קישור YouTube — לא חובה)"
         name: "video"
         widget: "string"
@@ -67,7 +74,14 @@ collections:
       - label: "Gallery images (recommended ratio 4:3)"
         name: "gallery"
         widget: "list"
-        field: { label: "Image", name: "image", widget: "image" }
+        fields:
+          - { label: "Image", name: "src", widget: "image" }
+          - {
+              label: "Caption (artist and work — optional)",
+              name: "caption",
+              widget: "string",
+              required: false,
+            }
       - label: "Video (YouTube link — optional)"
         name: "video"
         widget: "string"
@@ -103,7 +117,14 @@ collections:
       - label: "גלריית תמונות (יחס מומלץ 4:3)"
         name: "gallery"
         widget: "list"
-        field: { label: "תמונה", name: "image", widget: "image" }
+        fields:
+          - { label: "תמונה", name: "src", widget: "image" }
+          - {
+              label: "כיתוב (שם האמן/ית והעבודה — לא חובה)",
+              name: "caption",
+              widget: "string",
+              required: false,
+            }
       - label: "וידאו (קישור YouTube — לא חובה)"
         name: "video"
         widget: "string"
@@ -139,7 +160,14 @@ collections:
       - label: "Gallery images (recommended ratio 4:3)"
         name: "gallery"
         widget: "list"
-        field: { label: "Image", name: "image", widget: "image" }
+        fields:
+          - { label: "Image", name: "src", widget: "image" }
+          - {
+              label: "Caption (artist and work — optional)",
+              name: "caption",
+              widget: "string",
+              required: false,
+            }
       - label: "Video (YouTube link — optional)"
         name: "video"
         widget: "string"
@@ -177,7 +205,14 @@ collections:
         name: "gallery"
         widget: "list"
         required: false
-        field: { label: "תמונה", name: "image", widget: "image" }
+        fields:
+          - { label: "תמונה", name: "src", widget: "image" }
+          - {
+              label: "כיתוב (לא חובה)",
+              name: "caption",
+              widget: "string",
+              required: false,
+            }
       - label: "סדר הצגה ברשימה (מספר קטן = מוצג ראשון)"
         name: "order"
         widget: "number"
@@ -211,7 +246,14 @@ collections:
         name: "gallery"
         widget: "list"
         required: false
-        field: { label: "Image", name: "image", widget: "image" }
+        fields:
+          - { label: "Image", name: "src", widget: "image" }
+          - {
+              label: "Caption (optional)",
+              name: "caption",
+              widget: "string",
+              required: false,
+            }
       - label: "Display order (lower number = shown first)"
         name: "order"
         widget: "number"

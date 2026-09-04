@@ -7,11 +7,11 @@ year: 2021
 tags: ["תערוכה קבוצתית", "עוזרת אוצרת"]
 cover: "/images/imports/rest-mass/cover.webp"
 gallery:
-  - "/images/imports/rest-mass/01.webp"
-  - "/images/imports/rest-mass/02.webp"
-  - "/images/imports/rest-mass/03.webp"
-  - "/images/imports/rest-mass/04.webp"
-  - "/images/imports/rest-mass/05.webp"
+  - src: "/images/imports/rest-mass/01.webp"
+  - src: "/images/imports/rest-mass/02.webp"
+  - src: "/images/imports/rest-mass/03.webp"
+  - src: "/images/imports/rest-mass/04.webp"
+  - src: "/images/imports/rest-mass/05.webp"
 order: 6
 ---
 

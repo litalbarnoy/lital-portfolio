@@ -8,8 +8,8 @@ yearEnd: 2025
 tags: ["השפעה חברתית", "Mobile First", "פלטפורמת וידאו", "חינוך"]
 cover: "/images/imports/flamingo/01.webp"
 gallery:
-  - "/images/imports/flamingo/02.webp"
-  - "/images/imports/flamingo/demo.gif"
+  - src: "/images/imports/flamingo/02.webp"
+  - src: "/images/imports/flamingo/demo.gif"
 order: 6
 ---
 

@@ -8,8 +8,8 @@ yearEnd: 2026
 tags: ["סייבר סקיוריטי", "B2B", "Design Systems", "בונה תהליכי עבודה"]
 cover: "/images/imports/axonius/cover.webp"
 gallery:
-  - "/images/imports/axonius/workflows.webp"
-  - "/images/imports/axonius/nodes.webp"
+  - src: "/images/imports/axonius/workflows.webp"
+  - src: "/images/imports/axonius/nodes.webp"
 video: "https://www.youtube.com/watch?v=sKQLvQXDsVc"
 order: 2
 ---

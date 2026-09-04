@@ -1,6 +1,19 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
+// A gallery item is either a plain path or a path with a caption. Keeping
+// the bare string valid means existing content files stay correct, and the
+// caption doubles as the image's alt text — crediting an artist and
+// describing the image are the same sentence here.
+const mediaItem = z.union([
+  z.string(),
+  z.object({
+    src: z.string(),
+    caption: z.string().optional(),
+    alt: z.string().optional(),
+  }),
+]);
+
 const projectSchema = z.object({
   title: z.string(),
   subtitle: z.string(),
@@ -11,7 +24,7 @@ const projectSchema = z.object({
   ongoing: z.boolean().optional(),
   tags: z.array(z.string()),
   cover: z.string(),
-  gallery: z.array(z.string()),
+  gallery: z.array(mediaItem),
   video: z.string().optional(),
   externalUrl: z.string().optional(),
   order: z.number(),
@@ -37,7 +50,7 @@ const academicSchema = z.object({
   ongoing: z.boolean().optional(),
   tags: z.array(z.string()).default([]),
   cover: z.string().optional(),
-  gallery: z.array(z.string()).default([]),
+  gallery: z.array(mediaItem).default([]),
   video: z.string().optional(),
   externalUrl: z.string().optional(),
   order: z.number(),

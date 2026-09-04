@@ -8,10 +8,14 @@ yearEnd: 2022
 tags: ["Virtual Exhibition", "Biennale", "Digital Art", "Group Show"]
 cover: "/images/imports/purge-pray-play/cover.webp"
 gallery:
-  - "/images/imports/purge-pray-play/01.webp"
-  - "/images/imports/purge-pray-play/02.webp"
-  - "/images/imports/purge-pray-play/03.webp"
-  - "/images/imports/purge-pray-play/04.webp"
+  - src: "/images/imports/purge-pray-play/01.webp"
+    caption: "Léa Porré, Royal Fate is Fluid"
+  - src: "/images/imports/purge-pray-play/02.webp"
+    caption: "Yun Choi, Where The Heart Goes"
+  - src: "/images/imports/purge-pray-play/03.webp"
+    caption: "Anthr0morph, Earth Angel series"
+  - src: "/images/imports/purge-pray-play/04.webp"
+    caption: "Pavilion wireframes"
 externalUrl: "https://www.prtfl.co.il/archives/156390"
 order: 5
 ---

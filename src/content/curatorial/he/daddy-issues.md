@@ -7,9 +7,9 @@ year: 2019
 tags: ["תערוכה קבוצתית", "קולקטיב", "אוצרות שותפה"]
 cover: "/images/imports/daddy-issues/cover.webp"
 gallery:
-  - "/images/imports/daddy-issues/01.webp"
-  - "/images/imports/daddy-issues/02.webp"
-  - "/images/imports/daddy-issues/03.webp"
+  - src: "/images/imports/daddy-issues/01.webp"
+  - src: "/images/imports/daddy-issues/02.webp"
+  - src: "/images/imports/daddy-issues/03.webp"
 order: 7
 ---
 

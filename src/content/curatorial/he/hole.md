@@ -8,10 +8,10 @@ ongoing: true
 tags: ["פרפורמנס", "רב-תחומי", "אמנות בחלל ציבורי", "ירושלים"]
 cover: "/images/imports/hole/cover.webp"
 gallery:
-  - "/images/imports/hole/01.webp"
-  - "/images/imports/hole/02.webp"
-  - "/images/imports/hole/03.webp"
-  - "/images/imports/hole/04.webp"
+  - src: "/images/imports/hole/01.webp"
+  - src: "/images/imports/hole/02.webp"
+  - src: "/images/imports/hole/03.webp"
+  - src: "/images/imports/hole/04.webp"
 order: 1
 ---
 

@@ -7,8 +7,8 @@ year: 2019
 tags: ["שווקים מתפתחים", "מובייל", "ביצועים", "ניווט"]
 cover: "/images/imports/meta-fb-lite/cover.webp"
 gallery:
-  - "/images/imports/meta-fb-lite/01.webp"
-  - "/images/imports/meta-fb-lite/02.webp"
+  - src: "/images/imports/meta-fb-lite/01.webp"
+  - src: "/images/imports/meta-fb-lite/02.webp"
 order: 5
 ---
 

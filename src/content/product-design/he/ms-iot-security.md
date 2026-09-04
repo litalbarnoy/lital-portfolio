@@ -8,8 +8,8 @@ yearEnd: 2021
 tags: ["Enterprise", "סייבר סקיוריטי", "Design Systems", "Fluent Design"]
 cover: "/images/imports/ms-iot-security/cover.webp"
 gallery:
-  - "/images/imports/ms-iot-security/01.webp"
-  - "/images/imports/ms-iot-security/02.webp"
+  - src: "/images/imports/ms-iot-security/01.webp"
+  - src: "/images/imports/ms-iot-security/02.webp"
 order: 4
 ---
 

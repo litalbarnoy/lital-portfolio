@@ -7,10 +7,10 @@ year: 2023
 tags: ["New Media", "Solo Exhibition", "Video & Installation", "3D Printing"]
 cover: "/images/imports/shin/cover.webp"
 gallery:
-  - "/images/imports/shin/01.webp"
-  - "/images/imports/shin/02.webp"
-  - "/images/imports/shin/03.webp"
-  - "/images/imports/shin/04.webp"
+  - src: "/images/imports/shin/01.webp"
+  - src: "/images/imports/shin/02.webp"
+  - src: "/images/imports/shin/03.webp"
+  - src: "/images/imports/shin/04.webp"
 order: 3
 ---
 

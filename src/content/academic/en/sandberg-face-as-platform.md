@@ -7,8 +7,8 @@ year: 2026
 tags: ["PhD Research", "Sandberg Grant", "Visual Culture", "Interface Design", "AR"]
 cover: "/images/imports/bside/cover.webp"
 gallery:
-  - "/images/imports/bside/01.webp"
-  - "/images/imports/bside/02.webp"
+  - src: "/images/imports/bside/01.webp"
+  - src: "/images/imports/bside/02.webp"
 order: 1
 ---
 

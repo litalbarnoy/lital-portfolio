@@ -9,7 +9,7 @@ tags: ["Enterprise", "פלטפורמת דאטה", "KQL", "Microsoft Fabric"]
 cover: "/images/imports/ms-realtime-intelligence/cover.webp"
 video: "https://www.youtube.com/watch?v=efjaj1Qo18w"
 gallery:
-  - "/images/imports/ms-realtime-intelligence/01.webp"
+  - src: "/images/imports/ms-realtime-intelligence/01.webp"
 order: 3
 ---
 
