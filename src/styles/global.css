@@ -11,7 +11,7 @@
   --color-line: #e5e5e5;
 
   --font-display: "Frank Ruhl Libre", "David Libre", serif;
-  --font-body: "Assistant", "Heebo", sans-serif;
+  --font-body: "Noto Sans", "Noto Sans Hebrew", sans-serif;
 
   --ease-expo: cubic-bezier(0.165, 0.84, 0.44, 1);
   --ease-io: cubic-bezier(0.86, 0, 0.07, 1);
@@ -42,10 +42,9 @@
   font-display: swap;
 }
 
-/* English pages use Wagon + Geist Sans; Hebrew keeps the Hebrew pairing */
+/* English keeps its serif display face; the sans is shared with Hebrew. */
 :dir(ltr) {
   --font-display: "Wagon", "Frank Ruhl Libre", serif;
-  --font-body: "Geist", "Assistant", sans-serif;
 }
 
 /* Custom properties are not animatable until they are registered with a
