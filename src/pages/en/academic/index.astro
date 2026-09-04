@@ -5,6 +5,7 @@ import Reveal from "../../../components/Reveal.astro";
 import ProjectCard from "../../../components/ProjectCard.astro";
 import ProjectListRow from "../../../components/ProjectListRow.astro";
 import { stripLocale } from "../../../i18n/ui";
+import { paletteAttrs } from "../../../lib/palette";
 
 const entries = (await getCollection("academic"))
   .filter((e) => e.id.startsWith("en/"))
@@ -14,11 +15,11 @@ const featured = entries.filter((e) => e.data.cover);
 const list = entries.filter((e) => !e.data.cover);
 ---
 
-<BaseLayout
+<BaseLayout palette="about"
   title="Academic Research"
   description="PhD research, publications, and lectures by Lital Bar Noy."
 >
-  <section class="mx-auto max-w-6xl px-6 pt-16 lg:px-10 lg:pt-24">
+  <section class="mx-auto max-w-6xl px-6 pt-16 lg:px-10 lg:pt-24" {...paletteAttrs("about")}>
     <Reveal as="h1" class="text-4xl font-bold lg:text-6xl">
       Academic Research
     </Reveal>
@@ -29,7 +30,7 @@ const list = entries.filter((e) => !e.data.cover);
 
   {
     featured.length > 0 && (
-      <section class="mx-auto max-w-6xl px-6 py-16 lg:px-10">
+      <section class="mx-auto max-w-6xl px-6 py-16 lg:px-10" {...paletteAttrs("about")}>
         <div class="grid gap-10 md:grid-cols-2">
           {featured.map((entry) => (
             <ProjectCard
@@ -47,7 +48,7 @@ const list = entries.filter((e) => !e.data.cover);
 
   {
     list.length > 0 && (
-      <section class="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
+      <section class="mx-auto max-w-6xl px-6 pb-24 lg:px-10" {...paletteAttrs("about")}>
         <Reveal as="h2" class="mb-6 text-sm font-medium uppercase tracking-wide text-ink-soft">
           Publications &amp; Lectures
         </Reveal>

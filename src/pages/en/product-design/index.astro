@@ -5,6 +5,7 @@ import Reveal from "../../../components/Reveal.astro";
 import ProjectGrid from "../../../components/ProjectGrid.astro";
 import { formatYear } from "../../../lib/formatYear";
 import { stripLocale } from "../../../i18n/ui";
+import { paletteAttrs } from "../../../lib/palette";
 
 const projects = (await getCollection("product-design"))
   .filter((e) => e.id.startsWith("en/"))
@@ -19,11 +20,11 @@ const projects = (await getCollection("product-design"))
   }));
 ---
 
-<BaseLayout
+<BaseLayout palette="work"
   title="Product Design"
   description="UX design projects by Lital Bar Noy."
 >
-  <section class="mx-auto max-w-6xl px-6 pt-16 lg:px-10 lg:pt-24">
+  <section class="mx-auto max-w-6xl px-6 pt-16 lg:px-10 lg:pt-24" {...paletteAttrs("work")}>
     <Reveal as="h1" class="text-4xl font-bold lg:text-6xl">
       Product Design
     </Reveal>
@@ -33,7 +34,7 @@ const projects = (await getCollection("product-design"))
     </Reveal>
   </section>
 
-  <section class="mx-auto max-w-6xl px-6 py-16 lg:px-10">
+  <section class="mx-auto max-w-6xl px-6 py-16 lg:px-10" {...paletteAttrs("work")}>
     <ProjectGrid projects={projects} />
   </section>
 </BaseLayout>

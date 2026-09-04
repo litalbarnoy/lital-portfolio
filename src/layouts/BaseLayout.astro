@@ -7,11 +7,16 @@ import Cursor from "../components/Cursor.astro";
 import MotionLayer from "../components/MotionLayer.astro";
 import PageTransition from "../components/PageTransition.astro";
 import RippleField from "../components/RippleField.astro";
+import ColorField from "../components/ColorField.astro";
 import { getLang, ui } from "../i18n/ui";
+import { palette, paletteStyle, DEFAULT_PALETTE, type PaletteName } from "../lib/palette";
 
 interface Props {
   title: string;
   description?: string;
+  /** Colours the first paint, so the page never flashes before the
+      observer runs. Should match the page's first section. */
+  palette?: PaletteName;
 }
 
 const lang = getLang(Astro.url.pathname);
@@ -19,6 +24,7 @@ const t = ui[lang];
 
 const {
   title,
+  palette: firstPalette = DEFAULT_PALETTE,
   description = lang === "en"
     ? "Lital Bar Noy — UX Designer & Curator."
     : "ליטל בר נוי — מעצבת חוויית משתמש (UX) ואוצרת.",
@@ -27,13 +33,14 @@ const {
 const siteName = lang === "en" ? "Lital Bar Noy" : "ליטל בר נוי";
 ---
 
-<html lang={lang} dir={t.dir}>
+<html lang={lang} dir={t.dir} style={paletteStyle(firstPalette)}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title} · {siteName}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content={palette[firstPalette].bg} />
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -53,8 +60,80 @@ const siteName = lang === "en" ? "Lital Bar Noy" : "ליטל בר נוי";
       // render in their final, visible state (see global.css).
       document.documentElement.classList.add("js");
     </script>
+    <script is:inline>
+      // Scroll-driven palette. A section takes over when it crosses the
+      // vertical centre of the viewport — hence the -50%/-50% rootMargin,
+      // which collapses the root box to a single line through the middle.
+      // Observer only: no scroll listener, no rAF.
+      (() => {
+        let observer = null;
+        let tailObserver = null;
+
+        function paint(section) {
+          const bg = section.getAttribute("data-bg");
+          const fg = section.getAttribute("data-fg");
+          if (!bg || !fg) return;
+          const root = document.documentElement;
+          root.style.setProperty("--bg", bg);
+          root.style.setProperty("--fg", fg);
+          const tints = (section.getAttribute("data-tints") || "").split(",");
+          tints.forEach((t, i) => root.style.setProperty("--t" + (i + 1), t.trim()));
+          // Mobile browser chrome follows the page.
+          const meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute("content", bg);
+        }
+
+        function init() {
+          observer?.disconnect();
+          tailObserver?.disconnect();
+          const sections = document.querySelectorAll("[data-bg][data-fg]");
+          if (!sections.length) return;
+
+          // The server already inlined the first section's colours on <html>,
+          // so the first paint is correct; this only re-asserts it in case the
+          // page was restored mid-scroll.
+          paint(sections[0]);
+
+          const onIntersect = (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) paint(entry.target);
+            }
+          };
+
+          observer = new IntersectionObserver(onIntersect, {
+            threshold: 0,
+            rootMargin: "-50% 0px -50% 0px",
+          });
+          sections.forEach((s) => observer.observe(s));
+
+          // The centre line is unreachable for anything in the last
+          // half-viewport: the page runs out of scroll first, so a short
+          // footer never took over. It gets a second observer keyed on how
+          // much of it is showing rather than on a line, which holds at any
+          // viewport size. A footer taller than the viewport can reach the
+          // centre on its own, and the main observer covers that case.
+          const last = sections[sections.length - 1];
+          if (sections.length > 1) {
+            tailObserver = new IntersectionObserver(onIntersect, {
+              threshold: 0.5,
+            });
+            tailObserver.observe(last);
+          }
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+        document.addEventListener("astro:page-load", init);
+        document.addEventListener("astro:before-swap", () => {
+          observer?.disconnect();
+          tailObserver?.disconnect();
+          observer = null;
+          tailObserver = null;
+        });
+      })();
+    </script>
   </head>
-  <body class="bg-cream font-body text-ink antialiased">
+  <body class="font-body antialiased">
+    <ColorField />
     <PageTransition />
     <Nav />
     <main>

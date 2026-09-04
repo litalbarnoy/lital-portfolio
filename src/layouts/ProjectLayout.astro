@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import { getLang, ui } from "../i18n/ui";
 import { formatYear } from "../lib/formatYear";
+import { paletteAttrs } from "../lib/palette";
 import { youtubeEmbed } from "../lib/youtube";
 import { parseSections } from "../lib/projectContent";
 import { imageSize } from "../lib/imageSize";
@@ -55,6 +56,9 @@ const t = ui[lang].project;
 const isUi = Astro.url.pathname.includes("/product-design/");
 const fit: "contain" | "cover" = isUi ? "contain" : "cover";
 
+// The header takes the colour of the section the project belongs to.
+const headerPalette = isUi ? "work" : "curatorial";
+
 const texts = parseSections(body);
 const intro = texts[0] ?? null;
 const rest = texts.slice(1);
@@ -85,11 +89,11 @@ const videoEmbed = video ? youtubeEmbed(video) : null;
 const coverSize = sizes.get(cover)!;
 ---
 
-<BaseLayout title={title} description={subtitle}>
+<BaseLayout title={title} description={subtitle} palette={headerPalette}>
   <article class="project">
     {/* 01 — header: oversized title beside the cover, which carries the
         same pointer-driven hover as the rest of the site. */}
-    <header class="project-hero container">
+    <header class="project-hero container" {...paletteAttrs(headerPalette)}>
       <div class="hero-text">
         <p class="label reveal">{role}</p>
         <h1 class="project-title" data-hero-title>{title}</h1>
@@ -164,7 +168,7 @@ const coverSize = sizes.get(cover)!;
 
     {
       intro && (
-        <section class="project-section container text-section">
+        <section class="project-section container text-section" {...paletteAttrs("about")}>
           <h2 class="section-label" data-split>{intro.label}</h2>
           <div class="section-body reveal" set:html={intro.html} />
         </section>
@@ -175,7 +179,7 @@ const coverSize = sizes.get(cover)!;
         arrows, riding over the project name at display size. */}
     {
       media.length > 0 && (
-        <section class="reel" aria-roledescription="carousel" aria-label={title}>
+        <section class="reel" aria-roledescription="carousel" aria-label={title} {...paletteAttrs(headerPalette)}>
           <div class="reel-type" data-horizontal aria-hidden="true">
             <span>{title}</span>
           </div>
@@ -241,7 +245,7 @@ const coverSize = sizes.get(cover)!;
 
     {
       animations && animations.length > 0 && (
-        <section class="project-section container animation-grid">
+        <section class="project-section container animation-grid" {...paletteAttrs("about")}>
           {animations.map((a) => (
             <LottieFigure
               src={a.src}
@@ -257,7 +261,7 @@ const coverSize = sizes.get(cover)!;
 
     {
       rest.map((section) => (
-        <section class="project-section container text-section">
+        <section class="project-section container text-section" {...paletteAttrs("about")}>
           <h2 class="section-label" data-split>{section.label}</h2>
           <div class="section-body reveal" set:html={section.html} />
         </section>
@@ -282,7 +286,7 @@ const coverSize = sizes.get(cover)!;
 
     {
       next && (
-        <a class="next-project" href={next.href} data-cursor-hover data-astro-prefetch="hover">
+        <a class="next-project" href={next.href} {...paletteAttrs("contact")} data-cursor-hover data-astro-prefetch="hover">
           <span class="label">{t.next}</span>
           <span class="next-title">{next.title}</span>
           {next.cover && (

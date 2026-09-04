@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 @theme {
+  /* Placeholders. The real values are rebased onto the live palette in the
+     :root block below, so every existing utility follows the scroll colour
+     without a single class having to change. */
   --color-cream: #ffffff;
   --color-ink: #0a0a0a;
   --color-ink-soft: #6f6f6f;
@@ -43,6 +46,56 @@
 :dir(ltr) {
   --font-display: "Wagon", "Frank Ruhl Libre", serif;
   --font-body: "Geist", "Assistant", sans-serif;
+}
+
+/* ------------------------------------------------------------- palette
+   One source of colour: --bg and --fg, rewritten on the root element as
+   sections cross the middle of the viewport. Everything else is derived,
+   so nothing anywhere hardcodes a colour.
+
+   The default pair is inlined on <html> at build time by BaseLayout, which
+   is what stops the first paint flashing white. These are the fallbacks. */
+:root {
+  --bg: #acc5c9;
+  --fg: #16211f;
+
+  /* Secondary text at 90% toward the foreground. Lower mixes look right but
+     drop under 7:1 on the lighter pairs — 90% is the point where the worst
+     pair still clears it (7.4:1). */
+  --color-ink-soft: color-mix(in srgb, var(--fg) 90%, var(--bg));
+  --color-line: color-mix(in srgb, var(--fg) 22%, var(--bg));
+  --color-cream: var(--bg);
+  --color-ink: var(--fg);
+  --color-accent: var(--fg);
+
+  /* Neutral surface behind contained screenshots, tinted by the palette
+     rather than a fixed grey. */
+  --surface: color-mix(in srgb, var(--fg) 7%, var(--bg));
+
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+/* Sections paint nothing; the root is the only coloured surface. */
+body {
+  background-color: transparent;
+  color: var(--fg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root,
+  body {
+    transition:
+      background-color 700ms cubic-bezier(0.4, 0, 0.2, 1),
+      color 700ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  body {
+    transition: none;
+  }
 }
 
 html {
@@ -525,7 +578,7 @@ html.js [data-media].is-done {
 /* UI screenshots sit whole on a neutral surface rather than being cropped
    into unreadable fragments. */
 .fit-contain {
-  background: #f4f4f4;
+  background: var(--surface);
   padding: clamp(0.75rem, 2.5vw, 2rem);
 }
 

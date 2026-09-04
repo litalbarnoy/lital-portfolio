@@ -2,13 +2,14 @@
 import { Image } from "astro:assets";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Reveal from "../../components/Reveal.astro";
+import { paletteAttrs } from "../../lib/palette";
 ---
 
-<BaseLayout
+<BaseLayout palette="about"
   title="About"
   description="A little about me — Lital Bar Noy, UX Designer and Curator."
 >
-  <section class="mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:px-10 lg:py-24">
+  <section class="mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:px-10 lg:py-24" {...paletteAttrs("about")}>
     <div class="flex flex-col lg:min-h-[70vh] lg:justify-between">
       <Reveal as="h1" class="font-display text-6xl font-bold leading-[0.95] lg:text-8xl">
         About

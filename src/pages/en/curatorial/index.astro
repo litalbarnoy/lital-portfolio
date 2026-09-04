@@ -5,6 +5,7 @@ import Reveal from "../../../components/Reveal.astro";
 import ProjectGrid from "../../../components/ProjectGrid.astro";
 import { formatYear } from "../../../lib/formatYear";
 import { stripLocale } from "../../../i18n/ui";
+import { paletteAttrs } from "../../../lib/palette";
 
 const projects = (await getCollection("curatorial"))
   .filter((e) => e.id.startsWith("en/"))
@@ -19,11 +20,11 @@ const projects = (await getCollection("curatorial"))
   }));
 ---
 
-<BaseLayout
+<BaseLayout palette="curatorial"
   title="Curatorial"
   description="Curatorial and exhibition projects by Lital Bar Noy."
 >
-  <section class="mx-auto max-w-6xl px-6 pt-16 lg:px-10 lg:pt-24">
+  <section class="mx-auto max-w-6xl px-6 pt-16 lg:px-10 lg:pt-24" {...paletteAttrs("curatorial")}>
     <Reveal as="h1" class="text-4xl font-bold lg:text-6xl">
       Curatorial
     </Reveal>
@@ -33,11 +34,11 @@ const projects = (await getCollection("curatorial"))
     </Reveal>
   </section>
 
-  <section class="mx-auto max-w-6xl px-6 py-16 lg:px-10">
+  <section class="mx-auto max-w-6xl px-6 py-16 lg:px-10" {...paletteAttrs("curatorial")}>
     <ProjectGrid projects={projects} />
   </section>
 
-  <section class="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
+  <section class="mx-auto max-w-6xl px-6 pb-24 lg:px-10" {...paletteAttrs("curatorial")}>
     <Reveal as="h2" class="mb-6 text-sm font-medium uppercase tracking-wide text-ink-soft">
       Additional Curatorial Experience
     </Reveal>

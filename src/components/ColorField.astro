@@ -1,0 +1,111 @@
+---
+// The drifting gradient field that sits behind everything. Four soft blobs in
+// the current palette's tints, each on its own slow loop, so the colour under
+// the page is never quite the same twice.
+//
+// Radial gradients that fade to transparent rather than blurred shapes: the
+// softness is in the colour stops, which costs nothing to composite, where a
+// full-viewport filter: blur() would repaint on every frame.
+---
+
+<div class="color-field" aria-hidden="true">
+  <span class="blob blob-1"></span>
+  <span class="blob blob-2"></span>
+  <span class="blob blob-3"></span>
+  <span class="blob blob-4"></span>
+</div>
+
+<style>
+  .color-field {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background-color: var(--bg);
+  }
+
+  .blob {
+    position: absolute;
+    inline-size: 85vmax;
+    block-size: 85vmax;
+    border-radius: 50%;
+    will-change: transform;
+  }
+
+  /* Each blob transitions its own colour on the same curve as the page, so a
+     section change washes through the field rather than snapping. */
+  .blob-1 {
+    background: radial-gradient(circle, var(--t1) 0%, transparent 68%);
+    inset-block-start: -28vmax;
+    inset-inline-start: -22vmax;
+  }
+  .blob-2 {
+    background: radial-gradient(circle, var(--t2) 0%, transparent 68%);
+    inset-block-start: -14vmax;
+    inset-inline-end: -26vmax;
+  }
+  .blob-3 {
+    background: radial-gradient(circle, var(--t3) 0%, transparent 68%);
+    inset-block-end: -34vmax;
+    inset-inline-start: 4vmax;
+  }
+  .blob-4 {
+    background: radial-gradient(circle, var(--t4) 0%, transparent 68%);
+    inset-block-end: -26vmax;
+    inset-inline-end: -18vmax;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .blob {
+      transition: background 700ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* Long, mismatched durations so the four never fall into step and the
+       field reads as drifting rather than looping. */
+    .blob-1 {
+      animation: drift-1 34s ease-in-out infinite alternate;
+    }
+    .blob-2 {
+      animation: drift-2 43s ease-in-out infinite alternate;
+    }
+    .blob-3 {
+      animation: drift-3 38s ease-in-out infinite alternate;
+    }
+    .blob-4 {
+      animation: drift-4 47s ease-in-out infinite alternate;
+    }
+  }
+
+  @keyframes drift-1 {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(12vmax, 8vmax, 0) scale(1.15);
+    }
+  }
+  @keyframes drift-2 {
+    from {
+      transform: translate3d(0, 0, 0) scale(1.1);
+    }
+    to {
+      transform: translate3d(-10vmax, 12vmax, 0) scale(0.95);
+    }
+  }
+  @keyframes drift-3 {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(14vmax, -9vmax, 0) scale(1.2);
+    }
+  }
+  @keyframes drift-4 {
+    from {
+      transform: translate3d(0, 0, 0) scale(1.05);
+    }
+    to {
+      transform: translate3d(-13vmax, -7vmax, 0) scale(0.92);
+    }
+  }
+</style>

@@ -5,6 +5,7 @@ import Reveal from "../components/Reveal.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import { formatYear } from "../lib/formatYear";
 import { stripLocale } from "../i18n/ui";
+import { paletteAttrs } from "../lib/palette";
 
 const productDesign = (await getCollection("product-design"))
   .filter((e) => e.id.startsWith("he/"))
@@ -22,8 +23,8 @@ const pdPreviews = productDesign.map((p) => p.data.cover).join(",");
 const curPreviews = curatorial.map((p) => p.data.cover).join(",");
 ---
 
-<BaseLayout title="בית">
-  <section class="mx-auto max-w-6xl px-6 pb-16 pt-20 lg:px-10 lg:pt-32">
+<BaseLayout palette="hero" title="בית">
+  <section class="mx-auto max-w-6xl px-6 pb-16 pt-20 lg:px-10 lg:pt-32" {...paletteAttrs("hero")}>
     <div class="hero-lines overflow-hidden">
       <h1 class="font-display text-5xl font-bold leading-[1.1] lg:text-7xl">
         <span class="hero-line block"><span class="hero-line-inner block">ליטל בר נוי</span></span>
@@ -36,7 +37,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
     </p>
   </section>
 
-  <section class="mx-auto grid max-w-6xl gap-6 px-6 pb-24 md:grid-cols-2 lg:px-10">
+  <section class="mx-auto grid max-w-6xl gap-6 px-6 pb-24 md:grid-cols-2 lg:px-10" {...paletteAttrs("work")}>
     <Reveal>
       <a
         href="/product-design"
@@ -79,7 +80,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
 
   {
     featured.length > 0 && (
-      <section class="mx-auto max-w-6xl px-6 pb-28 lg:px-10">
+      <section class="mx-auto max-w-6xl px-6 pb-28 lg:px-10" {...paletteAttrs("curatorial")}>
         <Reveal as="h2" class="text-2xl font-bold">
           עבודות נבחרות
         </Reveal>

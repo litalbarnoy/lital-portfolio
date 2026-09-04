@@ -1,4 +1,5 @@
 ---
+import { paletteAttrs } from "../lib/palette";
 import { getLang, ui } from "../i18n/ui";
 
 const year = new Date().getFullYear();
@@ -7,7 +8,7 @@ const t = ui[lang];
 const brandName = lang === "en" ? "Lital Bar Noy" : "ליטל בר נוי";
 ---
 
-<footer class="border-t border-line px-6 py-12 lg:px-10">
+<footer class="border-t border-line px-6 py-12 lg:px-10" {...paletteAttrs("contact")}>
   <div class="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
     <div>
       <p class="text-lg font-bold">{brandName}</p>
