@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "cms": "decap-server & npm run dev"
+    "cms": "decap-server & npm run dev",
+    "images": "node scripts/import-images.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",
