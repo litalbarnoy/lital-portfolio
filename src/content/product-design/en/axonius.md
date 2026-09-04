@@ -4,12 +4,13 @@ subtitle: "Turning reactive debugging into proactive validation for a cybersecur
 role: "Product Designer — Workflows Module"
 client: "Axonius"
 year: 2025
+yearEnd: 2026
 tags: ["Cybersecurity", "B2B", "Design Systems", "Workflow Builder"]
 cover: "/images/imports/axonius/cover.webp"
 gallery:
   - "/images/imports/axonius/workflows.webp"
   - "/images/imports/axonius/nodes.webp"
-order: 1
+order: 2
 ---
 
 ## The Challenge

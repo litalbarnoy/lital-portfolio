@@ -3,13 +3,14 @@ title: "Flamingo"
 subtitle: "הושן x AppsFlyer — הנגשת זהויות מגדר ומשיכה דרך סיפורים אישיים קצרים"
 role: "מעצבת מוצר / UX"
 client: "הושן — חינוך ושינוי, בשיתוף AppsFlyer"
-year: 2024
+year: 2016
+yearEnd: 2025
 tags: ["השפעה חברתית", "Mobile First", "פלטפורמת וידאו", "חינוך"]
 cover: "/images/imports/flamingo/01.webp"
 gallery:
   - "/images/imports/flamingo/02.webp"
   - "/images/imports/flamingo/demo.gif"
-order: 3
+order: 6
 ---
 
 ## הרעיון

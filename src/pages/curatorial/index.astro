@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Reveal from "../../components/Reveal.astro";
 import ProjectGrid from "../../components/ProjectGrid.astro";
+import { formatYear } from "../../lib/formatYear";
 import { stripLocale } from "../../i18n/ui";
 
 const projects = (await getCollection("curatorial"))
@@ -13,7 +14,7 @@ const projects = (await getCollection("curatorial"))
     title: project.data.title,
     subtitle: project.data.subtitle,
     cover: project.data.cover,
-    year: project.data.year,
+    year: formatYear(project.data, "he"),
     tags: project.data.tags,
   }));
 ---

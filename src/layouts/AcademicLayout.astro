@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import Reveal from "../components/Reveal.astro";
 import { getLang, ui } from "../i18n/ui";
+import { formatYear } from "../lib/formatYear";
 
 interface Props {
   title: string;
@@ -10,12 +11,15 @@ interface Props {
   role: string;
   client: string;
   year: number;
+  yearEnd?: number;
+  ongoing?: boolean;
   tags: string[];
   cover?: string;
   gallery: string[];
 }
 
-const { title, subtitle, role, client, year, tags, cover, gallery } = Astro.props;
+const { title, subtitle, role, client, year, yearEnd, ongoing, tags, cover, gallery } =
+  Astro.props;
 
 const lang = getLang(Astro.url.pathname);
 const t = ui[lang].project;
@@ -44,7 +48,7 @@ const t = ui[lang].project;
         </div>
         <div>
           <dt class="text-xs uppercase tracking-wide text-ink-soft">{t.year}</dt>
-          <dd class="mt-1 font-medium">{year}</dd>
+          <dd class="mt-1 font-medium">{formatYear({ year, yearEnd, ongoing }, lang)}</dd>
         </div>
         {
           tags.length > 0 && (

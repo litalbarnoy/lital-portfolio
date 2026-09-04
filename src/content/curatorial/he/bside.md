@@ -3,7 +3,8 @@ title: "Bside"
 subtitle: "קונספט גלריה 'וירטואלית-פיזית', שכבה על חלל תצוגה מוזיאוני קיים"
 role: "אוצרת / מעצבת קונספט"
 client: "מוזיאון ישראל, ירושלים"
-year: 2025
+year: 2022
+yearEnd: 2023
 tags: ["AR", "מוזיאון", "עיצוב תערוכות", "גלריה וירטואלית"]
 cover: "/images/imports/bside/cover.webp"
 gallery:

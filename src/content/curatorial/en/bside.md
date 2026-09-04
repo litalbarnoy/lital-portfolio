@@ -3,7 +3,8 @@ title: "Bside"
 subtitle: "A 'Virtual-Physical' gallery concept, layered onto a museum's existing exhibition space"
 role: "Curator / Concept Designer"
 client: "The Israel Museum, Jerusalem"
-year: 2025
+year: 2022
+yearEnd: 2023
 tags: ["AR", "Museum", "Exhibition Design", "Virtual Gallery"]
 cover: "/images/imports/bside/cover.webp"
 gallery:

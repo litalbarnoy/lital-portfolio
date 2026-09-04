@@ -3,13 +3,14 @@ title: "Microsoft Fabric — Real-Time Intelligence"
 subtitle: "Taking a powerful internal engineering tool to General Availability for a global, enterprise audience"
 role: "Product Designer, Microsoft Fabric"
 client: "Microsoft"
-year: 2025
+year: 2021
+yearEnd: 2024
 tags: ["Enterprise", "Data Platform", "KQL", "Microsoft Fabric"]
 cover: "/images/imports/ms-realtime-intelligence/cover.webp"
 video: "https://youtu.be/hkChU3KMZaE"
 gallery:
   - "/images/imports/ms-realtime-intelligence/01.webp"
-order: 2
+order: 3
 ---
 
 ## The Challenge

@@ -4,6 +4,7 @@ subtitle: "A multidisciplinary performance art series turning historic Jerusalem
 role: "Co-Founder & Curator"
 client: "Youth Authority, Jerusalem Municipality (\"Barutina\")"
 year: 2025
+ongoing: true
 tags: ["Performance", "Multidisciplinary", "Public Space", "Jerusalem"]
 cover: "/images/imports/hole/cover.webp"
 gallery:

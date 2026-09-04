@@ -3,7 +3,7 @@ title: "זיכרון שריר"
 subtitle: "יובל כץ — הגוף כארכיון פעיל, בין תנועה, וידאו ותלת-ממד"
 role: "אוצרת"
 client: "EDC — מרכז אמנות"
-year: 2025
+year: 2023
 tags: ["תערוכת יחיד", "וידאו ארט", "תלת-ממד", "מחול"]
 cover: "/images/imports/zikaron-shrir/cover.webp"
 gallery:

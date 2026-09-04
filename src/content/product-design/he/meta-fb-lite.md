@@ -3,7 +3,7 @@ title: "Meta — Facebook Lite"
 subtitle: "הפיכת תפריט מועדפים סטטי לחוויה מוכוונת-תוכן עבור שווקים מתפתחים"
 role: "מעצבת מוצר, Facebook Lite"
 client: "Meta"
-year: 2025
+year: 2019
 tags: ["שווקים מתפתחים", "מובייל", "ביצועים", "ניווט"]
 cover: "/images/imports/meta-fb-lite/cover.webp"
 gallery:

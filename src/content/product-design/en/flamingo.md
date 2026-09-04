@@ -3,13 +3,14 @@ title: "Flamingo"
 subtitle: "Hoshen x AppsFlyer — making gender and attraction identities accessible through short personal stories"
 role: "Product / UX Designer"
 client: "Hoshen — Education and Change, in collaboration with AppsFlyer"
-year: 2024
+year: 2016
+yearEnd: 2025
 tags: ["Social Impact", "Mobile First", "Video Platform", "Education"]
 cover: "/images/imports/flamingo/01.webp"
 gallery:
   - "/images/imports/flamingo/02.webp"
   - "/images/imports/flamingo/demo.gif"
-order: 3
+order: 6
 ---
 
 ## The Idea

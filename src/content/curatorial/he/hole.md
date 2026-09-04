@@ -4,6 +4,7 @@ subtitle: "סדרת מופעי אמנות רב-תחומית שהופכת אתר�
 role: "מייסדת שותפה ואוצרת"
 client: "מנהל הנוער, עיריית ירושלים (״ברוטינה״)"
 year: 2025
+ongoing: true
 tags: ["פרפורמנס", "רב-תחומי", "אמנות בחלל ציבורי", "ירושלים"]
 cover: "/images/imports/hole/cover.webp"
 gallery:

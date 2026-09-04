@@ -3,7 +3,7 @@ title: "Meta — Facebook Lite"
 subtitle: "Turning a static bookmarks menu into a content-first experience for emerging markets"
 role: "Product Designer, Facebook Lite"
 client: "Meta"
-year: 2025
+year: 2019
 tags: ["Emerging Markets", "Mobile", "Performance", "Navigation"]
 cover: "/images/imports/meta-fb-lite/cover.webp"
 gallery:

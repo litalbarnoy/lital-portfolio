@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import { getLang, ui } from "../i18n/ui";
+import { formatYear } from "../lib/formatYear";
 import { parseSections } from "../lib/projectContent";
 import { imageSize } from "../lib/imageSize";
 
@@ -11,6 +12,8 @@ interface Props {
   role: string;
   client: string;
   year: number;
+  yearEnd?: number;
+  ongoing?: boolean;
   tags: string[];
   cover: string;
   gallery: string[];
@@ -26,6 +29,8 @@ const {
   role,
   client,
   year,
+  yearEnd,
+  ongoing,
   tags,
   cover,
   gallery,
@@ -101,7 +106,7 @@ const coverSize = sizes.get(cover)!;
             </div>
             <div>
               <dt class="label">{t.year}</dt>
-              <dd>{year}</dd>
+              <dd>{formatYear({ year, yearEnd, ongoing }, lang)}</dd>
             </div>
             {
               externalUrl && (

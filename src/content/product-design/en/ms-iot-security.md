@@ -3,7 +3,8 @@ title: "Microsoft IoT Security"
 subtitle: "Consolidating two design systems into one after Microsoft's acquisition of CyberX"
 role: "UX Lead — Design Consolidation"
 client: "Microsoft (Defender for IoT / CyberX)"
-year: 2025
+year: 2020
+yearEnd: 2021
 tags: ["Enterprise", "Cybersecurity", "Design Systems", "Fluent Design"]
 cover: "/images/imports/ms-iot-security/cover.webp"
 gallery:

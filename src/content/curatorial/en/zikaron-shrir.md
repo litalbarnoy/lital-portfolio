@@ -3,7 +3,7 @@ title: "Muscle Memory"
 subtitle: "Yuval Katz — the body as an active archive, between movement, video and 3D"
 role: "Curator"
 client: "EDC — Art Center"
-year: 2025
+year: 2023
 tags: ["Solo Exhibition", "Video Art", "3D", "Dance"]
 cover: "/images/imports/zikaron-shrir/cover.webp"
 gallery:

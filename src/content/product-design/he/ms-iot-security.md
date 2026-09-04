@@ -3,7 +3,8 @@ title: "Microsoft IoT Security"
 subtitle: "איחוד שתי מערכות עיצוב לאחת, בעקבות רכישת CyberX על ידי מיקרוסופט"
 role: "UX Lead — איחוד מערכות עיצוב"
 client: "Microsoft (Defender for IoT / CyberX)"
-year: 2025
+year: 2020
+yearEnd: 2021
 tags: ["Enterprise", "סייבר סקיוריטי", "Design Systems", "Fluent Design"]
 cover: "/images/imports/ms-iot-security/cover.webp"
 gallery:

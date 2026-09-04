@@ -4,12 +4,13 @@ subtitle: "הפיכת דיבוג רטרואקטיבי לבדיקה יזומה, �
 role: "מעצבת מוצר — מודול Workflows"
 client: "Axonius"
 year: 2025
+yearEnd: 2026
 tags: ["סייבר סקיוריטי", "B2B", "Design Systems", "בונה תהליכי עבודה"]
 cover: "/images/imports/axonius/cover.webp"
 gallery:
   - "/images/imports/axonius/workflows.webp"
   - "/images/imports/axonius/nodes.webp"
-order: 1
+order: 2
 ---
 
 ## האתגר
