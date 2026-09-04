@@ -380,18 +380,13 @@ html.js [data-media].is-done {
   font-weight: 500;
 }
 
+/* A landscape rectangle beside the title, rather than a panel filling the
+   column height. */
 .hero-media {
   position: relative;
   overflow: hidden;
   border-radius: 4px;
-  aspect-ratio: 4 / 5;
-  min-block-size: 60svh;
-}
-
-/* A contained screenshot in a tall portrait box is mostly empty surface. */
-.hero-media.fit-contain {
-  aspect-ratio: 4 / 3;
-  min-block-size: auto;
+  aspect-ratio: 3 / 2;
 }
 
 .project-section {
@@ -609,11 +604,10 @@ html.js [data-media].is-done {
     grid-template-columns: 1fr 0.85fr;
     min-block-size: 88svh;
   }
-  .hero-media,
-  .hero-media.fit-contain {
-    aspect-ratio: auto;
-    block-size: 100%;
-    min-block-size: 0;
+  /* Sits on the baseline of the meta row rather than stretching, so the
+     top of the hero stays open for the title. */
+  .hero-media {
+    align-self: end;
   }
   .meta-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
