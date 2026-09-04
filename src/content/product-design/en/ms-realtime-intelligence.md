@@ -14,7 +14,6 @@ gallery:
   - src: "/images/imports/ms-realtime-intelligence/03.webp"
   - src: "/images/imports/ms-realtime-intelligence/04.webp"
   - src: "/images/imports/ms-realtime-intelligence/05.webp"
-  - src: "/images/imports/ms-realtime-intelligence/06.webp"
 order: 3
 ---
 
