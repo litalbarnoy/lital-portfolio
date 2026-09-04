@@ -18,6 +18,9 @@ const DROP = path.join(os.homedir(), "Desktop", "site-images");
 const DEST = path.join(process.cwd(), "public", "images", "imports");
 const UPLOADS = path.join(process.cwd(), "public", "images", "uploads");
 
+// Sources are moved here after conversion so re-running is safe.
+const DONE_DIR = "_imported";
+
 const MAX_WIDTH = 1800;
 const QUALITY = 80;
 const SOURCE_TYPES = /\.(png|jpe?g|webp|tiff?|heic|avif)$/i;
@@ -73,6 +76,13 @@ async function importProject(slug) {
     const isCover = /^cover/i.test(file) || (!hasCover && i === 0);
     const name = isCover ? "cover.webp" : `${String(next++).padStart(2, "0")}.webp`;
     const stats = await convert(path.join(from, file), path.join(to, name));
+
+    // Move the source aside once it has been converted. Leaving it in place
+    // meant a second run imported the same photo again under a new number,
+    // quietly filling the gallery with duplicates.
+    await fs.mkdir(path.join(from, DONE_DIR), { recursive: true });
+    await fs.rename(path.join(from, file), path.join(from, DONE_DIR, file));
+
     done.push({ file, name, ...stats });
   }
   return done;
@@ -115,7 +125,9 @@ async function main() {
   await fs.mkdir(DROP, { recursive: true });
 
   const entries = await fs.readdir(DROP, { withFileTypes: true });
-  const projects = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+  const projects = entries
+    .filter((e) => e.isDirectory() && e.name !== DONE_DIR)
+    .map((e) => e.name);
 
   if (!projects.length) {
     console.log(`אין תיקיות ב-${DROP}`);
