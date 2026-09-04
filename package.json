@@ -10,7 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "cms": "decap-server"
+    "cms": "decap-server & npm run dev"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",
