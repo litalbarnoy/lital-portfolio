@@ -1,7 +1,7 @@
 ---
-title: "Microsoft IoT Security"
+title: "Microsoft Defender"
 subtitle: "Consolidating two design systems into one after Microsoft's acquisition of CyberX"
-role: "UX Lead — Design Consolidation"
+role: "UX Lead, Design Consolidation"
 client: "Microsoft (Defender for IoT / CyberX)"
 year: 2020
 yearEnd: 2021
@@ -15,9 +15,9 @@ order: 4
 
 ## The Challenge
 
-Microsoft Defender for IoT delivers comprehensive threat detection across IoT and OT environments, with flexible cloud, on-premises, and hybrid deployments. When Microsoft acquired the Israeli cybersecurity firm CyberX, it gained powerful OT security capabilities — and a major design alignment problem.
+Microsoft Defender for IoT delivers comprehensive threat detection across IoT and OT environments, with flexible cloud, on-premises, and hybrid deployments. When Microsoft acquired the Israeli cybersecurity firm CyberX, it gained powerful OT security capabilities, and a major design alignment problem.
 
-CyberX and Azure had completely different design systems. OT security workflows were highly specialized and didn't map cleanly onto existing Microsoft conventions. Investigations required switching between products, increasing cognitive load, and terminology and taxonomies were inconsistent — creating gaps in understanding between teams and customers.
+CyberX and Azure had completely different design systems. OT security workflows were highly specialized and didn't map cleanly onto existing Microsoft conventions. Investigations required switching between products, increasing cognitive load, and terminology and taxonomies were inconsistent, creating gaps in understanding between teams and customers.
 
 ## The Solution
 
@@ -25,4 +25,4 @@ I led the UX consolidation effort to integrate CyberX into Microsoft's ecosystem
 
 ## The Result
 
-A seamless experience that integrated CyberX's technology into the broader Microsoft security ecosystem — reducing cognitive load and improving cross-product usability for security teams working across both platforms.
+A seamless experience that integrated CyberX's technology into the broader Microsoft security ecosystem, reducing cognitive load and improving cross-product usability for security teams working across both platforms.

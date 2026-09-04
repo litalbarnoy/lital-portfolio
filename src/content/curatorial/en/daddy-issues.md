@@ -15,7 +15,7 @@ order: 7
 
 ## The Exhibition
 
-A group exhibition curated by the 'Lilith' collective — Nimrod Vainer, Lital Bar Noy, Bar Mussan Levi and Yoomee Khamai Ohayon. The collective formed out of our shared programme of study.
+A group exhibition curated by the 'Lilith' collective, Nimrod Vainer, Lital Bar Noy, Bar Mussan Levi and Yoomee Khamai Ohayon. The collective formed out of our shared programme of study.
 
 It opened on 12 August 2019 at 20:00, at Ha'Cheder Gallery in Beit Romano, 9 Jaffa Road, Tel Aviv.
 

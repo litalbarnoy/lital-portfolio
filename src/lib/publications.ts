@@ -32,7 +32,7 @@ export const publications: Record<Lang, Publication[]> = {
     },
     {
       title: "Rundgang, האקדמיה לאמנויות וינה",
-      venue: "The Quote Machine — מחקר והתקנה, במסגרת התערוכה To Work The Room",
+      venue: "The Quote Machine, מחקר והתקנה, במסגרת התערוכה To Work The Room",
       role: "מחקר והתקנה",
       year: 2019,
     },
@@ -61,7 +61,7 @@ export const publications: Record<Lang, Publication[]> = {
     {
       title: "Rundgang, Akademie der bildenden Künste Wien",
       venue:
-        "The Quote Machine — research and installation, part of To Work The Room",
+        "The Quote Machine, research and installation, part of To Work The Room",
       role: "Research and Installation",
       year: 2019,
     },

@@ -1,8 +1,8 @@
 ---
 title: "Flamingo"
-subtitle: "Hoshen x AppsFlyer — making gender and attraction identities accessible through short personal stories"
+subtitle: "Hoshen x AppsFlyer, making gender and attraction identities accessible through short personal stories"
 role: "Product / UX Designer"
-client: "Hoshen — Education and Change, in collaboration with AppsFlyer"
+client: "Hoshen Education and Change, in collaboration with AppsFlyer"
 year: 2016
 yearEnd: 2025
 tags: ["Social Impact", "Mobile First", "Video Platform", "Education"]
@@ -15,7 +15,7 @@ order: 6
 
 ## The Idea
 
-Flamingo is a digital platform that makes gender and attraction identities accessible through short personal stories, in partnership with Hoshen — Education and Change. Users explore personal videos organized by identity category, story topic, or individual participant, with an option to view everything in a single feed.
+Flamingo is a digital platform that makes gender and attraction identities accessible through short personal stories, in partnership with Hoshen Education and Change. Users explore personal videos organized by identity category, story topic, or individual participant, with an option to view everything in a single feed.
 
 ## Origin and Evolution
 
@@ -23,6 +23,6 @@ The platform started life in 2016 as a design final project at Shenkar College o
 
 ## The Redesign
 
-The redesign took a mobile-first approach built around teenagers' short attention spans — fast entry points, short-form video, and a structure that lets someone unfamiliar with the subject find their way in without friction.
+The redesign took a mobile-first approach built around teenagers' short attention spans, fast entry points, short-form video, and a structure that lets someone unfamiliar with the subject find their way in without friction.
 
-Diversity, inclusion, and equal opportunity in education aren't an add-on to this project — they're the foundation it was built on.
+Diversity, inclusion, and equal opportunity in education aren't an add-on to this project, they're the foundation it was built on.

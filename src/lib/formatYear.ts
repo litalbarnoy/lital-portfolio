@@ -10,15 +10,16 @@ export interface YearSpan {
 }
 
 const PRESENT: Record<Lang, string> = {
-  he: "היום",
-  en: "Present",
+  he: "עד היום",
+  en: "to Present",
 };
 
 export function formatYear(span: YearSpan, lang: Lang): string {
   const { year, yearEnd, ongoing } = span;
-  // An en dash, and always start–end in reading order: these are numerals,
-  // which stay left-to-right inside a right-to-left line either way.
-  if (ongoing) return `${year} – ${PRESENT[lang]}`;
+  // A closed range keeps its en dash: it is the convention for numerals, and
+  // a comma there would read as two separate years. An open range spells the
+  // word instead, so no dash is left standing next to text.
+  if (ongoing) return `${year} ${PRESENT[lang]}`;
   if (yearEnd && yearEnd !== year) return `${year}–${yearEnd}`;
   return String(year);
 }
