@@ -48,6 +48,42 @@
   --font-body: "Geist", "Assistant", sans-serif;
 }
 
+/* Custom properties are not animatable until they are registered with a
+   type. Without this the four field colours live inside radial-gradients,
+   and background-image cannot be transitioned — so the base faded over
+   1.6s while the blobs snapped instantly. That jump was the harshness.
+   Registered here, they interpolate, and the whole field crossfades. */
+@property --bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #8fb0b5;
+}
+@property --fg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ffffff;
+}
+@property --t1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #a9acb4;
+}
+@property --t2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #8b98ab;
+}
+@property --t3 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #7a9fa8;
+}
+@property --t4 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #a09b9e;
+}
+
 /* ------------------------------------------------------------- palette
    One source of colour: --bg and --fg, rewritten on the root element as
    sections cross the middle of the viewport. Everything else is derived,
@@ -73,6 +109,10 @@
   --surface: color-mix(in srgb, var(--fg) 22%, transparent);
   --glass-border: color-mix(in srgb, var(--fg) 34%, transparent);
 
+  /* Always dark, whatever the palette: this is what white text sits on
+     when it has to sit over a photograph. */
+  --scrim: #101416;
+
   background-color: var(--bg);
   color: var(--fg);
 }
@@ -86,9 +126,15 @@ body {
 @media (prefers-reduced-motion: no-preference) {
   :root,
   body {
-    /* Long and eased-out at both ends: at 700ms the change announced
-       itself as you crossed a section. This should be felt, not seen. */
+    /* The registered properties are what actually carry the change: every
+       gradient reading them crossfades along with the base. */
     transition:
+      --bg 1600ms cubic-bezier(0.33, 0, 0.2, 1),
+      --fg 1600ms cubic-bezier(0.33, 0, 0.2, 1),
+      --t1 1600ms cubic-bezier(0.33, 0, 0.2, 1),
+      --t2 1600ms cubic-bezier(0.33, 0, 0.2, 1),
+      --t3 1600ms cubic-bezier(0.33, 0, 0.2, 1),
+      --t4 1600ms cubic-bezier(0.33, 0, 0.2, 1),
       background-color 1600ms cubic-bezier(0.33, 0, 0.2, 1),
       color 1600ms cubic-bezier(0.33, 0, 0.2, 1);
   }
@@ -790,4 +836,28 @@ html.js [data-media].is-done {
 .hero-media-animated .lottie-stage {
   margin: 0;
   block-size: auto;
+}
+
+/* ------------------------------------------------------- hover scrim
+   A photograph is any colour it likes, so white text over one needs its
+   own dark ground rather than anything derived from the palette. */
+.preview-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  opacity: 0;
+  transition: opacity 600ms var(--ease-expo);
+  pointer-events: none;
+}
+
+.is-previewing .preview-scrim {
+  /* Sized against the worst case — a white screenshot underneath — where it
+     still puts white text at 8.3:1. Over a darker photograph it is better. */
+  opacity: 0.75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-scrim {
+    transition: none;
+  }
 }

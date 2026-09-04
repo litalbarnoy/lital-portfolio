@@ -47,7 +47,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
         data-preview-images={pdPreviews}
       >
         <div class="preview-bg absolute inset-[-4%] bg-cover bg-center opacity-0 transition-opacity duration-700"></div>
-        <div class="absolute inset-0 bg-ink/0 transition-colors duration-700"></div>
+        <div class="preview-scrim"></div>
         <div class="relative">
           <span class="text-sm font-medium text-accent transition-colors duration-500 preview-text">01</span>
           <h2 class="mt-4 text-3xl font-bold transition-colors duration-500 preview-text">Product Design</h2>
@@ -66,7 +66,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
         data-preview-images={curPreviews}
       >
         <div class="preview-bg absolute inset-[-4%] bg-cover bg-center opacity-0 transition-opacity duration-700"></div>
-        <div class="absolute inset-0 bg-ink/0 transition-colors duration-700"></div>
+        <div class="preview-scrim"></div>
         <div class="relative">
           <span class="text-sm font-medium text-accent transition-colors duration-500 preview-text">02</span>
           <h2 class="mt-4 text-3xl font-bold transition-colors duration-500 preview-text">Curatorial</h2>
@@ -138,7 +138,6 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
 
       const images = (el.dataset.previewImages || "").split(",").filter(Boolean);
       const bg = el.querySelector<HTMLElement>(".preview-bg");
-      const overlay = el.querySelector<HTMLElement>(".preview-bg + div");
       if (!images.length || !bg) return;
 
       let index = 0;
@@ -146,7 +145,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
       el.addEventListener("mouseenter", () => {
         bg.style.backgroundImage = `url(${images[index % images.length]})`;
         bg.style.opacity = "1";
-        overlay?.classList.add("bg-ink/55");
+        el.classList.add("is-previewing");
         el.querySelectorAll<HTMLElement>(".preview-text").forEach((t) => {
           t.style.color = "var(--color-cream)";
         });
@@ -155,7 +154,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
 
       el.addEventListener("mouseleave", () => {
         bg.style.opacity = "0";
-        overlay?.classList.remove("bg-ink/55");
+        el.classList.remove("is-previewing");
         el.querySelectorAll<HTMLElement>(".preview-text").forEach((t) => {
           t.style.color = "";
         });
