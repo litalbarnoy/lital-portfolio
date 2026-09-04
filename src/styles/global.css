@@ -919,3 +919,155 @@ html.js [data-media].is-done {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
+
+/* ---------------------------------------------------------------- lightbox
+   Full-size gallery viewer. A real <dialog>, so the top layer, focus trap
+   and Escape come from the browser. */
+.lightbox {
+  /* A dialog defaults to an absolutely-positioned, shrink-to-fit box. Pinning
+     it to the viewport is more reliable than sizing it, which left it laid
+     out against the document rather than the screen. */
+  position: fixed;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: color-mix(in srgb, var(--scrim) 72%, transparent);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  color: #fff;
+  overflow: hidden;
+}
+
+.lightbox::backdrop {
+  background: color-mix(in srgb, var(--scrim) 60%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.lightbox-stage {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  padding: clamp(3.5rem, 8vw, 6rem);
+}
+
+.lightbox-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  max-block-size: 100%;
+}
+
+.lightbox-figure img {
+  max-inline-size: 100%;
+  /* Leave room for the caption under the image. */
+  max-block-size: calc(100dvh - 12rem);
+  inline-size: auto;
+  block-size: auto;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.lightbox-caption {
+  font-size: 0.9375rem;
+  text-align: center;
+  color: color-mix(in srgb, #fff 82%, transparent);
+  max-inline-size: 60ch;
+}
+
+.lightbox-close,
+.lightbox-nav {
+  position: fixed;
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #fff;
+  /* Visible against whatever image is behind it. */
+  background: color-mix(in srgb, var(--scrim) 55%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, #fff 34%, transparent);
+  transition:
+    background-color 0.3s var(--ease-expo),
+    color 0.3s var(--ease-expo);
+}
+
+.lightbox-close svg,
+.lightbox-nav svg {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lightbox-close:hover,
+.lightbox-nav:hover {
+  background: #fff;
+  color: var(--scrim);
+}
+
+.lightbox-close {
+  inset-block-start: clamp(1rem, 3vw, 2rem);
+  inset-inline-end: clamp(1rem, 3vw, 2rem);
+}
+
+.lightbox-nav {
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-nav.is-prev {
+  inset-inline-start: clamp(1rem, 3vw, 2rem);
+}
+
+.lightbox-nav.is-next {
+  inset-inline-end: clamp(1rem, 3vw, 2rem);
+}
+
+.lightbox-count {
+  position: fixed;
+  inset-block-end: clamp(1rem, 3vw, 2rem);
+  inset-inline: 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, #fff 75%, transparent);
+}
+
+/* The reel cards become obviously clickable now that they open something. */
+.reel-card .media-frame {
+  cursor: zoom-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox-close,
+  .lightbox-nav {
+    transition: none;
+  }
+}
+
+/* The frame is a button now; it must not inherit button chrome. */
+button.media-frame {
+  display: block;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  appearance: none;
+}
+
+button.fit-contain {
+  padding: clamp(0.75rem, 2.5vw, 2rem);
+}

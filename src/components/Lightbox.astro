@@ -1,0 +1,142 @@
+---
+// Full-size viewer for the gallery. A real <dialog>, so the browser handles
+// the top layer, the backdrop, focus trapping and Escape for us rather than
+// us reimplementing them badly.
+import { getLang, ui } from "../i18n/ui";
+
+const lang = getLang(Astro.url.pathname);
+const t = ui[lang].project;
+const rtl = lang === "he";
+
+// Same reasoning as the reel: draw the arrow that points the way it travels
+// instead of mirroring one with a transform.
+const CHEVRON_LEFT = "M15 5l-7 7 7 7";
+const CHEVRON_RIGHT = "M9 5l7 7-7 7";
+---
+
+<dialog class="lightbox" data-lightbox aria-label={t.gallery ?? "Gallery"}>
+  <div class="lightbox-stage">
+    <figure class="lightbox-figure">
+      <img data-lightbox-image src="" alt="" />
+      <figcaption class="lightbox-caption" data-lightbox-caption></figcaption>
+    </figure>
+  </div>
+
+  <button type="button" class="lightbox-close" data-lightbox-close aria-label={t.close ?? "Close"}>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  </button>
+
+  <button type="button" class="lightbox-nav is-prev" data-lightbox-prev aria-label={t.prev}>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d={rtl ? CHEVRON_RIGHT : CHEVRON_LEFT} />
+    </svg>
+  </button>
+  <button type="button" class="lightbox-nav is-next" data-lightbox-next aria-label={t.nextImage}>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d={rtl ? CHEVRON_LEFT : CHEVRON_RIGHT} />
+    </svg>
+  </button>
+
+  <p class="lightbox-count" data-lightbox-count aria-live="polite"></p>
+</dialog>
+
+<script>
+  interface Slide {
+    src: string;
+    alt: string;
+    caption: string;
+  }
+
+  function setup() {
+    const dialog = document.querySelector<HTMLDialogElement>("[data-lightbox]");
+    if (!dialog || dialog.dataset.bound) return;
+
+    const triggers = [...document.querySelectorAll<HTMLElement>("[data-lightbox-open]")];
+    if (!triggers.length) return;
+    dialog.dataset.bound = "true";
+
+    const image = dialog.querySelector<HTMLImageElement>("[data-lightbox-image]")!;
+    const caption = dialog.querySelector<HTMLElement>("[data-lightbox-caption]")!;
+    const count = dialog.querySelector<HTMLElement>("[data-lightbox-count]")!;
+    const prev = dialog.querySelector<HTMLElement>("[data-lightbox-prev]")!;
+    const next = dialog.querySelector<HTMLElement>("[data-lightbox-next]")!;
+
+    const slides: Slide[] = triggers.map((el) => ({
+      src: el.dataset.lightboxOpen || "",
+      alt: el.dataset.lightboxAlt || "",
+      caption: el.dataset.lightboxCaption || "",
+    }));
+
+    let index = 0;
+    let opener: HTMLElement | null = null;
+
+    function show(i: number) {
+      // Wrap, so the arrows never dead-end.
+      index = (i + slides.length) % slides.length;
+      const slide = slides[index];
+      image.src = slide.src;
+      image.alt = slide.alt;
+      caption.textContent = slide.caption;
+      caption.hidden = !slide.caption;
+      count.textContent = `${index + 1} / ${slides.length}`;
+      // One image is not a sequence.
+      const single = slides.length < 2;
+      prev.hidden = single;
+      next.hidden = single;
+      count.hidden = single;
+    }
+
+    function open(i: number, from: HTMLElement) {
+      opener = from;
+      show(i);
+      dialog.showModal();
+      // The page behind must not scroll while the viewer is up.
+      document.documentElement.style.overflow = "hidden";
+      (window as any).__lenis?.stop();
+    }
+
+    function close() {
+      dialog.close();
+    }
+
+    triggers.forEach((el, i) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        open(i, el);
+      });
+    });
+
+    prev.addEventListener("click", () => show(index - 1));
+    next.addEventListener("click", () => show(index + 1));
+    dialog
+      .querySelector("[data-lightbox-close]")!
+      .addEventListener("click", close);
+
+    // Clicking the backdrop closes; clicking the image itself must not.
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) close();
+    });
+
+    dialog.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") show(index + 1);
+      if (e.key === "ArrowLeft") show(index - 1);
+    });
+
+    // Fires for Escape too, so cleanup lives in one place.
+    dialog.addEventListener("close", () => {
+      document.documentElement.style.overflow = "";
+      (window as any).__lenis?.start();
+      opener?.focus();
+      opener = null;
+    });
+  }
+
+  setup();
+  document.addEventListener("astro:page-load", setup);
+  document.addEventListener("astro:before-swap", () => {
+    const dialog = document.querySelector<HTMLDialogElement>("[data-lightbox]");
+    if (dialog?.open) dialog.close();
+  });
+</script>

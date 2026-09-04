@@ -27,6 +27,8 @@ export const ui = {
       prev: "הקודם",
       nextImage: "הבא",
       link: "קישור",
+      gallery: "גלריית התמונות",
+      close: "סגירה",
     },
   },
   en: {
@@ -55,6 +57,8 @@ export const ui = {
       prev: "Previous",
       nextImage: "Next",
       link: "Link",
+      gallery: "Image gallery",
+      close: "Close",
     },
   },
 } as const;

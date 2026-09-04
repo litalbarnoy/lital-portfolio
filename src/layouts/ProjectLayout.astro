@@ -9,6 +9,7 @@ import { parseSections } from "../lib/projectContent";
 import { imageSize } from "../lib/imageSize";
 import { resolveGallery, type MediaEntry } from "../lib/media";
 import LottieFigure from "../components/LottieFigure.astro";
+import Lightbox from "../components/Lightbox.astro";
 
 interface Props {
   title: string;
@@ -197,7 +198,8 @@ const coverSize = sizes.get(cover)!;
                     it into a decorative portrait frame just surrounds it with
                     empty surface. Photography is cropped anyway, so it takes
                     the varied frame that gives the reel its rhythm. */}
-                <div
+                <button
+                  type="button"
                   class:list={["media-frame", `fit-${fit}`]}
                   style={
                     fit === "contain"
@@ -206,6 +208,9 @@ const coverSize = sizes.get(cover)!;
                   }
                   data-ripple="loupe"
                   data-media
+                  data-lightbox-open={src}
+                  data-lightbox-alt={alt}
+                  data-lightbox-caption={caption ?? ""}
                 >
                   {src.endsWith(".gif") ? (
                     <img
@@ -225,7 +230,7 @@ const coverSize = sizes.get(cover)!;
                       sizes="(max-width: 900px) 78vw, 50vw"
                     />
                   )}
-                </div>
+                </button>
                 {caption && <figcaption class="reel-caption">{caption}</figcaption>}
               </figure>
             ))}
@@ -305,6 +310,8 @@ const coverSize = sizes.get(cover)!;
       )
     }
   </article>
+
+  <Lightbox />
 </BaseLayout>
 
 <script>
