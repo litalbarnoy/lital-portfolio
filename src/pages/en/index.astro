@@ -39,10 +39,10 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
   </section>
 
   <section class="mx-auto grid max-w-6xl gap-6 px-6 pb-24 md:grid-cols-2 lg:px-10" {...paletteAttrs("work")}>
-    <Reveal>
+    <Reveal class="h-full">
       <a
         href="/en/product-design"
-        class="group relative block overflow-hidden rounded-sm border border-line p-10"
+        class="group relative flex h-full flex-col overflow-hidden rounded-sm border border-line p-10"
         data-cursor-hover
         data-preview-images={pdPreviews}
       >
@@ -58,10 +58,10 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
         </div>
       </a>
     </Reveal>
-    <Reveal>
+    <Reveal class="h-full">
       <a
         href="/en/curatorial"
-        class="group relative block overflow-hidden rounded-sm border border-line p-10"
+        class="group relative flex h-full flex-col overflow-hidden rounded-sm border border-line p-10"
         data-cursor-hover
         data-preview-images={curPreviews}
       >

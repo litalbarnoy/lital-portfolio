@@ -767,7 +767,11 @@ html.js [data-media].is-done {
    Small thumbnails that grow on hover. The scale is on the media wrapper,
    never on the image inside it, so the wrapper keeps clipping its own
    contents and nothing can spill into a neighbouring card. */
+/* Every card shares one box, set to the ratio of the animation that runs in
+   some of them. Matching the stills to the animation rather than the other
+   way round is what removes the grey band it used to letterbox into. */
 .card-media {
+  aspect-ratio: 5 / 3;
   overflow: hidden;
   border-radius: 4px;
   background: var(--color-line);
@@ -904,7 +908,6 @@ html.js [data-media].is-done {
 /* An animated card keeps the same box as the stills beside it; the vector
    letterboxes inside it rather than stretching to fill. */
 .card-media--animated {
-  aspect-ratio: 4 / 3;
   display: grid;
   place-items: center;
 }
@@ -1072,4 +1075,12 @@ button.media-frame {
 
 button.fit-contain {
   padding: clamp(0.75rem, 2.5vw, 2rem);
+}
+
+/* The image fills the shared card box rather than carrying its own ratio. */
+.card-media-img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  display: block;
 }
