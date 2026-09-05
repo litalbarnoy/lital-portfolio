@@ -31,6 +31,7 @@ export const ui = {
       link: "קישור",
       gallery: "גלריית התמונות",
       close: "סגירה",
+      enlargeHint: "לחצו על תמונה להגדלה",
     },
   },
   en: {
@@ -63,6 +64,7 @@ export const ui = {
       link: "Link",
       gallery: "Image gallery",
       close: "Close",
+      enlargeHint: "Click any image to enlarge",
     },
   },
 } as const;

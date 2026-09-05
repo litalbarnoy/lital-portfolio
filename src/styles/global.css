@@ -573,8 +573,44 @@ html.js [data-media].is-done {
 .reel-controls {
   display: flex;
   gap: 0.75rem;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   margin-block-start: 1rem;
+}
+
+.reel-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-inline-start: auto;
+}
+
+/* Quiet by design: it should be findable when looked for, not compete with
+   the pictures it is describing. */
+.reel-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  color: var(--color-ink-soft);
+  opacity: 0.85;
+}
+
+.reel-hint svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+@media (max-width: 560px) {
+  /* On a phone the arrows matter more than the sentence. */
+  .reel-hint {
+    display: none;
+  }
 }
 
 .reel-btn {
@@ -626,10 +662,17 @@ html.js [data-media].is-done {
   object-fit: cover;
 }
 
-/* UI screenshots sit whole on a neutral surface rather than being cropped
-   into unreadable fragments. */
-.fit-contain {
+/* UI screenshots sit whole rather than being cropped into unreadable
+   fragments. The box takes the picture's own ratio, so there is nothing left
+   over to show as a frame. */
+
+/* Cut-out art is the one case that does need breathing room: without it a
+   transparent PNG runs straight into the edge of the layout. */
+.has-plate {
   padding: clamp(0.75rem, 2.5vw, 2rem);
+  /* The ratio is the picture's, so it has to describe the content box; on the
+     border box the padding would eat into it and letterbox the image again. */
+  box-sizing: content-box;
 }
 
 .fit-contain :is(img, video) {
@@ -1075,8 +1118,11 @@ button.media-frame {
   appearance: none;
 }
 
-button.fit-contain {
+/* Restores the plate after the button reset above zeroed it. Cut-out art
+   only — a solid screenshot gets no surround. */
+button.has-plate {
   padding: clamp(0.75rem, 2.5vw, 2rem);
+  box-sizing: content-box;
 }
 
 /* The image fills the shared card box rather than carrying its own ratio. */

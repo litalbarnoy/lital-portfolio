@@ -157,9 +157,21 @@ const coverSize = sizes.get(cover)!;
         ) : (
           /* Parallax needs object-fit: cover, which would crop a UI screenshot
              into an unreadable fragment — so photography gets the drift and
-             screenshots get shown whole instead. */
+             screenshots get shown whole instead. A contained cover also drops
+             the fixed 3:2 box: a near-square screenshot letterboxed inside it
+             read as a large empty frame with a small picture in the middle. */
           <figure
-            class:list={["hero-media", "media-frame", `fit-${fit}`]}
+            class:list={[
+              "hero-media",
+              "media-frame",
+              `fit-${fit}`,
+              fit === "contain" && coverSize.transparent && "has-plate",
+            ]}
+            style={
+              fit === "contain"
+                ? `aspect-ratio:${coverSize.width} / ${coverSize.height}`
+                : undefined
+            }
             data-ripple="loupe"
             data-media
             data-parallax={fit === "cover" ? "" : undefined}
@@ -207,10 +219,16 @@ const coverSize = sizes.get(cover)!;
                 {/* A contained screenshot keeps its own proportions — forcing
                     it into a decorative portrait frame just surrounds it with
                     empty surface. Photography is cropped anyway, so it takes
-                    the varied frame that gives the reel its rhythm. */}
+                    the varied frame that gives the reel its rhythm.
+                    The inset plate is only for art that is actually cut out:
+                    a solid screenshot has its own edges and needs no ground. */}
                 <button
                   type="button"
-                  class:list={["media-frame", `fit-${fit}`]}
+                  class:list={[
+                    "media-frame",
+                    `fit-${fit}`,
+                    fit === "contain" && sizes.get(src)!.transparent && "has-plate",
+                  ]}
                   style={
                     fit === "contain"
                       ? `aspect-ratio:${sizes.get(src)!.width} / ${sizes.get(src)!.height}`
@@ -247,12 +265,23 @@ const coverSize = sizes.get(cover)!;
           </div>
 
           <div class="reel-controls container">
+            {/* The images open full size on click, which nothing else on the
+                page announces. Stated once, quietly, opposite the arrows. */}
+            <p class="reel-hint">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5M11 8.5v5M8.5 11h5" />
+              </svg>
+              {t.enlargeHint}
+            </p>
+            <div class="reel-buttons">
             <button type="button" class="reel-btn" data-reel-prev aria-label={t.prev}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d={arrowStart} /></svg>
             </button>
             <button type="button" class="reel-btn" data-reel-next aria-label={t.nextImage}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d={arrowEnd} /></svg>
             </button>
+            </div>
           </div>
         </section>
       )

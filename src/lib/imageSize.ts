@@ -11,16 +11,21 @@ const require = createRequire(import.meta.url);
 export interface Size {
   width: number;
   height: number;
+  /** True only when the file actually has see-through pixels. An alpha
+      channel on its own does not count: screenshots exported to WebP often
+      carry one that is fully opaque. Such an image needs no surface behind
+      it, so this is what decides whether it gets a plate. */
+  transparent: boolean;
 }
 
-const FALLBACK: Size = { width: 1200, height: 900 };
+const FALLBACK: Size = { width: 1200, height: 900, transparent: false };
 const cache = new Map<string, Size>();
 
 function fromPlaceholder(src: string): Size | null {
   // https://placehold.co/1200x900/... — the size is in the path.
   const match = src.match(/placehold\.co\/(\d+)x(\d+)/);
   return match
-    ? { width: Number(match[1]), height: Number(match[2]) }
+    ? { width: Number(match[1]), height: Number(match[2]), transparent: false }
     : null;
 }
 
@@ -30,8 +35,21 @@ async function fromDisk(src: string): Promise<Size | null> {
     // stays importable in environments where it is unavailable.
     const sharp = require("sharp");
     const file = path.join(process.cwd(), "public", src.replace(/^\//, ""));
-    const { width, height } = await sharp(file).metadata();
-    if (width && height) return { width, height };
+    const image = sharp(file);
+    const { width, height, hasAlpha } = await image.metadata();
+    if (!width || !height) return null;
+
+    // stats() reads the pixels, so only pay for it where an alpha channel
+    // makes transparency possible at all.
+    let transparent = false;
+    if (hasAlpha) {
+      try {
+        transparent = !(await image.stats()).isOpaque;
+      } catch {
+        /* unreadable pixels — treat as opaque, which is the safer default */
+      }
+    }
+    return { width, height, transparent };
   } catch {
     /* unreadable or unsupported — fall through to the default ratio */
   }
