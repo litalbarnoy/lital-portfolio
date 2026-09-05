@@ -10,7 +10,9 @@
   --color-accent: #0a0a0a;
   --color-line: #e5e5e5;
 
-  --font-display: "Frank Ruhl Libre", "David Libre", serif;
+  /* Hebrew sets no separate display face: headings are the body font at a
+     heavier weight. English overrides this below. */
+  --font-display: "Noto Sans", "Noto Sans Hebrew", sans-serif;
   --font-body: "Noto Sans", "Noto Sans Hebrew", sans-serif;
 
   --ease-expo: cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -44,7 +46,7 @@
 
 /* English keeps its serif display face; the sans is shared with Hebrew. */
 :dir(ltr) {
-  --font-display: "Wagon", "Frank Ruhl Libre", serif;
+  --font-display: "Wagon", serif;
 }
 
 /* Custom properties are not animatable until they are registered with a
