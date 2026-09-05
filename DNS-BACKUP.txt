@@ -1,0 +1,28 @@
+# גיבוי רשומות DNS — litalbarnoy.com
+# נלכד ב: 2026-09-05 14:00
+# לפני המעבר מ-Wix ל-Vercel. אם משהו משתבש, אלה הערכים להחזיר.
+
+## NS (שרתי שמות — לא נוגעים)
+  ns1.wixdns.net.
+  ns0.wixdns.net.
+
+## A  @  (זה מה שמחליפים)
+  185.230.63.186
+  185.230.63.107
+  185.230.63.171
+
+## CNAME/A  www  (זה מה שמחליפים)
+  cdn1.wixdns.net.
+  td-ccm-neg-87-45.wixdns.net.
+  34.149.87.45
+
+## MX  (אימייל Google — לא נוגעים!)
+  50 alt4.aspmx.l.google.com.
+  40 alt3.aspmx.l.google.com.
+  20 alt1.aspmx.l.google.com.
+  30 alt2.aspmx.l.google.com.
+  10 aspmx.l.google.com.
+
+## TXT (SPF + אימות Google — לא נוגעים!)
+  "google-site-verification=k08wxXAaBgnV6NU9kaE-b4DO8cQzJfL2uMFNWS5fJjE"
+  "v=spf1 include:_spf.google.com ~all"
