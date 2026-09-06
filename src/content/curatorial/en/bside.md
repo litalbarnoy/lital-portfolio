@@ -1,6 +1,6 @@
 ---
 title: "Bside"
-subtitle: "A 'Virtual-Physical' gallery concept, layered onto a museum's existing exhibition space"
+subtitle: "An augmented reality curatorial platform, in the permanent Israeli art galleries of the Israel Museum"
 role: "Curator / Concept Designer"
 client: "The Israel Museum, Jerusalem"
 year: 2022
@@ -19,10 +19,18 @@ order: 4
 
 ## The Idea
 
-Bside is an exhibition platform that redefines the museum experience by layering a "Virtual-Physical" gallery onto an existing exhibition space. Visitors activate a virtual layer through their own mobile devices, using AR to transform how they engage with the physical artwork in front of them.
+bside is a virtual platform developed as a final project in the MA programme in Policy and Theory of the Arts at Bezalel Academy of Arts and Design, Jerusalem. It is presented through an app in the permanent exhibition of Israeli art at the Israel Museum in Jerusalem.
 
-## How It Works
+The platform is curatorial and built on augmented reality, and it sets out to examine what room for action museum visitors actually have, by looking at the power held in the phone in their hand.
 
-The AR layer functions as an interactive, transformative element, one that challenges the traditional, canonical statements museums typically make about the work on their walls. The encounter between an official institutional exhibition and the virtual content layered on top of it creates a kind of double act: an "exhibition within the exhibition."
+## The Camera as a Third Eye
 
-That structure opens the physical space to artists and voices who wouldn't otherwise appear in the museum's canonical, curated selection, letting them enter into a virtual dialogue with the work that is physically on display, and expanding what the exhibition is allowed to say beyond its official walls.
+Photographing on a phone has long since become a practice inseparable from the experience of visiting a museum, with the phone camera serving as a kind of third eye: a doorway into a virtual space that holds a reduced, processed version of the museum and the works shown in it.
+
+bside sets out to enter that virtual space and use it critically, as a way of examining how the digital object produces a new relation to physical and human space.
+
+## The Viewer as Part of the Work
+
+Using bside depends on visitors taking an active part, since it asks them to look at the exhibition both through the devices in their hands and without them. Adding and removing the virtual layer is what makes the looking multi-layered.
+
+The visitors' bodies become part of the exhibition too, as it is their movement that activates the body of works living in the virtual layer.

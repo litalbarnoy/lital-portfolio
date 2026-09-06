@@ -2,7 +2,7 @@
 title: "Flamingo"
 subtitle: "Hoshen x AppsFlyer, making gender and attraction identities accessible through short personal stories"
 role: "Product / UX Designer"
-client: "Hoshen Education and Change, in collaboration with AppsFlyer"
+client: "Hoshen, Education and Change, with AppsFlyer"
 year: 2016
 yearEnd: 2025
 tags: ["Social Impact", "Mobile First", "Video Platform", "Education"]
@@ -20,14 +20,22 @@ order: 6
 
 ## The Idea
 
-Flamingo is a digital platform that makes gender and attraction identities accessible through short personal stories, in partnership with Hoshen Education and Change. Users explore personal videos organized by identity category, story topic, or individual participant, with an option to view everything in a single feed.
+Flamingo is a digital platform that makes gender and attraction identities accessible through short personal stories. It comes out of Hoshen, Education and Change, the education and outreach organisation of the LGBTQ+ community in Israel.
 
 ## Origin and Evolution
 
-The platform started life in 2016 as a design final project at Shenkar College of Engineering, Design and Art. It was later redesigned in collaboration with Hoshen and AppsFlyer, evolving from a project focused primarily on the LGBTQ+ community into a tool aimed at teens and parents who may not be familiar with community terminology at all.
+Flamingo began as an idea of mine, first developed as a design final project in the Visual Communication department at Shenkar's School of Design.
+
+Working with Hoshen and with AppsFlyer, it grew into an accessible platform where anyone can come to know these identities through stories and lived experience.
+
+## How It Works
+
+You can watch people of every identity talk about their own identity, about coming out, about relationships and more.
+
+The videos can be followed by identity (everyone bisexual talking about bisexuality), by subject (all the coming-out stories), or by participant (everything one person recorded).
 
 ## The Redesign
 
-The redesign took a mobile-first approach built around teenagers' short attention spans, fast entry points, short-form video, and a structure that lets someone unfamiliar with the subject find their way in without friction.
+The redesign took a mobile-first approach built around teenagers' short attention spans: fast entry points, short-form video, and a structure that lets someone unfamiliar with the subject find their way in without friction.
 
-Diversity, inclusion, and equal opportunity in education aren't an add-on to this project, they're the foundation it was built on.
+That is what widened the project from a tool aimed mainly at the LGBTQ+ community into one that also serves teenagers and parents who may not know the terms at all.
