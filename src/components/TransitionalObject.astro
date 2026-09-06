@@ -1,0 +1,236 @@
+---
+// A small note beside the bear: how to play with it, and why it is there.
+//
+// Hover is not the only way in — the trigger is a real <button>, so it opens on
+// keyboard focus and on tap, closes on Escape, and is linked by
+// aria-describedby so screen readers announce the note instead of missing it.
+import { getLang } from "../i18n/ui";
+
+const lang = getLang(Astro.url.pathname);
+
+const copy = {
+  he: {
+    label: "חפץ המעבר",
+    aria: "מידע על חפץ המעבר",
+    hint: "גרירה או משיכה של הדובי באמצעות העכבר תזיז אותו ממקומו.",
+    body: "חפץ מעבר (או חפץ מנחם) הוא אובייקט הנמצא באזור הדמדומים שבין הממשי למדומיין. נשיאתו מאפשרת לעבור בין בבטחה בין מצבים, כמו נסיעה למקום לא ידוע. החפץ שיהיה בדרך כלל רך, יכול להיות שמיכה, דובון או מוצץ.",
+  },
+  en: {
+    label: "The transitional object",
+    aria: "About the transitional object",
+    hint: "Dragging or pulling the bear with your mouse will move it from its place.",
+    body: "A transitional object (or comfort object) sits in the twilight between the real and the imagined. Carrying it lets you move safely between states, like a journey somewhere unknown. The object is usually soft — a blanket, a teddy bear, a pacifier.",
+  },
+}[lang];
+---
+
+<div class="to-wrap">
+  <button
+    type="button"
+    class="to-trigger"
+    aria-label={copy.aria}
+    aria-describedby="transitional-object-note"
+    data-cursor-hover
+  >
+    <svg class="to-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.1" />
+      <circle cx="8" cy="4.6" r="0.85" fill="currentColor" />
+      <path
+        d="M8 7.1v4.6"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.1"
+        stroke-linecap="round"
+      />
+    </svg>
+    <span class="to-label">{copy.label}</span>
+  </button>
+
+  <div class="to-note" id="transitional-object-note" role="tooltip">
+    <p class="to-hint">{copy.hint}</p>
+    <p class="to-body">{copy.body}</p>
+  </div>
+</div>
+
+<style>
+  .to-wrap {
+    /* Pinned to the bear itself. hero.js publishes the body's on-screen
+       footprint as --gummy-anchor-*, in document coordinates, and the caption
+       hangs from the bottom of it — so it follows the bear to whichever side
+       the language puts it on, and keeps following when the bear is dragged.
+       The fallbacks keep it sensible for the moment before the first frame,
+       and if the canvas never starts at all.
+
+       The hero section is deliberately NOT a positioning context: these are
+       document coordinates, so the nearest positioned ancestor has to be the
+       page itself. While the hero was `relative` the offsets were counted from
+       its top edge instead, which is what threw the caption far below the
+       bear. */
+    position: absolute;
+    inset-inline-start: auto;
+    left: var(--gummy-anchor-x, 50%);
+    /* Hung above the head, not below the feet. Below the body it landed in the
+       work cards and read as belonging to them. translate pulls its own height
+       up so the anchor is its bottom edge. */
+    top: var(--gummy-anchor-top, 32vh);
+    translate: -50% calc(-100% - 0.75rem);
+    z-index: 3;
+    max-inline-size: 14rem;
+  }
+
+  .to-trigger {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    color: var(--fg);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.35s var(--ease-expo);
+  }
+
+  .to-trigger:hover,
+  .to-trigger:focus-visible {
+    opacity: 1;
+  }
+
+  .to-icon {
+    inline-size: 0.95em;
+    block-size: 0.95em;
+    flex: none;
+    /* Optically centred against lowercase/Hebrew x-height. */
+    margin-block-start: -0.05em;
+  }
+
+  .to-label {
+    font-family: var(--font-body);
+    font-size: 0.6875rem; /* 11px */
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  /* ---------- the note ---------- */
+
+  .to-note {
+    position: absolute;
+    /* Opens downward. Upward put the panel straight over the headline — the
+       trigger sits beside the bear, mid-hero, so there is nothing above it but
+       the title. Below it there is only background. */
+    inset-block-start: calc(100% + 0.7rem);
+    /* Centred on the caption, then clamped below so it can never leave the
+       viewport on whichever side the bear happens to be. */
+    inset-inline-start: 50%;
+    margin-inline-start: calc(min(26rem, 100vw - 2.5rem) / -2);
+    inline-size: min(26rem, calc(100vw - 2.5rem));
+
+    padding: 1.25rem 1.4rem;
+    /* One soft shape. There is no caret: a rotated square tacked onto a
+       backdrop-filtered panel double-blurs at the join and always reads as two
+       pieces glued together. Proximity and the shadow do the pointing. */
+    border-radius: 18px;
+
+    /* Frosted, and tinted by whatever palette the page is on, so it belongs to
+       the section it opens over instead of being a white card. */
+    background: color-mix(in oklab, var(--bg) 60%, transparent);
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    border: 1px solid color-mix(in oklab, var(--fg) 20%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklab, var(--fg) 14%, transparent) inset,
+      0 20px 55px -14px rgb(0 0 0 / 0.35);
+
+    opacity: 0;
+    visibility: hidden;
+    translate: 0 -6px;
+    transition:
+      opacity 0.4s var(--ease-expo),
+      translate 0.5s var(--ease-expo),
+      visibility 0s linear 0.4s;
+    pointer-events: none;
+  }
+
+  .to-hint,
+  .to-body {
+    font-family: var(--font-body);
+    color: var(--fg);
+    text-wrap: pretty;
+    margin: 0;
+  }
+
+  .to-hint {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    opacity: 0.75;
+    padding-block-end: 0.7rem;
+    margin-block-end: 0.7rem;
+    border-block-end: 1px solid color-mix(in oklab, var(--fg) 14%, transparent);
+  }
+
+  .to-body {
+    font-size: 0.875rem;
+    line-height: 1.75;
+  }
+
+  .to-wrap:hover .to-note,
+  .to-wrap:focus-within .to-note,
+  .to-note.is-open {
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+    transition-delay: 0s, 0s, 0s;
+  }
+
+  /* Narrow screens have no room beside the bear, and no hover either: the note
+     returns to the flow under the hero copy. */
+  @media (max-width: 767px) {
+    .to-wrap {
+      position: static;
+      max-inline-size: none;
+      margin-block-start: 1.75rem;
+      display: block;
+    }
+    .to-note {
+      inline-size: calc(100vw - 3rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .to-note,
+    .to-trigger {
+      transition-duration: 0.01ms;
+    }
+  }
+</style>
+
+<script>
+  // Touch has no hover: a tap opens the note, and a second tap, Escape, or a tap
+  // anywhere else closes it. CSS still owns the pointer and keyboard cases.
+  function wire() {
+    document.querySelectorAll<HTMLElement>(".to-wrap").forEach((wrap) => {
+      const trigger = wrap.querySelector<HTMLButtonElement>(".to-trigger");
+      const note = wrap.querySelector<HTMLElement>(".to-note");
+      if (!trigger || !note || wrap.dataset.wired) return;
+      wrap.dataset.wired = "true";
+
+      const close = () => note.classList.remove("is-open");
+
+      trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        note.classList.toggle("is-open");
+      });
+      document.addEventListener("click", close);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") close();
+      });
+    });
+  }
+
+  document.addEventListener("astro:page-load", wire);
+</script>

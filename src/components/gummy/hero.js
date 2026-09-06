@@ -18,7 +18,7 @@
  * known to be present, so `three` stays out of the main bundle.
  */
 import * as THREE from 'three/webgpu';
-import { Fn, uv, uniform, vec3, float, smoothstep } from 'three/tsl';
+import { Fn, uv, uniform, vec3, vec4, float, smoothstep, texture } from 'three/tsl';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import {
   SoftbodySimulation,
@@ -34,6 +34,7 @@ import {
   bakeThickness,
 } from './bear-geometry.js';
 import { applyGlassMaterial, setupStudio, GUMMY_PRESETS } from './material.js';
+import { HeroText } from './hero-text.js';
 
 /** Coarser physics on phones: fewer tets and fewer solver steps. */
 const MOBILE = {
@@ -45,16 +46,18 @@ const MOBILE = {
   // the edge it sits. A phone is tall and narrow: at the desktop framing the
   // same camera distance made the bear fill ~73% of the width and swallow the
   // opening paragraph, so it is framed smaller and kept nearer the centre.
-  widthFraction: 0.46,
-  sideBias: 0.30,
+  widthFraction: 0.66,
+  heightFraction: 0.52,
+  sideBias: 0.34,
 };
 const DESKTOP = {
   physicsDetail: 22,
   resolution: 6,
   stepsPerSecond: 640,
   pixelRatio: 2,
-  widthFraction: 0.34,
-  sideBias: 0.52,
+  widthFraction: 0.56,
+  heightFraction: 0.60,
+  sideBias: 0.62,
 };
 
 /* ------------------------------------------------------------------ *
@@ -91,8 +94,14 @@ export async function mountGummyHero(container, options = {}) {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-  const baseCameraY = 1.9;
-  const lookY = 1.0;
+  // The camera looks straight ahead, never down. Aiming it below the body's
+  // centre lifted the bear in frame, but it also tilted it: a downward view
+  // foreshortens the head and the bear reads as leaning forward. Keeping the
+  // target level with the camera removes the tilt entirely, and vertical
+  // placement is set by the camera's own height instead — raise it and the bear
+  // sits lower in frame.
+  const baseCameraY = 1.62;
+  const lookY = baseCameraY;
   camera.position.set(0, baseCameraY, 5.4);
   camera.lookAt(0, lookY, 0);
 
@@ -101,7 +110,10 @@ export async function mountGummyHero(container, options = {}) {
   // moving the body keeps physics and picking in the same world space — the
   // vertex buffers are world coordinates and know nothing about a transform on
   // simulation.object.
-  const rtl = (document.documentElement.dir || 'ltr').toLowerCase() === 'rtl';
+  // Read on every layout pass, not captured once. Astro swaps pages with the
+  // ClientRouter, and a value latched at mount left the bear on the Hebrew side
+  // of an English page (and vice versa) after switching language.
+  const isRtl = () => (document.documentElement.dir || 'ltr').toLowerCase() === 'rtl';
   // Fraction of the visible half-width to push it by. Positive camera x moves
   // the bear left on screen, so RTL takes the positive sign.
   const sideBias = options.sideBias ?? profile.sideBias;
@@ -142,6 +154,7 @@ export async function mountGummyHero(container, options = {}) {
   const uBg = uniform(new THREE.Color(pal.bg));
   const uTints = pal.tints.map((c) => uniform(new THREE.Color(c)));
   const uAspect = uniform(1);
+  const uTextColor = uniform(new THREE.Color(0xffffff));
 
   // Four soft radial blobs over a base colour — the same construction as
   // ColorField.astro. This is no longer drawn as geometry: it is the function
@@ -169,12 +182,64 @@ export async function mountGummyHero(container, options = {}) {
       const w = smoothstep(float(0.62), float(0.0), d);
       out = out.mix(vec3(uTints[i]), w);
     });
-    return out;
+    // Composite the headline on top, so what the glass refracts is exactly what
+    // a viewer sees behind it: the page gradient with the title sitting on it.
+    if (!textInScene) return out;
+    // Composite the headline on top, so what the glass refracts is exactly what
+    // a viewer sees behind it: the page gradient with the title sitting on it.
+    // The texture is a coverage mask, so its red channel is the glyph alpha.
+    const mask = texture(heroText.texture, p).r;
+    return out.mix(vec3(uTextColor), mask);
   };
+
+  // DISABLED, and deliberately hard to turn back on by accident.
+  //
+  // Rasterising the page's headline into the scene is the only way the glass
+  // can refract it — but the raster would not land on the real text. Across
+  // several attempts it sat about one line-height low, and the cause was never
+  // found: it was not the entry animation (the layout was measured stable), not
+  // the canvas transform, and not the mixed-script line boxes. Each attempt put
+  // a broken headline on the site's most prominent element.
+  //
+  // The DOM headline is now never touched by this component at all — the CSS
+  // rule that could hide it has been deleted, so the worst an accidental
+  // re-enable can do is draw a second copy, which is visible and harmless
+  // rather than a broken layout.
+  const textInScene = false;
+
+  const heroText = new HeroText(options.textSelector ?? 'h1');
+  if (textInScene) {
+    await HeroText.waitForFonts();
+    heroText.draw();
+    uTextColor.value.set(heroText.color);
+  }
+
+  const TEXT_DISTANCE = 12;
+  const textMaterial = new THREE.MeshBasicNodeMaterial();
+  textMaterial.transparent = true;
+  textMaterial.depthWrite = false;
+  textMaterial.toneMapped = false;
+  textMaterial.colorNode = vec3(uTextColor);
+  textMaterial.opacityNode = texture(heroText.texture, uv()).r;
+
+  const textPlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), textMaterial);
+  textPlane.position.z = -TEXT_DISTANCE;
+  textPlane.frustumCulled = false;
+  textPlane.renderOrder = -1;
+  textPlane.visible = textInScene;
+  if (textInScene) camera.add(textPlane);
+  scene.add(camera);   // camera children only render if the camera is in the graph
+
+  function fitTextPlane() {
+    const hh = 2 * TEXT_DISTANCE * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+    textPlane.scale.set(hh * camera.aspect, hh, 1);
+  }
+
+
 
   const studio = setupStudio(scene, renderer, {
     RoomEnvironment,
-    environmentIntensity: options.environmentIntensity ?? 1.1,
+    environmentIntensity: options.environmentIntensity ?? 0.7,
   });
   // The gradient is the background; a lit ground plane under the bear would
   // read as a stage floor and break the "floating in the page" look.
@@ -246,13 +311,20 @@ export async function mountGummyHero(container, options = {}) {
   // against a studio backdrop, so these are tuned for the on-site context.
   const gummyMaterial = applyGlassMaterial(softGeometry.material, backdropAt, {
     thicknessScale: options.thicknessScale ?? 1.0,
-    attenuationColor: preset.attenuationColor,
+    // A soft rose rather than the preset amber. Against this palette amber went
+    // muddy, and at the low absorption needed for a see-through body it drained
+    // to a milky white with no colour left in it at all.
+    attenuationColor: options.attenuationColor ?? 0xff5fa2,
     // Tuned live against the site's own gradient. Absorption is deliberately
     // weak — the body should read as glass with a hint of flavour, not as
     // coloured plastic — and the refraction is strong enough that the bent
     // background, not diffuse shading, is what gives the body its form.
-    attenuationDistance: options.attenuationDistance ?? 22.0,
-    rimStrength: options.rimStrength ?? 0.22,
+    // Close enough to the body's own thickness that the tint actually reads,
+    // far enough that you still see straight through it.
+    attenuationDistance: options.attenuationDistance ?? 7.0,
+    // The rim was most of the milkiness: a bright fresnel halo over a pale
+    // body reads as frosted plastic. Kept only as a thin wet edge.
+    rimStrength: options.rimStrength ?? 0.10,
     refractStrength: options.refractStrength ?? 0.30,
     roughness: options.roughness ?? 0.06,
   });
@@ -283,6 +355,9 @@ export async function mountGummyHero(container, options = {}) {
   // anywhere on the page would have to round-trip the GPU to find out whether
   // it touched the bear, and the answer would arrive too late to stop the
   // browser starting a text selection.
+  // Declared here rather than with the loop state below: refreshBounds() reads
+  // it and now runs at mount, before that block is reached.
+  let disposed = false;
   let bearBounds = null;
   async function refreshBounds() {
     if (disposed || !simulation.initialized) return;
@@ -295,6 +370,56 @@ export async function mountGummyHero(container, options = {}) {
       if (z < b.minz) b.minz = z; if (z > b.maxz) b.maxz = z;
     }
     bearBounds = b;
+    publishAnchor();
+  }
+
+  const _c = new THREE.Vector3();
+  /**
+   * Writes the bear's on-screen footprint to CSS custom properties, in document
+   * coordinates, so anything in the page can attach itself to the body instead
+   * of being parked at a guessed offset. The layer never scrolls relative to the
+   * document, so adding scrollY once makes these stable page positions.
+   */
+  function publishAnchor() {
+    if (!bearBounds) return;
+    // project() reads camera.matrixWorldInverse, which three only refreshes as
+    // part of a render. This runs before the first frame — and again whenever
+    // the loop is parked — so the matrix has to be brought up to date by hand
+    // or every point projects to the centre of the screen.
+    camera.updateMatrixWorld(true);
+    const r = canvas.getBoundingClientRect();
+    let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+    for (let i = 0; i < 8; i++) {
+      _c.set(
+        i & 1 ? bearBounds.maxx : bearBounds.minx,
+        i & 2 ? bearBounds.maxy : bearBounds.miny,
+        i & 4 ? bearBounds.maxz : bearBounds.minz
+      ).project(camera);
+      const sx = r.left + (_c.x * 0.5 + 0.5) * r.width;
+      const sy = r.top + (-_c.y * 0.5 + 0.5) * r.height;
+      if (sx < minX) minX = sx;
+      if (sx > maxX) maxX = sx;
+      if (sy < minY) minY = sy;
+      if (sy > maxY) maxY = sy;
+    }
+    const root = document.documentElement.style;
+    root.setProperty('--gummy-anchor-x', `${Math.round((minX + maxX) / 2)}px`);
+    root.setProperty('--gummy-anchor-y', `${Math.round(maxY + window.scrollY)}px`);
+    // Top of the head, for anything that should hang above the bear rather
+    // than below it — below lands in the work cards.
+    root.setProperty('--gummy-anchor-top', `${Math.round(minY + window.scrollY)}px`);
+
+    // The body's inner edge — the side facing the text — plus how much of the
+    // viewport it claims. Published so page content can be laid out against the
+    // bear instead of guessing where it is. It is a live measurement, so it
+    // stays true as the body deforms and as the framing changes with viewport.
+    const rtlNow = isRtl();
+    const innerEdge = rtlNow ? maxX : minX;
+    root.setProperty('--gummy-inner-edge', `${Math.round(innerEdge)}px`);
+    root.setProperty(
+      '--gummy-claim',
+      `${Math.round(rtlNow ? innerEdge : window.innerWidth - innerEdge)}px`
+    );
   }
 
   const _corner = new THREE.Vector3();
@@ -332,6 +457,12 @@ export async function mountGummyHero(container, options = {}) {
     return true;
   }
 
+  // Publish an anchor immediately, before the render loop has run a single
+  // frame. The loop is paused whenever the hero is off-screen or the tab is
+  // hidden, so anything relying on the anchor would otherwise sit at its
+  // fallback position until the reader happened to scroll it into view.
+  await refreshBounds();
+
   const grabControl = new GrabControl(simulation, camera, canvas, softGrab, {
     maxDistance: 0.35,
     // The layer is click-through, so listen where every event actually lands.
@@ -364,6 +495,10 @@ export async function mountGummyHero(container, options = {}) {
     lastPaletteKey = key;
     uBg.value.set(p.bg);
     p.tints.forEach((c, i) => uTints[i].value.set(c));
+    if (textInScene) {
+      heroText.draw();                      // line boxes/colour move with --fg
+      uTextColor.value.set(heroText.color);
+    }
   }
   syncPalette();
 
@@ -376,27 +511,42 @@ export async function mountGummyHero(container, options = {}) {
     camera.aspect = w / h;
 
     // Frame by how much of the viewport the bear should cover, not by a fixed
-    // camera distance. A fixed distance means the visible world width shrinks
+    // camera distance. Note this is measured against the bounding SPHERE, which
+    // is wider than the bear's actual silhouette, so the fraction it occupies
+    // on screen lands at roughly two thirds of the number set here. A fixed distance means the visible world width shrinks
     // with the aspect ratio, so the same bear that reads well on a desktop
     // takes over the screen on a phone. Solving for the distance instead keeps
     // it the same share of the frame everywhere.
     const halfFov = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
-    const targetVisibleW = bearWidth / (options.widthFraction ?? profile.widthFraction);
+
+    // Framed against BOTH axes, taking whichever constraint binds. Sizing on
+    // width alone meant a wide, short window (HD is 16:9) gave the bear its
+    // share of a very large width while the height stayed small, so it grew
+    // past the top and bottom of the screen. The larger of the two distances is
+    // the one that satisfies both limits.
+    const wf = options.widthFraction ?? profile.widthFraction;
+    const hf = options.heightFraction ?? profile.heightFraction;
+    const distForWidth = bearWidth / (wf * 2 * halfFov * camera.aspect);
+    const distForHeight = bearWidth / (hf * 2 * halfFov);
     const dist = THREE.MathUtils.clamp(
-      targetVisibleW / (2 * halfFov * camera.aspect),
+      Math.max(distForWidth, distForHeight),
       3.0,
       24.0
     );
 
     const visibleW = 2 * dist * halfFov * camera.aspect;
-    const panX = (rtl ? 1 : -1) * sideBias * (visibleW / 2);
+    const panX = (isRtl() ? 1 : -1) * sideBias * (visibleW / 2);
 
     camera.position.set(panX, baseCameraY, dist);
     camera.updateProjectionMatrix();
     camera.lookAt(panX, lookY, 0);
 
     uAspect.value = w / h;
+    if (textInScene) { fitTextPlane(); heroText.draw(); }   // boxes move with layout
     renderer.setSize(w, h, false);
+    // The camera has only now been framed; the mount-time publish ran against
+    // an unframed camera and put the anchor at the centre of the screen.
+    publishAnchor();
   }
   resize();
   window.addEventListener('resize', resize, { passive: true });
@@ -424,7 +574,6 @@ export async function mountGummyHero(container, options = {}) {
   let onScreen = true;
   let visible = !document.hidden;
   let running = false;
-  let disposed = false;
   let generation = 0;
   let last = performance.now();
   let boundsAge = 1e9;   // forces a bounds read on the first frame
@@ -465,6 +614,14 @@ export async function mountGummyHero(container, options = {}) {
 
     syncPalette();
 
+    // Re-rasterise only when the headline actually moved. During the hero's
+    // entry animation and while scrolling this fires for a few frames; the
+    // rest of the time the comparison is all it costs.
+    if (textInScene && heroText.signature() !== heroText.lastSignature) {
+      heroText.draw();
+      uTextColor.value.set(heroText.color);
+    }
+
     await simulation.update(dt, now / 1000);
     // Both are separate compute passes and have to be dispatched every frame,
     // after the solver. Without the first, the pointer picks a vertex and
@@ -498,6 +655,7 @@ export async function mountGummyHero(container, options = {}) {
     grabControl,
     softGrab,
     homeSpring,
+    heroText,
     _palette: { uBg, uTints, syncPalette, readPalette },
     setPreset(name) {
       const p = GUMMY_PRESETS[name];
@@ -513,12 +671,19 @@ export async function mountGummyHero(container, options = {}) {
       generation++;
       document.body.classList.remove('gummy-active');
       io.disconnect();
+      document.documentElement.style.removeProperty('--gummy-anchor-x');
+      document.documentElement.style.removeProperty('--gummy-anchor-y');
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', onScroll);
       document.removeEventListener('visibilitychange', onVisibility);
       grabControl.dispose();
       scene.remove(simulation.object);
       simulation.dispose();
+
+      camera.remove(textPlane);
+      textPlane.geometry.dispose();
+      textMaterial.dispose();
+      heroText.dispose();
       studio.dispose();
       surface.dispose();
       renderer.dispose();

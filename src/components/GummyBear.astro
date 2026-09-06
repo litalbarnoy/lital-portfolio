@@ -12,9 +12,16 @@
   /* Above the headline, below the cards. z-index 1 clears the page's normal
      flow (which is auto), and the card section is lifted to 2. Site landmarks
      sit far above: nav 50, page transition 1000, cursor 9999. */
+  /* ABSOLUTE, not fixed. Fixed pinned the bear to the viewport, so it travelled
+     down the page with the reader and sat over the work cards. Anchored to the
+     document instead, it keeps its place in the hero and scrolls away like any
+     other element — which also lets the IntersectionObserver park the render
+     loop the moment it leaves the screen. */
   #gummy-layer {
-    position: fixed;
-    inset: 0;
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: 100vh;
     z-index: 1;
     /* Click-through. The canvas covers the whole viewport, so owning pointer
        events would swallow every link on the page; the bear does its own hit

@@ -160,6 +160,11 @@ export function applyGummyMaterial(material, options = {}) {
  * @param {(uv) => any} backdrop Returns the page's background colour at a screen uv.
  */
 export function applyGlassMaterial(material, backdrop, options = {}) {
+  // `backdrop(uv)` returns what is behind the body at a screen uv. Splitting the
+  // lookup into three slightly different offsets per colour channel is what
+  // produces the coloured fringe real glass shows at its steep edges — the same
+  // effect three's own `dispersion` gives, done here because this path composes
+  // its background rather than sampling the scene.
   const uniforms = {
     attenuationColor: uniform(new THREE.Color(options.attenuationColor ?? 0xff7a18)),
     attenuationDistance: uniform(options.attenuationDistance ?? 9.0),
@@ -168,6 +173,7 @@ export function applyGlassMaterial(material, backdrop, options = {}) {
     ior: uniform(options.ior ?? 1.35),
     rimStrength: uniform(options.rimStrength ?? 0.35),
     refractStrength: uniform(options.refractStrength ?? 0.30),
+    dispersion: uniform(options.dispersion ?? 0.10),
   };
 
   material.transmission = 0;      // the analytic backdrop replaces it
@@ -185,7 +191,13 @@ export function applyGlassMaterial(material, backdrop, options = {}) {
   const offset = vec2(normalView.x, normalView.y)
     .mul(uniforms.refractStrength)
     .mul(thickness);
-  const behind = backdrop(screenUV.add(offset));
+
+  const d = uniforms.dispersion;
+  const behind = vec3(
+    backdrop(screenUV.add(offset.mul(float(1.0).sub(d)))).r,
+    backdrop(screenUV.add(offset)).g,
+    backdrop(screenUV.add(offset.mul(float(1.0).add(d)))).b
+  );
 
   // Beer-Lambert as a per-unit transmittance: colour^(distance / attenuation),
   // so thick parts saturate and thin ones stay near-clear.
