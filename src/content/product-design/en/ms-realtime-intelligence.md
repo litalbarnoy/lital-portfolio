@@ -1,6 +1,6 @@
 ---
 title: "Microsoft Fabric"
-subtitle: "Taking a powerful internal engineering tool to General Availability for a global, enterprise audience"
+subtitle: "Designing real-time data analytics, from a tool built for engineers into a product a whole organisation works with"
 role: "Product Designer, Microsoft Fabric"
 client: "Microsoft"
 year: 2021
@@ -22,12 +22,25 @@ order: 3
 
 ## The Challenge
 
-Real-Time Intelligence is a core capability within Microsoft Fabric that processes live streaming data to deliver insights within seconds, across industries. Organizations increasingly need to analyze and act on data as it flows in, and Fabric provides the ecosystem to process, store, analyze, and visualize that data with minimal latency.
+For several years I designed data analytics experiences: systems where people look for an answer inside enormous amounts of information that keeps streaming in live. A machine that stopped on the production line, unusual traffic on the network, a jump in sales that happened two minutes ago.
 
-When I joined, the underlying technology, Kusto, was an internal Microsoft tool: powerful, but built for expert users, not a broad enterprise audience. My mission was to lead the user experience transformation needed to take this complex, heavy-lifting technology to General Availability (GA) in the global market.
+The technology underneath the product was originally built as an internal Microsoft tool, for engineers who write queries. It was very powerful, but getting anything out of it meant knowing exactly what to ask and how to phrase it in a query language. My job was to turn it into a product a whole organisation could work with.
 
-## The Process
+## Two Users Who Want Opposite Things
 
-I translated highly complex data-querying workflows, specifically around the Kusto Query Language (KQL), into clear, visual, engaging interfaces. That meant end-to-end flow planning grounded in the pain points and mental models of external data analysts and engineers, not just the internal experts who built the original tool.
+The personas I designed for sat at two ends. On one side a technical user who writes their own queries and wants full control, with the interface hiding nothing from them. On the other a business analyst who will not touch a line of code, and wants to see a graph that answers their question.
 
-The core design challenge was bridging Kusto's raw computational power with an experience that felt native to the broader Microsoft Fabric ecosystem, frictionless enough for a GA audience, without losing the depth power users relied on.
+Both work in the same product, sometimes on the same screen. Most of the design decisions came out of that tension.
+
+## What I Designed
+
+The bulk of my work was on two things: the product's dashboard, where data becomes a picture you can read at a glance, and the query experience itself.
+
+Alongside those I designed two experiences the product did not have before, when it was query-based only:
+
+- **The product's first Copilot experience**, which lets you ask a question in plain language instead of composing a query
+- **Low-code experiences**, which get you to an answer without writing code at all
+
+Both aimed at the same thing: lowering the cost of entry without taking anything away from the users who do know how to write.
+
+*At Microsoft Ignite, Satya Nadella presented screens from this work on stage.*

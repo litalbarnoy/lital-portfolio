@@ -1,8 +1,9 @@
 // Maps the existing project markdown onto the sectioned layout without
-// asking every content file to be rewritten. Bodies use exactly three
-// constructs — `## ` headings, `- ` bullets and `**bold**` — so they are
-// rendered here directly rather than pulling in a markdown dependency.
-// Anything outside that set is escaped and shown verbatim, never executed.
+// asking every content file to be rewritten. Bodies use exactly four
+// constructs — `## ` headings, `- ` bullets, `**bold**` and `*italic*` — so
+// they are rendered here directly rather than pulling in a markdown
+// dependency. Anything outside that set is escaped and shown verbatim,
+// never executed.
 
 export interface TextSection {
   label: string;
@@ -18,7 +19,14 @@ function escapeHtml(value: string): string {
 }
 
 function inline(value: string): string {
-  return escapeHtml(value).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  return (
+    escapeHtml(value)
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      // Bold is consumed first, so nothing here can see a `**` pair. Several
+      // pages already used this for their closing credit line and were
+      // printing the asterisks on screen.
+      .replace(/\*([^*\n]+)\*/g, "<em>$1</em>")
+  );
 }
 
 // Groups a chunk's lines into paragraphs and bullet lists.

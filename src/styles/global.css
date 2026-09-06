@@ -1207,3 +1207,15 @@ button.has-plate {
     display: none;
   }
 }
+
+/* A whole paragraph in italics is how the content files write a closing
+   credit or note: exhibition dates, photography, a footnote. It should read
+   as an aside rather than as emphasis inside a sentence. */
+.section-body p > em:only-child {
+  display: block;
+  font-size: 0.9375rem;
+  font-style: normal;
+  color: var(--color-ink-soft);
+  padding-block-start: 0.75rem;
+  border-block-start: 1px solid var(--color-line);
+}

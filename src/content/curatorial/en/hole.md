@@ -1,6 +1,6 @@
 ---
 title: "Hole"
-subtitle: "A multidisciplinary performance art series turning historic Jerusalem landmarks into one-night-only artistic spaces"
+subtitle: "Multidisciplinary art evenings in historic Jerusalem sites, with the location and the lineup kept secret until the night itself"
 role: "Co-Founder & Curator"
 client: "Youth Authority, Jerusalem Municipality (\"Barutina\")"
 year: 2025
@@ -20,10 +20,21 @@ order: 1
 
 ## The Idea
 
-Hole is a multidisciplinary performance art series I co-founded in collaboration with the Youth Authority of the Jerusalem Municipality ("Barutina"). It takes historic sites around the city, such as Jaffa 93 and The Jerusalem House of Quality, and turns them into immersive artistic spaces for a single night.
+The Hole collective connects the community of young creators, students and artists in Jerusalem with the city's historic and cultural institutions.
+
+The events are multidisciplinary surprise evenings: both the location and the lineup are kept secret until the night itself.
 
 ## How It Works
 
-Each evening layers several kinds of work in the same place at the same time: performance, video projection, live music, and an audience moving between the spaces. The building itself, with its arches, its courtyard and the shops around it, is not a backdrop but part of the work.
+Each event reveals a lineup drawn from several fields at once: performance, dance, video art and a live music set.
 
-The impermanence is the point: the evening happens once and does not return. What remains is the memory of the people who were there, and the way the place reads differently afterwards.
+The surprise is what makes the crossing of boundaries happen on its own inside the audience. People who came for the music found themselves watching performance art, and a crowd from the electronic music scene was drawn into dance.
+
+## From Recent Events
+
+- Video art by Haifa Festival winners **Asa Rikin and Noga Sirota**
+- Work by photographer **Limor Ben Romano**
+- A debut album launch by **Shir Shani**
+- A performance piece by **Yehudit Bryozkin**
+
+All of them artists who grew up and work in Jerusalem.
