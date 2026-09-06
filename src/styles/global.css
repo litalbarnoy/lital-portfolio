@@ -742,7 +742,10 @@ html.js [data-media].is-done {
        align-self keeps it on the first line of its body text. */
     align-self: start;
   }
-  .section-body {
+  .section-body,
+  /* The link list is a section body like any other: the heading belongs in
+     its own column beside it, not stacked full width above it. */
+  .link-list {
     grid-column: span 7;
   }
 }
@@ -869,8 +872,21 @@ html.js [data-media].is-done {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
   }
-  /* The first one leads at full width; the rest pair up beneath it. */
-  .animation-grid > :first-child {
+  /* With three or more, the first leads at full width and the rest pair up
+     beneath it. */
+  .animation-grid > :first-child:nth-last-child(n + 3) {
+    grid-column: 1 / -1;
+  }
+
+  /* Two is not a pair worth halving. Unqualified, the rule above put the
+     first at full width and left the second alone in a half cell beside
+     empty space: the same interface drawn at two different scales, which is
+     what made the section look broken. These are dense product screens, and
+     at half width the UI inside them stops being readable anyway, so with
+     one or two they both run full width, at one scale. */
+  .animation-grid > :only-child,
+  .animation-grid > :first-child:nth-last-child(2),
+  .animation-grid > :first-child:nth-last-child(2) ~ * {
     grid-column: 1 / -1;
   }
 }
