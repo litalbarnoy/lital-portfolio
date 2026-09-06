@@ -9,6 +9,9 @@ cover: "/images/imports/meta-fb-lite/cover.webp"
 gallery:
   - src: "/images/imports/meta-fb-lite/01.webp"
   - src: "/images/imports/meta-fb-lite/02.webp"
+links:
+  - url: "https://about.fb.com/news/2015/06/announcing-facebook-lite/"
+    label: "Facebook Lite"
 order: 5
 ---
 

@@ -16,7 +16,9 @@ gallery:
     caption: "Anthr0morph, סדרת ‏Earth Angel"
   - src: "/images/imports/purge-pray-play/04.webp"
     caption: "ווייארפריימים של הביתן"
-externalUrl: "https://www.prtfl.co.il/archives/156390"
+links:
+  - url: "https://www.prtfl.co.il/archives/156390"
+    label: "ראיון עם יובל סער, מגזין פורטפוליו"
 order: 5
 ---
 

@@ -26,6 +26,9 @@ animations:
     caption: "The action menu on an exposed identity, disable token, revalidate, raise a ticket"
     width: 1780
     height: 1063
+links:
+  - url: "https://entro.security/"
+    label: "Entro Security"
 order: 1
 ---
 

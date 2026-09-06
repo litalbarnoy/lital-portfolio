@@ -10,6 +10,11 @@ cover: "/images/imports/flamingo/01.webp"
 gallery:
   - src: "/images/imports/flamingo/02.webp"
   - src: "/images/imports/flamingo/demo.gif"
+links:
+  - url: "https://www.flamingo.org.il/"
+    label: "The Flamingo site"
+  - url: "https://www.haaretz.co.il/captain/net/2016-08-11/ty-article/.premium/0000017f-e2be-d568-ad7f-f3ffad460000"
+    label: "Feature in Haaretz"
 order: 6
 ---
 

@@ -11,18 +11,23 @@ gallery:
   - src: "/images/imports/shin/02.webp"
   - src: "/images/imports/shin/03.webp"
   - src: "/images/imports/shin/04.webp"
+links:
+  - url: "https://ronniekarfiol.com/Shin"
+    label: "Ona Untitled Space おんなアートギャラリ"
 order: 3
 ---
 
 ## The Idea
 
-In Hebrew, Shin (ש) is the first-before-last letter of the alphabet, and its shape embodies the spiritual meaning of fierce change, burning and transforming. Traditionally, it symbolizes the connection between the depths below and the highs above.
+In Hebrew, shin is the letter before last, and its form embodies the spiritual meaning of fierce change; burning and transmutation. As such, it traditionally stands for the link between the depths below and the heights above.
 
-Ronnie Karfiol's exhibition moves between two worlds: the secret Jewish mythology of Kabbalah, alongside impressions from the contemporary RPG game culture that dominates East Asia, such as Genshin Impact.
+## The Artist
 
-## The Process
+Ronnie Karfiol is a new media artist originally from Tel Aviv, living in East Asia. Her body of work joins Jewish mythology together with impressions of the contemporary computer game culture that dominates East Asia, such as Genshin Impact.
 
-Karfiol, an Israeli new media artist originally from Tel Aviv who moved to East Asia, reflects in Shin on being both a stranger physically and a local digitally, a young woman fluent in game culture. Through the dual character of the Shin (using the Chinese pronunciation of the Kanji 神, which is also the name of the Hebrew letter ש), she creates the vision of an entity: part Seraph, a frightening mythological Jewish angel, and part non-traditional, queer self-portrait of a woman looking to find her own vantage point in the world.
+## The Exhibition
+
+Shin reflects on the idea of foreignness, physical, local and digital, as a young woman fluent in gaming culture. Through the image and the double character of the "Shin" (by way of the Chinese reading of the kanji 神, which is also the name of the Hebrew letter ש), Karfiol creates a vision of an entity, part seraph, a frightening mythological Jewish angel, and part untraditional self-portrait of a woman looking to find a vantage point of her own in this world.
 
 ## The Result
 

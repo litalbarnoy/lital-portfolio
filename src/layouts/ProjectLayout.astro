@@ -26,7 +26,7 @@ interface Props {
   coverAnimation?: { src: string; width: number; height: number };
   animations?: { src: string; caption?: string; width: number; height: number }[];
   body: string;
-  externalUrl?: string;
+  links?: { url: string; label: string }[];
   next?: { href: string; title: string; cover?: string } | null;
 }
 
@@ -45,7 +45,7 @@ const {
   coverAnimation,
   animations,
   body,
-  externalUrl,
+  links = [],
   next,
 } = Astro.props;
 
@@ -125,18 +125,6 @@ const coverSize = sizes.get(cover)!;
               <dt class="label">{t.year}</dt>
               <dd>{formatYear({ year, yearEnd, ongoing }, lang)}</dd>
             </div>
-            {
-              externalUrl && (
-                <div>
-                  <dt class="label">{t.link}</dt>
-                  <dd>
-                    <a href={externalUrl} target="_blank" rel="noopener" class="link-underline">
-                      {new URL(externalUrl).hostname}
-                    </a>
-                  </dd>
-                </div>
-              )
-            }
           </dl>
         </div>
       </div>
@@ -310,6 +298,29 @@ const coverSize = sizes.get(cover)!;
           <div class="section-body reveal" set:html={section.html} />
         </section>
       ))
+    }
+
+    {
+      links.length > 0 && (
+        <section class="project-section container" {...paletteAttrs("about")}>
+          <h2 class="section-label" data-split>{t.links}</h2>
+          <ul class="link-list reveal">
+            {links.map(({ url, label }) => (
+              <li>
+                <a href={url} target="_blank" rel="noopener" data-cursor-hover>
+                  <span>{label}</span>
+                  {/* The host is the reassurance that the name alone cannot
+                      give: it says where the click actually lands. */}
+                  <span class="link-host">{new URL(url).hostname.replace(/^www\./, "")}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 17L17 7M9 7h8v8" />
+                  </svg>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
     }
 
     {

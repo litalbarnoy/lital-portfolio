@@ -10,6 +10,9 @@ cover: "/images/imports/ms-iot-security/cover.webp"
 gallery:
   - src: "/images/imports/ms-iot-security/01.webp"
   - src: "/images/imports/ms-iot-security/02.webp"
+links:
+  - url: "https://www.microsoft.com/en-us/security/business/endpoint-security/microsoft-defender-iot"
+    label: "Microsoft Defender for IoT"
 order: 4
 ---
 

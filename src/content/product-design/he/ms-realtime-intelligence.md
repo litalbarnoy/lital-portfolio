@@ -14,6 +14,9 @@ gallery:
   - src: "/images/imports/ms-realtime-intelligence/03.webp"
   - src: "/images/imports/ms-realtime-intelligence/04.webp"
   - src: "/images/imports/ms-realtime-intelligence/05.webp"
+links:
+  - url: "https://www.microsoft.com/en-us/microsoft-fabric/features/real-time-intelligence"
+    label: "Microsoft Fabric"
 order: 3
 ---
 

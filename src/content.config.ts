@@ -42,7 +42,12 @@ const projectSchema = z.object({
       })
     )
     .optional(),
-  externalUrl: z.string().optional(),
+  /* Named outward links. The label is written per project because a bare
+     hostname says nothing useful: "prtfl.co.il" is really an interview, and
+     one project can point at both a live site and a press piece. */
+  links: z
+    .array(z.object({ url: z.string().url(), label: z.string() }))
+    .default([]),
   order: z.number(),
 });
 
@@ -68,7 +73,12 @@ const academicSchema = z.object({
   cover: z.string().optional(),
   gallery: z.array(mediaItem).default([]),
   video: z.string().optional(),
-  externalUrl: z.string().optional(),
+  /* Named outward links. The label is written per project because a bare
+     hostname says nothing useful: "prtfl.co.il" is really an interview, and
+     one project can point at both a live site and a press piece. */
+  links: z
+    .array(z.object({ url: z.string().url(), label: z.string() }))
+    .default([]),
   order: z.number(),
 });
 

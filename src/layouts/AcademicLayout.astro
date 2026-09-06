@@ -20,7 +20,6 @@ interface Props {
   cover?: string;
   gallery: MediaEntry[];
   video?: string;
-  externalUrl?: string;
 }
 
 const {
@@ -35,7 +34,6 @@ const {
   cover,
   gallery,
   video,
-  externalUrl,
 } = Astro.props;
 
 const videoEmbed = video ? youtubeEmbed(video) : null;

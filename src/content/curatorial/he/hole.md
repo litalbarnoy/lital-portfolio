@@ -12,6 +12,9 @@ gallery:
   - src: "/images/imports/hole/02.webp"
   - src: "/images/imports/hole/03.webp"
   - src: "/images/imports/hole/04.webp"
+links:
+  - url: "https://www.instagram.com/hor.community/"
+    label: "עמוד האינסטגרם של חור"
 order: 1
 ---
 

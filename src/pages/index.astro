@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import GummyBear from "../components/GummyBear.astro";
 import Reveal from "../components/Reveal.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import { formatYear } from "../lib/formatYear";
@@ -24,6 +25,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
 ---
 
 <BaseLayout palette="hero" title="בית">
+  <GummyBear />
   <section class="mx-auto max-w-6xl px-6 pb-16 pt-20 lg:px-10 lg:pt-32" {...paletteAttrs("hero")}>
     <div class="hero-lines overflow-hidden">
       <h1 class="font-display text-5xl font-bold leading-[1.1] lg:text-7xl">
@@ -37,7 +39,7 @@ const curPreviews = curatorial.map((p) => p.data.cover).join(",");
     </p>
   </section>
 
-  <section class="mx-auto grid max-w-6xl gap-6 px-6 pb-24 md:grid-cols-2 lg:px-10" {...paletteAttrs("work")}>
+  <section class="mx-auto grid max-w-6xl gap-6 px-6 pb-24 md:grid-cols-2 lg:px-10" data-gummy-blocks {...paletteAttrs("work")}>
     <Reveal class="h-full">
       <a
         href="/product-design"

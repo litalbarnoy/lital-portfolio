@@ -11,19 +11,20 @@ gallery:
   - src: "/images/imports/zikaron-shrir/02.webp"
   - src: "/images/imports/zikaron-shrir/03.webp"
   - src: "/images/imports/zikaron-shrir/04.webp"
+links:
+  - url: "https://edrcenter.com/exhibitions/%D7%96%D7%99%D7%9B%D7%A8%D7%95%D7%9F-%D7%A9%D7%A8%D7%99%D7%A8/"
+    label: "Muscle Memory"
 order: 2
 ---
 
 ## The Idea
 
-"Muscle Memory" is a solo exhibition by artist Yuval Katz that combines video, animation and 3D. At its center is an unnamed figure reconstructing her memories through performative dance, dancers' movements captured and translated into a digital space.
+In the video work Muscle Memory, Yuval Katz presents an unnamed figure reconstructing her memories. These memory-dreams take shape as performative dances, standing not only for personal memory but for a collective human one: what has been forgotten, what has been repressed, and what was never put into words.
 
 ## The Process
 
-The curatorial concept rests on the idea of the body as a carrier: a body that stores within it movements, gestures and rituals inscribed over time. The work's passage between the phases of the day reflects shifting states of consciousness, and the digital space becomes an arena where bodily memory is made visible.
+The work draws on the genre of visual poetry; a poetic cinema in which the visual elements are built as a sequence of non-narrative images, producing a feeling rather than a linear story.
 
-## The Result
-
-Underpinning the concept is philosopher Gilles Deleuze's notion of the body as an "active archive", not a static repository of the past, but a living system that continues to produce meaning in the present. The exhibition invites the viewer to experience memory not as a frozen image but as ongoing movement.
+In Katz's treatment, the movements of live dancers were filmed, scanned and translated into three-dimensional space by computational means. The movements were rebuilt and met with other gestures, making a dance of many participants that can exist only in digital space.
 
 *Exhibited at the EDC Art Center, 30.10–28.11.2025. Photography: Daniel Hanoch.*

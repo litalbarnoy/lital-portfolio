@@ -16,7 +16,9 @@ gallery:
     caption: "Anthr0morph, Earth Angel series"
   - src: "/images/imports/purge-pray-play/04.webp"
     caption: "Pavilion wireframes"
-externalUrl: "https://www.prtfl.co.il/archives/156390"
+links:
+  - url: "https://www.prtfl.co.il/archives/156390"
+    label: "Interview with Yuval Saar, Portfolio Magazine"
 order: 5
 ---
 

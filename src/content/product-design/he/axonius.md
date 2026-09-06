@@ -13,6 +13,9 @@ gallery:
   - src: "/images/imports/axonius/01.webp"
   - src: "/images/imports/axonius/02.webp"
 video: "https://www.youtube.com/watch?v=sKQLvQXDsVc"
+links:
+  - url: "https://www.axonius.com/"
+    label: "Axonius"
 order: 2
 ---
 

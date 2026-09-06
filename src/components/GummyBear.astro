@@ -1,0 +1,87 @@
+---
+// The soft-body gummy bear that sits behind the hero.
+//
+// Mounts only where WebGPU exists. Everywhere else nothing loads at all —
+// not the module, not the 1.2 MB model — and the page keeps the CSS
+// ColorField gradient it already had, which is the designed fallback.
+---
+
+<div id="gummy-layer" aria-hidden="true"></div>
+
+<style is:global>
+  /* Above the headline, below the cards. z-index 1 clears the page's normal
+     flow (which is auto), and the card section is lifted to 2. Site landmarks
+     sit far above: nav 50, page transition 1000, cursor 9999. */
+  #gummy-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    /* Click-through. The canvas covers the whole viewport, so owning pointer
+       events would swallow every link on the page; the bear does its own hit
+       test on window instead and only takes the gesture when it is really hit. */
+    pointer-events: none;
+  }
+
+  #gummy-layer canvas {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    pointer-events: none;
+    /* A plain vertical swipe still scrolls; GrabControl only claims the
+       gesture after a deliberate hold. */
+    touch-action: pan-y;
+  }
+
+  /* Cards read on top of the bear. */
+  body.gummy-active [data-gummy-blocks] {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* The CSS gradient stays. The canvas is transparent now and the glass
+     refracts an analytic copy of this same gradient, so the page keeps
+     painting its own background and the two agree. */
+
+  @media (prefers-reduced-motion: reduce) {
+    #gummy-layer {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  let hero: { destroy(): void } | null = null;
+
+  async function mount() {
+    if (hero) return;
+    const el = document.getElementById("gummy-layer");
+    if (!el) return;
+
+    // Gate before importing: this keeps three.js out of the bundle that
+    // browsers without WebGPU ever have to download.
+    if (!navigator.gpu) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    try {
+      const { mountGummyHero } = await import("./gummy/hero.js");
+      hero = await mountGummyHero(el, { preset: "amber" });
+      // Dev-only handle for tuning from the console. Stripped from production
+      // builds by the import.meta.env.DEV branch.
+      if (import.meta.env.DEV) (window as any).__gummy = hero;
+    } catch (err) {
+      console.warn("[gummy] could not start, falling back to the gradient", err);
+      hero = null;
+    }
+  }
+
+  function unmount() {
+    hero?.destroy();
+    hero = null;
+  }
+
+  document.addEventListener("astro:page-load", mount);
+  // View transitions swap the DOM without a reload; without this the GPU
+  // context and its buffers would leak on every navigation.
+  document.addEventListener("astro:before-swap", unmount);
+  window.addEventListener("pagehide", unmount);
+</script>
