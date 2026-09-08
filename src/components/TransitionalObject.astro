@@ -189,15 +189,36 @@ const copy = {
 
   /* Narrow screens have no room beside the bear, and no hover either: the note
      returns to the flow under the hero copy. */
-  @media (max-width: 767px) {
+  /* Up to 1024px the caption returns to the normal flow. Pinning it above the
+     bear's head only works where there is empty page beside the body; on a
+     phone or tablet the hero copy spans the full column, so "above the head"
+     is inside the paragraph and the label landed on top of the text. */
+  @media (max-width: 1023px) {
     .to-wrap {
-      position: static;
+      /* `relative`, not `static`: it keeps the caption in the normal flow while
+         still giving the panel something to anchor to. Under `static` the panel
+         fell back to the body and kept the desktop centring offsets, landing at
+         x=-128 and adding 128px of horizontal page scroll. */
+      position: relative;
+      left: auto;
+      top: auto;
+      /* `translate` is NOT a positioning property — it kept applying under
+         position:static, shoving the label half its width left and its whole
+         height up, straight over the paragraph. Cancel it explicitly. */
+      translate: none;
       max-inline-size: none;
       margin-block-start: 1.75rem;
       display: block;
     }
     .to-note {
       inline-size: calc(100vw - 3rem);
+      /* Anchored to the caption's reading edge and growing inward, so it stays
+         on screen in both directions. The desktop centring offsets must be
+         cleared or they drag it back off the edge. */
+      inset-inline-start: 0;
+      margin-inline-start: 0;
+      left: auto;
+      right: auto;
     }
   }
 

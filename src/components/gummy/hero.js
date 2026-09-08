@@ -88,7 +88,10 @@ function readPalette() {
 export async function mountGummyHero(container, options = {}) {
   if (typeof navigator === 'undefined' || !navigator.gpu) return null;
 
-  const isMobile = window.matchMedia('(max-width: 767px)').matches;
+  // Tablets take the light profile too. At 767px a 768-wide iPad fell through
+  // to the desktop settings — 22 cage cells, 640 solver steps a second and a
+  // 2x buffer — which is far more than a tablet GPU should be asked for.
+  const isMobile = window.matchMedia('(max-width: 1023px)').matches;
   const profile = isMobile ? MOBILE : DESKTOP;
   const preset = GUMMY_PRESETS[options.preset ?? 'amber'];
 
@@ -286,7 +289,11 @@ export async function mountGummyHero(container, options = {}) {
   // surface. It also removes toppling: a hard throw can no longer leave the
   // hero lying on its face until someone reloads.
   const simulation = new SoftbodySimulation(renderer, {
-    stepsPerSecond: preset.stepsPerSecond ?? profile.stepsPerSecond,
+    // The profile CAPS the preset, it does not merely provide a default. Every
+    // flavour carries its own stepsPerSecond, so `preset ?? profile` meant the
+    // mobile ceiling was never once applied and phones were running the full
+    // desktop solver rate.
+    stepsPerSecond: Math.min(preset.stepsPerSecond ?? Infinity, profile.stepsPerSecond),
     gravity: new THREE.Vector3(0, 0, 0),
     damping: 0.93,
     friction: 0.9,
@@ -661,7 +668,7 @@ export async function mountGummyHero(container, options = {}) {
       const p = GUMMY_PRESETS[name];
       if (!p) return;
       gummyMaterial.apply(p);
-      simulation.config.stepsPerSecond = p.stepsPerSecond;
+      simulation.config.stepsPerSecond = Math.min(p.stepsPerSecond, profile.stepsPerSecond);
       softGrab.radius = p.grabRadius;
       softGrab.strength = p.grabStrength;
     },

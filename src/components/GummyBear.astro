@@ -22,6 +22,12 @@
     inset-block-start: 0;
     inset-inline: 0;
     block-size: 100vh;
+    /* svh = the SMALL viewport height, i.e. with the mobile browser's toolbar
+       showing. Plain vh is the large viewport, so on a phone the layer is
+       taller than what is actually visible and its height changes as the URL
+       bar collapses — which resizes the canvas mid-scroll. Falls back to the
+       vh above wherever svh is unsupported. */
+    block-size: 100svh;
     z-index: 1;
     /* Click-through. The canvas covers the whole viewport, so owning pointer
        events would swallow every link on the page; the bear does its own hit
