@@ -12,13 +12,13 @@ const copy = {
   he: {
     label: "חפץ המעבר",
     aria: "מידע על חפץ המעבר",
-    hint: "גרירה או משיכה של הדובי באמצעות העכבר תזיז אותו ממקומו.",
+    hint: "גרירה או משיכה תזיז את חפץ המעבר.",
     body: "חפץ מעבר (או חפץ מנחם) הוא אובייקט הנמצא באזור הדמדומים שבין הממשי למדומיין. נשיאתו מאפשרת לעבור בין בבטחה בין מצבים, כמו נסיעה למקום לא ידוע. החפץ שיהיה בדרך כלל רך, יכול להיות שמיכה, דובון או מוצץ.",
   },
   en: {
     label: "The transitional object",
     aria: "About the transitional object",
-    hint: "Dragging or pulling the bear with your mouse will move it from its place.",
+    hint: "Dragging or pulling will move the transitional object.",
     body: "A transitional object (or comfort object) sits in the twilight between the real and the imagined. Carrying it lets you move safely between states, like a journey somewhere unknown. The object is usually soft — a blanket, a teddy bear, a pacifier.",
   },
 }[lang];
@@ -212,6 +212,13 @@ const copy = {
     }
     .to-note {
       inline-size: calc(100vw - 3rem);
+      /* Opens UPWARD here. In the flow the caption sits below the hero copy,
+         low on a phone screen, so a panel hanging beneath it opened below the
+         fold and had to be scrolled to. Above the caption there is hero copy
+         already on screen, so it lands in view. */
+      inset-block-start: auto;
+      inset-block-end: calc(100% + 0.7rem);
+      translate: 0 6px;
       /* Anchored to the caption's reading edge and growing inward, so it stays
          on screen in both directions. The desktop centring offsets must be
          cleared or they drag it back off the edge. */
