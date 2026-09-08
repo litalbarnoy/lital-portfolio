@@ -422,6 +422,15 @@ export async function mountGummyHero(container, options = {}) {
     // stays true as the body deforms and as the framing changes with viewport.
     const rtlNow = isRtl();
     const innerEdge = rtlNow ? maxX : minX;
+    // Full screen box of the body, in document coords, so a real touch target
+    // can be laid over it. CSS `touch-action` only applies to the element that
+    // actually receives the gesture — the canvas is pointer-events:none, so the
+    // rule sitting on it never once applied, and the browser treated every
+    // touch as a scroll and cancelled the pointer stream before the grab began.
+    root.setProperty('--gummy-box-left', `${Math.round(minX)}px`);
+    root.setProperty('--gummy-box-top', `${Math.round(minY + window.scrollY)}px`);
+    root.setProperty('--gummy-box-width', `${Math.round(maxX - minX)}px`);
+    root.setProperty('--gummy-box-height', `${Math.round(maxY - minY)}px`);
     root.setProperty('--gummy-inner-edge', `${Math.round(innerEdge)}px`);
     root.setProperty(
       '--gummy-claim',
@@ -455,7 +464,11 @@ export async function mountGummyHero(container, options = {}) {
     if (!pointerOverBear(event)) return false;
     // The canvas is pointer-events:none, so this reports the real content
     // under the cursor rather than the canvas itself.
-    const el = document.elementFromPoint(event.clientX, event.clientY);
+    // Look THROUGH the grab pad: it sits over the bear, so elementFromPoint
+    // would always name the pad and the page-owns check below could never see
+    // the link or card actually underneath.
+    const stack = document.elementsFromPoint(event.clientX, event.clientY);
+    const el = stack.find((n) => n.id !== 'gummy-grab') ?? null;
     if (!el) return true;
     if (el.closest(PAGE_OWNS)) return false;
     // Don't grab through a card: it is stacked above the bear, so a press
@@ -475,10 +488,11 @@ export async function mountGummyHero(container, options = {}) {
     // The layer is click-through, so listen where every event actually lands.
     eventTarget: window,
     shouldGrab: pointerIsFree,
-    // A plain swipe has to keep scrolling the page, so on touch the bear is
-    // only grabbed after the finger has held still briefly. A mouse has a
-    // real button and needs no such gate.
-    touchHoldDelay: 150,
+    // No hold delay any more. The grab pad only covers the body itself and
+    // declares touch-action:none, so a touch that lands on it is unambiguously
+    // aimed at the bear and the browser will not steal it for a scroll. Waiting
+    // 150ms just made the bear feel dead to the touch.
+    touchHoldDelay: 0,
     touchSlop: 10,
   });
 

@@ -6,7 +6,16 @@
 // ColorField gradient it already had, which is the designed fallback.
 ---
 
-<div id="gummy-layer" aria-hidden="true"></div>
+<div id="gummy-layer" aria-hidden="true">
+  <!-- The bear's touch target. `touch-action` only governs the element that
+       actually receives a gesture, and the canvas is pointer-events:none, so
+       the rule on it never applied and mobile browsers claimed every touch as a
+       scroll. This pad tracks the body's real screen box and declares
+       touch-action:none, so a finger landing on the bear reaches the drag
+       handler instead of being taken for a swipe. It covers only the body, so
+       the rest of the page still scrolls normally. -->
+  <div id="gummy-grab"></div>
+</div>
 
 <style is:global>
   /* Above the headline, below the cards. z-index 1 clears the page's normal
@@ -44,6 +53,24 @@
        gesture after a deliberate hold. */
     touch-action: pan-y;
   }
+
+  #gummy-grab {
+    position: absolute;
+    left: var(--gummy-box-left, 50%);
+    top: var(--gummy-box-top, 50%);
+    inline-size: var(--gummy-box-width, 0);
+    block-size: var(--gummy-box-height, 0);
+    pointer-events: auto;
+    /* The whole point: this element owns the gesture, so the browser does not
+       hand it to the scroller and cancel the pointer stream mid-drag. */
+    touch-action: none;
+  }
+
+  /* No "not yet reported" guard is needed: until hero.js publishes a box the
+     width and height fall back to 0, so there is nothing to hit anyway. An
+     earlier :not([style]) guard matched permanently — the pad is positioned
+     from custom properties, never from an inline style attribute — and left
+     the pad inert. */
 
   /* Cards read on top of the bear. */
   body.gummy-active [data-gummy-blocks] {
