@@ -37,6 +37,12 @@
        bar collapses — which resizes the canvas mid-scroll. Falls back to the
        vh above wherever svh is unsupported. */
     block-size: 100svh;
+    /* The grab pad tracks the bear's box, and the bear is framed hard against
+       one edge — so its box can start a few pixels off-screen. The canvas does
+       not care, but the pad is a real element and those few pixels became real
+       horizontal page scroll. Clipping the layer contains it; the canvas is
+       exactly the layer's size, so nothing visible is cut. */
+    overflow: hidden;
     z-index: 1;
     /* Click-through. The canvas covers the whole viewport, so owning pointer
        events would swallow every link on the page; the bear does its own hit

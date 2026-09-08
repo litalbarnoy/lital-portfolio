@@ -10,15 +10,13 @@ const lang = getLang(Astro.url.pathname);
 
 const copy = {
   he: {
-    label: "חפץ המעבר",
+    label: "גרירה או משיכה תזיז את הדובון ממקומו",
     aria: "מידע על חפץ המעבר",
-    hint: "גרירה או משיכה תזיז את חפץ המעבר.",
     body: "חפץ מעבר (או חפץ מנחם) הוא אובייקט הנמצא באזור הדמדומים שבין הממשי למדומיין. נשיאתו מאפשרת לעבור בין בבטחה בין מצבים, כמו נסיעה למקום לא ידוע. החפץ שיהיה בדרך כלל רך, יכול להיות שמיכה, דובון או מוצץ.",
   },
   en: {
-    label: "The transitional object",
+    label: "Dragging or pulling will move the bear from its place",
     aria: "About the transitional object",
-    hint: "Dragging or pulling will move the transitional object.",
     body: "A transitional object (or comfort object) sits in the twilight between the real and the imagined. Carrying it lets you move safely between states, like a journey somewhere unknown. The object is usually soft — a blanket, a teddy bear, a pacifier.",
   },
 }[lang];
@@ -47,7 +45,6 @@ const copy = {
   </button>
 
   <div class="to-note" id="transitional-object-note" role="tooltip">
-    <p class="to-hint">{copy.hint}</p>
     <p class="to-body">{copy.body}</p>
   </div>
 </div>
@@ -75,7 +72,7 @@ const copy = {
     top: var(--gummy-anchor-top, 32vh);
     translate: -50% calc(-100% - 0.75rem);
     z-index: 3;
-    max-inline-size: 14rem;
+    max-inline-size: 17rem;
   }
 
   .to-trigger {
@@ -86,7 +83,9 @@ const copy = {
     margin: 0;
     font: inherit;
     display: inline-flex;
-    align-items: center;
+    /* Aligned to the first line rather than centred, so a label that wraps to
+       two lines does not leave the icon floating in the middle of the block. */
+    align-items: flex-start;
     gap: 0.4em;
     color: var(--fg);
     cursor: pointer;
@@ -112,8 +111,10 @@ const copy = {
     font-size: 0.6875rem; /* 11px */
     font-weight: 400;
     letter-spacing: 0.06em;
-    line-height: 1.4;
-    white-space: nowrap;
+    line-height: 1.5;
+    /* No nowrap: the label carries a full sentence now, and holding it on one
+       line pushed it past the edge of narrow screens. */
+    text-wrap: pretty;
   }
 
   /* ---------- the note ---------- */
@@ -156,21 +157,11 @@ const copy = {
     pointer-events: none;
   }
 
-  .to-hint,
   .to-body {
     font-family: var(--font-body);
     color: var(--fg);
     text-wrap: pretty;
     margin: 0;
-  }
-
-  .to-hint {
-    font-size: 0.8125rem;
-    line-height: 1.6;
-    opacity: 0.75;
-    padding-block-end: 0.7rem;
-    margin-block-end: 0.7rem;
-    border-block-end: 1px solid color-mix(in oklab, var(--fg) 14%, transparent);
   }
 
   .to-body {
